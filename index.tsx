@@ -36,7 +36,7 @@ const firebaseConfig = {
 const app = getApps().length === 0 ? initializeApp(firebaseConfig) : getApp();
 const db = getFirestore(app);
 
-const DB_KEY = 'bb_label_db_v11_fixed_height';
+const DB_KEY = 'bb_label_db_v7_perfect';
 
 const generateSafeId = () => Math.random().toString(36).substring(2, 15);
 
@@ -131,113 +131,74 @@ const DataService = {
 };
 
 const Label: React.FC<{ bundle: Bundle, lang: 'de' | 'en', packedOn: string, forPrint?: boolean }> = ({ bundle, lang, packedOn, forPrint }) => {
-  const getDietIcon = (diet: string, size: number) => {
+  const getDietIcon = (diet: string) => {
     const d = diet.toLowerCase();
-    if (d.includes('vegan')) return <Leaf size={size} className="text-green-600" />;
-    if (d.includes('vegetarisch')) return <Sprout size={size} className="text-green-500" />;
-    if (d.includes('meat') || d.includes('fleisch') || d.includes('beef')) return <div style={{ fontSize: `${size * 1.2}px` }}>🥩</div>;
-    return <Soup size={size} className="text-blue-500" />;
+    if (d.includes('vegan')) return <Leaf size={24} className="text-green-600" />;
+    if (d.includes('vegetarisch')) return <Sprout size={24} className="text-green-500" />;
+    if (d.includes('meat') || d.includes('fleisch') || d.includes('beef')) return <div className="text-red-700 text-2xl">🥩</div>;
+    return <Soup size={24} className="text-blue-500" />;
   };
 
   const itemCount = bundle.items.length;
   
-  // Height constraint variables
-  let headerH = 'h-[75px]';
-  let footerH = 'h-[65px]';
-  let nameFS = 'text-[24px]';
-  let iconS = 28;
-  let allergenFS = 'text-[10px]';
-  let itemPadding = 'py-8';
-
-  if (itemCount === 1) {
-    nameFS = 'text-[32px]';
-    itemPadding = 'py-12';
-  } else if (itemCount <= 3) {
-    nameFS = 'text-[22px]';
-    itemPadding = 'py-8';
-  } else if (itemCount <= 4) {
-    nameFS = 'text-[18px]';
-    itemPadding = 'py-6';
-    iconS = 24;
-  } else if (itemCount <= 5) {
-    nameFS = 'text-[16px]';
-    itemPadding = 'py-4';
-    iconS = 22;
-  } else if (itemCount <= 6) {
-    nameFS = 'text-[14px]';
-    itemPadding = 'py-3';
-    iconS = 20;
-    allergenFS = 'text-[9px]';
-  } else if (itemCount <= 8) {
-    headerH = 'h-[60px]';
-    footerH = 'h-[55px]';
-    nameFS = 'text-[12px]';
-    itemPadding = 'py-2';
-    iconS = 18;
-    allergenFS = 'text-[8px]';
-  } else {
-    headerH = 'h-[50px]';
-    footerH = 'h-[50px]';
-    nameFS = 'text-[10px]';
-    itemPadding = 'py-1';
-    iconS = 16;
-    allergenFS = 'text-[7px]';
-  }
+  // Dynamic styling for fitting up to 8+ items in 144.25mm height
+  const nameFontSize = itemCount === 1 ? 'text-[28px]' : 
+                     itemCount <= 4 ? 'text-[20px]' : 
+                     itemCount <= 6 ? 'text-[16px]' : 'text-[13px]';
+  
+  const itemVerticalPadding = itemCount === 1 ? 'py-12' : 
+                               itemCount <= 3 ? 'py-8' : 
+                               itemCount <= 5 ? 'py-5' : 
+                               itemCount <= 7 ? 'py-3' : 'py-2';
+  
+  const allergenFontSize = itemCount > 6 ? 'text-[8px]' : 'text-[10px]';
+  const iconScaleClass = itemCount > 7 ? 'scale-75' : 'scale-90';
 
   return (
     <div 
-      className={`label-card flex flex-col overflow-hidden relative ${!forPrint ? 'shadow-2xl border border-slate-700 rounded-lg' : ''}`} 
+      className={`label-card bg-white text-slate-900 flex flex-col overflow-hidden relative ${!forPrint ? 'shadow-2xl border border-slate-700 rounded-lg h-[144.25mm] w-[100.75mm]' : 'h-full w-full'}`} 
       style={{ 
         fontFamily: "'Inter', sans-serif", 
         boxSizing: 'border-box',
         backgroundColor: '#fff',
         color: '#000',
-        width: '100.75mm',
-        height: '144.25mm',
-        maxWidth: '100.75mm',
-        maxHeight: '144.25mm'
+        width: forPrint ? '100.75mm' : undefined,
+        height: forPrint ? '144.25mm' : undefined
       }}
     >
-      {/* Header - Fixed Height */}
-      <div 
-        className={`px-6 flex items-center justify-center ${headerH} shrink-0 border-b-2`}
-        style={{ backgroundColor: 'var(--brand-green)', borderBottomColor: 'var(--brand-pink)' }}
-      >
-        <h2 className="text-white text-center font-black text-[18px] uppercase tracking-wider leading-tight">
+      {/* Header - Fixed Height to prevent layout shift */}
+      <div className="bg-[#024930] py-4 px-6 flex items-center justify-center min-h-[85px] shrink-0 border-b-2 border-[#FEACCF]">
+        <h2 className="text-white text-center font-black text-[22px] uppercase tracking-wider leading-tight">
           {lang === 'de' ? bundle.name_de : bundle.name_en}
         </h2>
       </div>
 
-      {/* Main Content Area - Justify between to fill space evenly */}
+      {/* Main Content Area */}
       <div className="flex-1 px-8 py-2 flex flex-col overflow-hidden relative watermark">
         <div className="flex-1 flex flex-col justify-around relative z-10 overflow-hidden">
           {bundle.items.map((item, idx) => (
-            <div key={item.id} className={`flex justify-between items-center border-b border-gray-100 last:border-none ${itemPadding} w-full`}>
-              <div className="flex-1 pr-4 min-w-0">
-                <div className={`font-black ${nameFS} leading-tight text-gray-950 uppercase tracking-tight overflow-hidden text-ellipsis`} style={{ display: '-webkit-box', WebkitLineClamp: '2', WebkitBoxOrient: 'vertical' }}>
+            <div key={item.id} className={`flex justify-between items-center border-b border-gray-100 last:border-none ${itemVerticalPadding} transition-all`}>
+              <div className="flex-1 pr-4">
+                <div className={`font-black ${nameFontSize} leading-tight text-gray-950`}>
                   {lang === 'de' ? item.item_name_de : item.item_name_en}
                 </div>
-                <div className="flex flex-wrap gap-1 mt-1">
+                <div className="flex flex-wrap gap-1.5 mt-2">
                   {item.allergens_de.split(/[,/]+/).map((alg, aIdx) => {
                     const trimmed = alg.trim();
                     if (!trimmed) return null;
                     return (
-                      <span 
-                        key={aIdx} 
-                        className={`font-black px-1 py-0.5 rounded-[1px] uppercase tracking-tighter whitespace-nowrap ${allergenFS}`}
-                        style={{ backgroundColor: 'var(--brand-pink)', color: 'var(--text-on-pink)' }}
-                      >
+                      <span key={aIdx} className={`bg-[#FEACCF] ${allergenFontSize} font-black px-1.5 py-0.5 rounded-[1px] uppercase text-[#024930] tracking-tighter`}>
                         {trimmed}
                       </span>
                     );
                   })}
                 </div>
               </div>
-              <div className="flex flex-col items-center min-w-[65px] text-center shrink-0">
+              <div className={`flex flex-col items-center min-w-[75px] text-center pt-1 transition-transform origin-top ${iconScaleClass}`}>
                 <div className="mb-1">
-                  {getDietIcon(item.diet_de, iconS)}
+                  {getDietIcon(item.diet_de)}
                 </div>
-                <span className="text-[8px] font-black uppercase tracking-tight text-[#024930] leading-none opacity-80">
+                <span className="text-[10px] font-black uppercase tracking-tight text-[#024930] leading-none opacity-80">
                   {item.diet_de}
                 </span>
               </div>
@@ -246,24 +207,13 @@ const Label: React.FC<{ bundle: Bundle, lang: 'de' | 'en', packedOn: string, for
         </div>
       </div>
 
-      {/* Footer - Fixed Height */}
-      <div 
-        className={`${footerH} px-8 flex justify-between items-center shrink-0`}
-        style={{ backgroundColor: 'var(--footer-bg)', color: 'var(--text-on-pink)' }}
-      >
-         <div className="flex flex-col items-start">
-           <span className="text-[8px] font-black uppercase tracking-widest opacity-70 leading-none">PACKED ON</span>
-           <span className="text-[13px] font-black leading-none mt-1">{packedOn}</span>
+      {/* Footer - Fixed Height at Bottom */}
+      <div className="bg-[#C197AB] py-5 px-10 flex justify-between items-center text-[#024930] shrink-0">
+         <div className="flex flex-col">
+           <span className="text-[10px] font-black uppercase tracking-widest opacity-80 leading-none">PACKED ON</span>
+           <span className="text-[16px] font-black leading-none mt-1.5">{packedOn}</span>
          </div>
-         
-         <div className="hidden sm:flex flex-col items-center flex-1 px-2">
-            <span className="text-[7px] font-black tracking-widest uppercase opacity-40 whitespace-nowrap">Premium Catering</span>
-            <div className="h-0.5 w-0.5 rounded-full bg-current opacity-20 mt-1"></div>
-         </div>
-
-         <div className="font-black text-[22px] tracking-tighter italic leading-none uppercase text-right">
-           BELLA&BONA
-         </div>
+         <div className="font-black text-[30px] tracking-tighter italic leading-none uppercase">BELLA&BONA</div>
       </div>
     </div>
   );
@@ -466,12 +416,12 @@ const App: React.FC = () => {
                       XLSX.utils.book_append_sheet(wb, ws, "Labels");
                       XLSX.writeFile(wb, "BellaBona_Template.xlsx");
                     }} className="bg-slate-800/30 p-8 rounded-2xl border-2 border-dashed border-slate-700 cursor-pointer hover:border-emerald-500 transition-all group">
-                      <FileSpreadsheet size={32} className="text-emerald-500 mb-4 group-hover:scale-110 transition-transform" />
+                      <FileSpreadsheet size={32} className="text-emerald-500 mb-4 group-hover:scale-100 transition-transform" />
                       <p className="font-bold">Download Template</p>
                     </div>
                     <div onClick={() => fileInputRef.current?.click()} className="bg-slate-800/30 p-8 rounded-2xl border-2 border-dashed border-slate-700 cursor-pointer hover:border-pink-400 transition-all relative group">
                       {isProcessingImport && <div className="absolute inset-0 bg-slate-900/80 flex items-center justify-center rounded-2xl z-20"><Loader2 className="animate-spin text-pink-400" size={32} /></div>}
-                      <Upload size={32} className="text-pink-400 mb-4 group-hover:scale-110 transition-transform" />
+                      <Upload size={32} className="text-pink-400 mb-4 group-hover:scale-100 transition-transform" />
                       <p className="font-bold">Upload Excel</p>
                       <input type="file" ref={fileInputRef} className="hidden" accept=".xlsx" onChange={handleFileUpload} />
                     </div>
@@ -500,7 +450,7 @@ const App: React.FC = () => {
             </div>
             <div className="flex-1 overflow-y-auto p-12 bg-slate-950 flex flex-col items-center gap-16">
               {printGroups.map((group, idx) => (
-                <div key={idx} className="bg-white shadow-2xl" style={{ width: '210mm', height: '297mm', minHeight: '297mm', padding: '4.25mm', boxSizing: 'border-box' }}>
+                <div key={idx} className="bg-white shadow-2xl" style={{ width: '210mm', height: '297mm', minHeight: '297mm', minWidth: '210mm' }}>
                    <div className="label-page-group">
                      {group.map((b, bi) => (
                        <div key={bi} className="label-card-container">

@@ -11,9 +11,11 @@
         @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap');
         
         :root {
+            /* Standard Brand Colors */
             --brand-green: #024930;
             --brand-pink: #FEACCF;
             --footer-bg: #C197AB;
+            --text-on-pink: #024930;
         }
 
         body {
@@ -33,7 +35,14 @@
         }
 
         @media print {
-            /* Full Reset for Print */
+            /* Lighter Brand Colors for Print (approx 10% closer to white) */
+            :root {
+                --brand-green: #1B5B44;
+                --brand-pink: #FEB4D4;
+                --footer-bg: #C7A1B3;
+                --text-on-pink: #024930;
+            }
+
             *, *:before, *:after {
                 box-sizing: border-box !important;
                 -webkit-print-color-adjust: exact !important;
@@ -53,16 +62,16 @@
 
             @page {
                 size: A4;
-                margin: 4.25mm !important; /* Fixed 4.25mm margin on all sides */
+                margin: 4.25mm !important; /* Standard requested margin */
             }
 
-            /* Container for the 2x2 grid */
+            /* Container for the 2x2 grid - use 1fr to fill printable area automatically */
             .label-page-group {
                 display: grid !important;
-                grid-template-columns: 100.75mm 100.75mm !important;
-                grid-template-rows: 144.25mm 144.25mm !important;
-                width: 201.5mm !important; /* 210 - (2 * 4.25) */
-                height: 288.5mm !important; /* 297 - (2 * 4.25) */
+                grid-template-columns: 1fr 1fr !important;
+                grid-template-rows: 1fr 1fr !important;
+                width: 100% !important; 
+                height: 100% !important;
                 padding: 0 !important;
                 margin: 0 !important;
                 gap: 0 !important;
@@ -71,19 +80,18 @@
             }
 
             .label-card-container {
-                width: 100.75mm !important;
-                height: 144.25mm !important;
+                width: 100% !important;
+                height: 100% !important;
                 padding: 0 !important;
                 margin: 0 !important;
-                border: 0.05mm solid #eee; /* Minimal cut guide */
-                display: block !important;
+                border: 0.05mm solid #f2f2f2; /* Extremely faint cut guide */
+                display: flex !important;
                 overflow: hidden !important;
-                position: relative !important;
             }
 
             .label-card {
-                width: 100.75mm !important;
-                height: 144.25mm !important;
+                width: 100% !important;
+                height: 100% !important;
                 display: flex !important;
                 flex-direction: column !important;
                 margin: 0 !important;
@@ -101,9 +109,9 @@
     "lucide-react": "https://esm.sh/lucide-react@0.461.0",
     "firebase/app": "https://esm.sh/firebase@12.7.0/app",
     "firebase/firestore": "https://esm.sh/firebase@12.7.0/firestore",
-    "react-dom/": "https://esm.sh/react-dom@^19.2.3/",
+    "react/": "https://esm.sh/react@^19.2.3/",
     "firebase/": "https://esm.sh/firebase@^12.7.0/",
-    "react/": "https://esm.sh/react@^19.2.3/"
+    "react-dom/": "https://esm.sh/react-dom@^19.2.3/"
   }
 }
 </script>

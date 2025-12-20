@@ -36,7 +36,7 @@ const firebaseConfig = {
 const app = getApps().length === 0 ? initializeApp(firebaseConfig) : getApp();
 const db = getFirestore(app);
 
-const DB_KEY = 'bb_label_db_v8_final_scaling';
+const DB_KEY = 'bb_label_db_v10_final';
 
 const generateSafeId = () => Math.random().toString(36).substring(2, 15);
 
@@ -141,19 +141,14 @@ const Label: React.FC<{ bundle: Bundle, lang: 'de' | 'en', packedOn: string, for
 
   const itemCount = bundle.items.length;
   
-  // GRANULAR SCALING LOGIC FOR 144.25MM HEIGHT
-  // Total height: 144.25mm
-  // Header: ~20mm
-  // Footer: ~18mm
-  // Remaining: ~106mm
-  
-  const headerHeight = itemCount > 6 ? 'min-h-[60px]' : 'min-h-[75px]';
+  // Header and Footer sizing adjustments
+  const headerHeight = itemCount > 6 ? 'min-h-[55px]' : 'min-h-[75px]';
   const footerHeight = itemCount > 6 ? 'py-3' : 'py-5';
   
-  // Font sizes in PX (approximate conversion for print)
+  // Font and Padding scaling
   let nameFontSize = 'text-[24px]';
   let itemPadding = 'py-10';
-  let iconSize = 30;
+  let iconSize = 28;
   let allergenFontSize = 'text-[10px]';
 
   if (itemCount === 1) {
@@ -164,7 +159,7 @@ const Label: React.FC<{ bundle: Bundle, lang: 'de' | 'en', packedOn: string, for
     itemPadding = 'py-8';
   } else if (itemCount <= 5) {
     nameFontSize = 'text-[18px]';
-    itemPadding = 'py-4';
+    itemPadding = 'py-5';
     iconSize = 24;
   } else if (itemCount <= 6) {
     nameFontSize = 'text-[15px]';
@@ -172,44 +167,46 @@ const Label: React.FC<{ bundle: Bundle, lang: 'de' | 'en', packedOn: string, for
     iconSize = 20;
     allergenFontSize = 'text-[9px]';
   } else if (itemCount <= 8) {
-    nameFontSize = 'text-[12px]';
-    itemPadding = 'py-1.5';
+    nameFontSize = 'text-[13px]';
+    itemPadding = 'py-2';
     iconSize = 18;
-    allergenFontSize = 'text-[7.5px]';
+    allergenFontSize = 'text-[8.5px]';
   } else {
-    // 9+ items
     nameFontSize = 'text-[11px]';
     itemPadding = 'py-1';
     iconSize = 16;
-    allergenFontSize = 'text-[7px]';
+    allergenFontSize = 'text-[7.5px]';
   }
 
   return (
     <div 
-      className={`label-card bg-white text-slate-900 flex flex-col overflow-hidden relative ${!forPrint ? 'shadow-2xl border border-slate-700 rounded-lg h-[144.25mm] w-[100.75mm]' : ''}`} 
+      className={`label-card flex flex-col overflow-hidden relative ${!forPrint ? 'shadow-2xl border border-slate-700 rounded-lg' : ''}`} 
       style={{ 
         fontFamily: "'Inter', sans-serif", 
         boxSizing: 'border-box',
         backgroundColor: '#fff',
         color: '#000',
-        width: '100.75mm',
-        height: '144.25mm'
+        width: forPrint ? '100%' : '100.75mm',
+        height: forPrint ? '100%' : '144.25mm'
       }}
     >
       {/* Header */}
-      <div className={`bg-[#024930] px-6 flex items-center justify-center ${headerHeight} shrink-0 border-b-2 border-[#FEACCF]`}>
+      <div 
+        className={`px-6 flex items-center justify-center ${headerHeight} shrink-0 border-b-2`}
+        style={{ backgroundColor: 'var(--brand-green)', borderBottomColor: 'var(--brand-pink)' }}
+      >
         <h2 className="text-white text-center font-black text-[20px] uppercase tracking-wider leading-tight">
           {lang === 'de' ? bundle.name_de : bundle.name_en}
         </h2>
       </div>
 
-      {/* Main Content Area - Justify around distributes space equally */}
-      <div className="flex-1 px-8 py-1 flex flex-col overflow-hidden relative watermark">
+      {/* Main Content Area */}
+      <div className="flex-1 px-8 py-2 flex flex-col overflow-hidden relative watermark">
         <div className="flex-1 flex flex-col justify-center relative z-10 overflow-hidden">
           {bundle.items.map((item, idx) => (
             <div key={item.id} className={`flex justify-between items-center border-b border-gray-100 last:border-none ${itemPadding} w-full`}>
               <div className="flex-1 pr-4 min-w-0">
-                <div className={`font-black ${nameFontSize} leading-tight text-gray-950 break-words`}>
+                <div className={`font-black ${nameFontSize} leading-tight text-gray-950 break-words uppercase tracking-tight`}>
                   {lang === 'de' ? item.item_name_de : item.item_name_en}
                 </div>
                 <div className="flex flex-wrap gap-1 mt-1.5">
@@ -217,18 +214,22 @@ const Label: React.FC<{ bundle: Bundle, lang: 'de' | 'en', packedOn: string, for
                     const trimmed = alg.trim();
                     if (!trimmed) return null;
                     return (
-                      <span key={aIdx} className={`bg-[#FEACCF] ${allergenFontSize} font-black px-1.5 py-0.5 rounded-[1px] uppercase text-[#024930] tracking-tighter whitespace-nowrap`}>
+                      <span 
+                        key={aIdx} 
+                        className={`font-black px-1.5 py-0.5 rounded-[1px] uppercase tracking-tighter whitespace-nowrap ${allergenFontSize}`}
+                        style={{ backgroundColor: 'var(--brand-pink)', color: 'var(--text-on-pink)' }}
+                      >
                         {trimmed}
                       </span>
                     );
                   })}
                 </div>
               </div>
-              <div className="flex flex-col items-center min-w-[65px] text-center pt-0.5">
+              <div className="flex flex-col items-center min-w-[75px] text-center pt-1">
                 <div className="mb-1">
                   {getDietIcon(item.diet_de, iconSize)}
                 </div>
-                <span className="text-[8.5px] font-black uppercase tracking-tight text-[#024930] leading-none opacity-80">
+                <span className="text-[9px] font-black uppercase tracking-tight text-[#024930] leading-none opacity-80">
                   {item.diet_de}
                 </span>
               </div>
@@ -237,13 +238,25 @@ const Label: React.FC<{ bundle: Bundle, lang: 'de' | 'en', packedOn: string, for
         </div>
       </div>
 
-      {/* Footer */}
-      <div className={`bg-[#C197AB] ${footerHeight} px-10 flex justify-between items-center text-[#024930] shrink-0`}>
-         <div className="flex flex-col">
-           <span className="text-[9px] font-black uppercase tracking-widest opacity-80 leading-none">PACKED ON</span>
-           <span className="text-[14px] font-black leading-none mt-1">{packedOn}</span>
+      {/* Footer - Filling the middle gap */}
+      <div 
+        className={`${footerHeight} px-8 flex justify-between items-center shrink-0`}
+        style={{ backgroundColor: 'var(--footer-bg)', color: 'var(--text-on-pink)' }}
+      >
+         <div className="flex flex-col items-start min-w-[30%]">
+           <span className="text-[9px] font-black uppercase tracking-widest opacity-70 leading-none">PACKED ON</span>
+           <span className="text-[15px] font-black leading-none mt-1">{packedOn}</span>
          </div>
-         <div className="font-black text-[26px] tracking-tighter italic leading-none uppercase">BELLA&BONA</div>
+         
+         {/* Middle content to prevent empty appearance */}
+         <div className="flex flex-col items-center flex-1 px-2">
+            <span className="text-[8px] font-black tracking-widest uppercase opacity-40 whitespace-nowrap">Premium Catering</span>
+            <div className="h-1 w-1 rounded-full bg-current opacity-20 mt-1"></div>
+         </div>
+
+         <div className="font-black text-[26px] tracking-tighter italic leading-none uppercase text-right min-w-[30%]">
+           BELLA&BONA
+         </div>
       </div>
     </div>
   );
@@ -329,7 +342,7 @@ const App: React.FC = () => {
 
   return (
     <>
-      {/* PRINT LAYER - ABSOLUTE ALIGNMENT */}
+      {/* PRINT LAYER - ABSOLUTE GRID */}
       <div className="print-only">
         {printGroups.map((group, groupIdx) => (
           <div key={groupIdx} className="label-page-group">
@@ -482,7 +495,7 @@ const App: React.FC = () => {
             <div className="flex-1 overflow-y-auto p-12 bg-slate-950 flex flex-col items-center gap-16">
               {printGroups.map((group, idx) => (
                 <div key={idx} className="bg-white shadow-2xl" style={{ width: '210mm', height: '297mm', minHeight: '297mm', padding: '4.25mm', boxSizing: 'border-box' }}>
-                   <div className="label-page-group" style={{ display: 'grid', gridTemplateColumns: 'repeat(2, 100.75mm)', gridTemplateRows: 'repeat(2, 144.25mm)' }}>
+                   <div className="label-page-group">
                      {group.map((b, bi) => (
                        <div key={bi} className="label-card-container">
                          <Label bundle={b} lang={lang} packedOn={packedOn} forPrint />

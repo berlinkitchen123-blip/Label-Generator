@@ -34,7 +34,6 @@ const firebaseConfig = {
   appId: "1:168446433946:web:6536d1d40fb86ee1f61d23"
 };
 
-// Initialize Firebase once
 const app = getApps().length === 0 ? initializeApp(firebaseConfig) : getApp();
 const db = getFirestore(app);
 
@@ -148,11 +147,17 @@ const DataService = {
 const Label: React.FC<{ bundle: Bundle, lang: 'de' | 'en', packedOn: string, forPrint?: boolean }> = ({ bundle, lang, packedOn, forPrint }) => {
   const getDietIcon = (diet: string) => {
     const d = diet.toLowerCase();
-    if (d.includes('vegan')) return <Leaf size={22} className="text-[#024930]" />;
-    if (d.includes('vegetarisch')) return <Sprout size={22} className="text-green-600" />;
-    if (d.includes('meat') || d.includes('beef')) return <div className="text-red-700 font-bold text-lg leading-none">🥩</div>;
-    return <Soup size={22} className="text-blue-500" />;
+    if (d.includes('vegan')) return <Leaf size={24} className="text-[#024930]" />;
+    if (d.includes('vegetarisch')) return <Sprout size={24} className="text-[#024930]" />;
+    if (d.includes('meat') || d.includes('beef')) return <div className="text-red-700 text-2xl">🥩</div>;
+    return <Soup size={24} className="text-blue-500" />;
   };
+
+  const itemCount = bundle.items.length;
+  // Dynamically adjust font size to ensure multi-item bundles fit
+  const nameFontSize = itemCount > 4 ? 'text-[13px]' : 'text-[16px]';
+  const itemSpacing = itemCount > 5 ? 'space-y-1' : 'space-y-3';
+  const allergenFontSize = itemCount > 5 ? 'text-[7px]' : 'text-[9px]';
 
   return (
     <div 
@@ -166,42 +171,42 @@ const Label: React.FC<{ bundle: Bundle, lang: 'de' | 'en', packedOn: string, for
         backgroundColor: '#fff'
       }}
     >
-      {/* Header - Matching reference image style */}
-      <div className="bg-[#024930] py-3 px-4 flex items-center justify-center min-h-[52px]">
-        <h2 className="text-white text-center font-black text-[18px] uppercase tracking-wide leading-tight">
+      {/* Header - Matching reference image */}
+      <div className="bg-[#024930] py-3 px-6 flex items-center justify-center min-h-[50px]">
+        <h2 className="text-white text-center font-black text-[18px] uppercase tracking-wider leading-tight">
           {lang === 'de' ? bundle.name_de : bundle.name_en}
         </h2>
       </div>
 
-      {/* Brand Line */}
+      {/* Brand Separator */}
       <div className="w-full h-[2px] bg-[#FEACCF]"></div>
 
-      {/* Body with Watermark pattern */}
-      <div className="flex-1 px-4 py-3 flex flex-col overflow-hidden relative watermark">
-        <div className="space-y-4 relative z-10">
+      {/* Content Area with Watermark */}
+      <div className="flex-1 px-5 py-3 flex flex-col overflow-hidden relative watermark">
+        <div className={`${itemSpacing} relative z-10`}>
           {bundle.items.map(item => (
-            <div key={item.id} className="flex justify-between items-start pb-1">
-              <div className="flex-1 pr-3">
-                <div className="font-extrabold text-[15px] leading-tight text-gray-950">
+            <div key={item.id} className="flex justify-between items-start">
+              <div className="flex-1 pr-4">
+                <div className={`font-extrabold ${nameFontSize} leading-tight text-gray-950`}>
                   {lang === 'de' ? item.item_name_de : item.item_name_en}
                 </div>
-                <div className="flex flex-wrap gap-1.5 mt-1.5">
+                <div className="flex flex-wrap gap-1 mt-1">
                   {item.allergens_de.split(/[,/]+/).map((alg, idx) => {
                     const trimmed = alg.trim();
                     if (!trimmed) return null;
                     return (
-                      <span key={idx} className="bg-[#FEACCF] text-[9px] font-black px-1.5 py-0.5 rounded-[1px] uppercase text-[#024930] tracking-tighter">
+                      <span key={idx} className={`bg-[#FEACCF] ${allergenFontSize} font-black px-1.5 py-0.5 rounded-[1px] uppercase text-[#024930] tracking-tighter`}>
                         {trimmed}
                       </span>
                     );
                   })}
                 </div>
               </div>
-              <div className="flex flex-col items-center min-w-[75px] text-center pt-1">
-                <div className="mb-1">
+              <div className="flex flex-col items-center min-w-[75px] text-center">
+                <div className="mb-0.5">
                   {getDietIcon(item.diet_de)}
                 </div>
-                <span className="text-[10px] font-black uppercase tracking-tight text-[#024930] leading-none opacity-80">
+                <span className="text-[10px] font-black uppercase tracking-tight text-[#024930] leading-none opacity-90">
                   {item.diet_de}
                 </span>
               </div>
@@ -210,13 +215,13 @@ const Label: React.FC<{ bundle: Bundle, lang: 'de' | 'en', packedOn: string, for
         </div>
       </div>
 
-      {/* Footer - Matching reference layout */}
-      <div className="bg-[#C197AB] py-2.5 px-5 flex justify-between items-center text-[#024930] mt-auto">
+      {/* Footer - Exactly like reference image */}
+      <div className="bg-[#C197AB] py-2.5 px-6 flex justify-between items-center text-[#024930] mt-auto">
          <div className="flex flex-col">
            <span className="text-[9px] font-black uppercase tracking-widest opacity-80 leading-none">PACKED ON</span>
            <span className="text-[12px] font-black leading-none mt-1">{packedOn}</span>
          </div>
-         <div className="font-black text-xl tracking-tighter italic leading-none">BELLA&BONA</div>
+         <div className="font-black text-2xl tracking-tighter italic leading-none uppercase">BELLA&BONA</div>
       </div>
     </div>
   );
@@ -326,7 +331,7 @@ const App: React.FC = () => {
     }, 500);
   };
 
-  // Improved Grouping Logic for A4 Page Layout
+  // Group labels into 2x2 grids for A4
   const printGroups = useMemo(() => {
     const allLabels = selections.flatMap(sel => {
       const bundle = bundles.find(b => b.id === sel.bundleId);
@@ -343,7 +348,7 @@ const App: React.FC = () => {
 
   return (
     <>
-      {/* PRINT AREA - Managed in groups of 4 for A4 pages */}
+      {/* PRINT AREA */}
       <div className="print-only">
         {printGroups.map((group, groupIdx) => (
           <div key={groupIdx} className="label-page-group">
@@ -538,16 +543,16 @@ const App: React.FC = () => {
         <div className="no-print fixed inset-0 z-[200] bg-slate-950/95 backdrop-blur-xl flex items-center justify-center p-4 sm:p-8 animate-fade-in">
           <div className="bg-slate-900 w-full max-w-6xl h-[90vh] rounded-[2rem] sm:rounded-[3rem] shadow-2xl flex flex-col border border-slate-800 overflow-hidden">
             <div className="p-6 sm:p-10 border-b border-slate-800 flex items-center justify-between">
-              <h2 className="text-2xl sm:text-3xl font-black text-white">{t.previewPdf} (A4 Layout)</h2>
+              <h2 className="text-2xl sm:text-3xl font-black text-white">{t.previewPdf} (A4 Grid)</h2>
               <button onClick={() => setIsPreviewing(false)} className="w-12 h-12 rounded-2xl bg-slate-800 flex items-center justify-center text-white">
                 <X size={24} />
               </button>
             </div>
             <div className="flex-1 overflow-y-auto p-4 sm:p-8 bg-slate-950 custom-scrollbar">
-              <div className="flex flex-col items-center gap-8">
+              <div className="flex flex-col items-center gap-12">
                 {printGroups.map((group, groupIdx) => (
-                  <div key={groupIdx} className="bg-white p-8 shadow-2xl" style={{ width: '210mm', height: '297mm', minHeight: '297mm', position: 'relative' }}>
-                    <div className="grid grid-cols-2 gap-4 justify-center pt-8">
+                  <div key={groupIdx} className="bg-white p-0 shadow-2xl" style={{ width: '210mm', height: '297mm', position: 'relative' }}>
+                    <div className="grid grid-cols-2 gap-0 justify-center pt-[15mm] px-[5mm]">
                       {group.map((bundle, bundleIdx) => (
                         <Label key={`${groupIdx}-${bundleIdx}`} bundle={bundle} lang={lang} packedOn={packedOn} />
                       ))}

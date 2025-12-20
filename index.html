@@ -23,31 +23,66 @@
             background-color: #020617;
         }
 
-        /* Essential print controls */
+        /* Watermark pattern for labels */
+        .watermark {
+            background-image: url("data:image/svg+xml,%3Csvg width='60' height='60' viewBox='0 0 60 60' xmlns='http://www.w3.org/2000/svg'%3E%3Cpath d='M15 10c-2 0-4 1-5 3-1 2-1 4 0 6l2 4c-1 0-2 1-2 2s1 2 2 2h6c1 0 2-1 2-2s-1-2-2-2l2-4c1-2 1-4 0-6-1-2-3-3-5-3zm20 30c-2 0-4 1-5 3-1 2-1 4 0 6l2 4c-1 0-2 1-2 2s1 2 2 2h6c1 0 2-1 2-2s-1-2-2-2l2-4c1-2 1-4 0-6-1-2-3-3-5-3z' fill='%23f1f5f9' fill-opacity='0.4' fill-rule='evenodd'/%3E%3C/svg%3E");
+        }
+
+        /* Screen-only styles */
         @media screen {
             .print-only { display: none !important; }
         }
 
+        /* Print-only styles */
         @media print {
-            .no-print { display: none !important; }
-            .print-only { display: block !important; }
+            .no-print { 
+                display: none !important; 
+            }
             
-            body, html { 
+            .print-only { 
+                display: block !important;
+                visibility: visible !important;
+            }
+
+            body, html, #root { 
                 background: white !important; 
                 margin: 0 !important;
                 padding: 0 !important;
-                width: 100mm !important;
-                height: auto !important; /* Fixed: Allowing multiple pages */
-            }
-
-            #root { 
-                background: transparent !important;
+                width: 210mm !important; /* A4 Width */
+                height: auto !important;
                 display: block !important;
+                -webkit-print-color-adjust: exact !important;
+                print-color-adjust: exact !important;
             }
 
             @page {
-                size: 100mm 62mm;
-                margin: 0;
+                size: A4;
+                margin: 5mm;
+            }
+
+            /* Container for the 2x2 grid */
+            .print-grid {
+                display: grid;
+                grid-template-columns: repeat(2, 100mm);
+                grid-auto-rows: 62mm;
+                gap: 2mm;
+                justify-content: center;
+                align-content: start;
+            }
+
+            /* Force page break after every 4 labels */
+            .label-page-group {
+                display: grid;
+                grid-template-columns: repeat(2, 100mm);
+                grid-template-rows: repeat(2, 62mm);
+                gap: 2mm;
+                page-break-after: always;
+                justify-content: center;
+                padding-top: 5mm;
+            }
+
+            .label-card {
+                border: 0.5pt solid #eee !important;
             }
         }
     </style>
@@ -57,8 +92,7 @@
     "react": "https://esm.sh/react@19.0.0",
     "react-dom": "https://esm.sh/react-dom@19.0.0",
     "react-dom/client": "https://esm.sh/react-dom@19.0.0/client",
-    "react-dom/server": "https://esm.sh/react-dom@19.0.0/server",
-    "lucide-react": "https://esm.sh/lucide-react@0.460.0",
+    "lucide-react": "https://esm.sh/lucide-react@0.461.0",
     "firebase/app": "https://esm.sh/firebase@12.7.0/app",
     "firebase/firestore": "https://esm.sh/firebase@12.7.0/firestore",
     "react-dom/": "https://esm.sh/react-dom@^19.2.3/",

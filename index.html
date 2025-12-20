@@ -9,7 +9,7 @@
     <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
     <script>
-        // Browser shims for library compatibility ("bubble")
+        // Browser shims for library compatibility
         window.global = window;
         window.process = { env: { NODE_ENV: 'production' } };
     </script>
@@ -43,7 +43,6 @@
             width: 105mm;
         }
 
-        /* Smooth Scrollbar */
         ::-webkit-scrollbar { width: 6px; }
         ::-webkit-scrollbar-track { background: #020617; }
         ::-webkit-scrollbar-thumb { background: #1e293b; border-radius: 10px; }

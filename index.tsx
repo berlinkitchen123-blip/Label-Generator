@@ -57,6 +57,54 @@ const DEFAULT_ALLERGENS = [
   { code: 'R', name: 'Molluscs' },
 ];
 
+/**
+ * DATA STORAGE KEYS & RECOVERY LOGIC
+ */
+const CURRENT_DB_KEY = 'bb_label_db_v3';
+const CURRENT_ALLERGEN_KEY = 'bb_allergen_db_v3';
+
+// Migration/Recovery function
+const getInitialData = (): Bundle[] => {
+  const keys = ['bb_label_db_v3', 'bb_label_db_v2', 'bb_label_db'];
+  for (const key of keys) {
+    const saved = localStorage.getItem(key);
+    if (saved && saved !== '[]' && saved !== 'null') {
+      try {
+        const data = JSON.parse(saved);
+        if (Array.isArray(data) && data.length > 0) {
+          // If we found data in an old key, migrate it to the current one
+          if (key !== CURRENT_DB_KEY) {
+            localStorage.setItem(CURRENT_DB_KEY, saved);
+          }
+          return data;
+        }
+      } catch (e) {
+        console.error("Migration error for key " + key, e);
+      }
+    }
+  }
+  return [];
+};
+
+const getInitialAllergens = (): { code: string, name: string }[] => {
+  const keys = ['bb_allergen_db_v3', 'bb_allergen_db_v2', 'bb_allergen_db'];
+  for (const key of keys) {
+    const saved = localStorage.getItem(key);
+    if (saved && saved !== '[]' && saved !== 'null') {
+      try {
+        const data = JSON.parse(saved);
+        if (Array.isArray(data) && data.length > 0) {
+          if (key !== CURRENT_ALLERGEN_KEY) {
+            localStorage.setItem(CURRENT_ALLERGEN_KEY, saved);
+          }
+          return data;
+        }
+      } catch (e) {}
+    }
+  }
+  return DEFAULT_ALLERGENS;
+};
+
 const DEMO_BUNDLES: Bundle[] = [
   {
     id: 'demo-1',
@@ -67,16 +115,6 @@ const DEMO_BUNDLES: Bundle[] = [
       { id: 'i1', bundle_id: 'demo-1', item_name_de: 'Buttercroissant', item_name_en: 'Butter Croissant', allergens_de: 'A, C, G', diet_de: 'Vegetarisch', created_at: '' },
       { id: 'i2', bundle_id: 'demo-1', item_name_de: 'Frischer Obstsalat', item_name_en: 'Fresh Fruit Salad', allergens_de: '', diet_de: 'Vegan', created_at: '' },
       { id: 'i3', bundle_id: 'demo-1', item_name_de: 'Griechischer Joghurt', item_name_en: 'Greek Yogurt', allergens_de: 'G', diet_de: 'Vegetarisch', created_at: '' }
-    ]
-  },
-  {
-    id: 'demo-2',
-    name_de: 'Bella Italia Lunch',
-    name_en: 'Bella Italia Lunch',
-    created_at: new Date().toISOString(),
-    items: [
-      { id: 'i4', bundle_id: 'demo-2', item_name_de: 'Penne mit Pesto', item_name_en: 'Penne with Pesto', allergens_de: 'A, G, H', diet_de: 'Vegetarisch', created_at: '' },
-      { id: 'i5', bundle_id: 'demo-2', item_name_de: 'Bresaola & Rucola', item_name_en: 'Bresaola & Rocket', allergens_de: '', diet_de: 'Fleisch', created_at: '' }
     ]
   }
 ];
@@ -202,21 +240,6 @@ interface Selection {
   bundleId: string;
   quantity: number;
 }
-
-const DB_KEY = 'bb_label_db_v3';
-const ALLERGEN_KEY = 'bb_allergen_db_v3';
-
-const getInitialData = (): Bundle[] => {
-  const saved = localStorage.getItem(DB_KEY);
-  if (saved) return JSON.parse(saved);
-  return [];
-};
-
-const getInitialAllergens = (): { code: string, name: string }[] => {
-  const saved = localStorage.getItem(ALLERGEN_KEY);
-  if (saved) return JSON.parse(saved);
-  return DEFAULT_ALLERGENS;
-};
 
 const DietSymbol = ({ type, size = 20 }: { type: string, size?: number }) => {
   const t = type.toLowerCase();
@@ -522,10 +545,9 @@ const App = () => {
 
   const t = (TEXT as any)[lang];
 
-  useEffect(() => { localStorage.setItem(DB_KEY, JSON.stringify(bundles)); }, [bundles]);
-  useEffect(() => { localStorage.setItem(ALLERGEN_KEY, JSON.stringify(allergens)); }, [allergens]);
+  useEffect(() => { localStorage.setItem(CURRENT_DB_KEY, JSON.stringify(bundles)); }, [bundles]);
+  useEffect(() => { localStorage.setItem(CURRENT_ALLERGEN_KEY, JSON.stringify(allergens)); }, [allergens]);
 
-  // Cleanup preview URL to avoid memory leaks
   useEffect(() => {
     return () => {
       if (previewBlobUrl) URL.revokeObjectURL(previewBlobUrl);
@@ -574,7 +596,7 @@ const App = () => {
     if (window.confirm(t.confirmClear)) {
       setBundles([]);
       setSelections([]);
-      localStorage.removeItem(DB_KEY);
+      localStorage.removeItem(CURRENT_DB_KEY);
     }
   };
 
@@ -738,7 +760,7 @@ const App = () => {
           <div className="brand-pink text-brand-green p-2.5 rounded-2xl shadow-inner"><FileText size={28} strokeWidth={2.5} /></div>
           <div>
             <h1 className="text-xl font-black tracking-tighter uppercase leading-none">Bella<span className="text-brand-pink">&</span>Bona</h1>
-            <p className="text-[10px] font-bold uppercase tracking-[0.2em] opacity-60">Label Engine v2.2</p>
+            <p className="text-[10px] font-bold uppercase tracking-[0.2em] opacity-60">Label Engine v2.5</p>
           </div>
         </div>
         <div className="flex items-center gap-3">

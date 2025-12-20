@@ -36,7 +36,7 @@ const firebaseConfig = {
 const app = getApps().length === 0 ? initializeApp(firebaseConfig) : getApp();
 const db = getFirestore(app);
 
-const DB_KEY = 'bb_label_db_v10_final';
+const DB_KEY = 'bb_label_db_v11_fixed_height';
 
 const generateSafeId = () => Math.random().toString(36).substring(2, 15);
 
@@ -141,41 +141,47 @@ const Label: React.FC<{ bundle: Bundle, lang: 'de' | 'en', packedOn: string, for
 
   const itemCount = bundle.items.length;
   
-  // Header and Footer sizing adjustments
-  const headerHeight = itemCount > 6 ? 'min-h-[55px]' : 'min-h-[75px]';
-  const footerHeight = itemCount > 6 ? 'py-3' : 'py-5';
-  
-  // Font and Padding scaling
-  let nameFontSize = 'text-[24px]';
-  let itemPadding = 'py-10';
-  let iconSize = 28;
-  let allergenFontSize = 'text-[10px]';
+  // Height constraint variables
+  let headerH = 'h-[75px]';
+  let footerH = 'h-[65px]';
+  let nameFS = 'text-[24px]';
+  let iconS = 28;
+  let allergenFS = 'text-[10px]';
+  let itemPadding = 'py-8';
 
   if (itemCount === 1) {
-    nameFontSize = 'text-[32px]';
-    itemPadding = 'py-16';
+    nameFS = 'text-[32px]';
+    itemPadding = 'py-12';
   } else if (itemCount <= 3) {
-    nameFontSize = 'text-[22px]';
+    nameFS = 'text-[22px]';
     itemPadding = 'py-8';
+  } else if (itemCount <= 4) {
+    nameFS = 'text-[18px]';
+    itemPadding = 'py-6';
+    iconS = 24;
   } else if (itemCount <= 5) {
-    nameFontSize = 'text-[18px]';
-    itemPadding = 'py-5';
-    iconSize = 24;
+    nameFS = 'text-[16px]';
+    itemPadding = 'py-4';
+    iconS = 22;
   } else if (itemCount <= 6) {
-    nameFontSize = 'text-[15px]';
+    nameFS = 'text-[14px]';
     itemPadding = 'py-3';
-    iconSize = 20;
-    allergenFontSize = 'text-[9px]';
+    iconS = 20;
+    allergenFS = 'text-[9px]';
   } else if (itemCount <= 8) {
-    nameFontSize = 'text-[13px]';
+    headerH = 'h-[60px]';
+    footerH = 'h-[55px]';
+    nameFS = 'text-[12px]';
     itemPadding = 'py-2';
-    iconSize = 18;
-    allergenFontSize = 'text-[8.5px]';
+    iconS = 18;
+    allergenFS = 'text-[8px]';
   } else {
-    nameFontSize = 'text-[11px]';
+    headerH = 'h-[50px]';
+    footerH = 'h-[50px]';
+    nameFS = 'text-[10px]';
     itemPadding = 'py-1';
-    iconSize = 16;
-    allergenFontSize = 'text-[7.5px]';
+    iconS = 16;
+    allergenFS = 'text-[7px]';
   }
 
   return (
@@ -186,37 +192,39 @@ const Label: React.FC<{ bundle: Bundle, lang: 'de' | 'en', packedOn: string, for
         boxSizing: 'border-box',
         backgroundColor: '#fff',
         color: '#000',
-        width: forPrint ? '100%' : '100.75mm',
-        height: forPrint ? '100%' : '144.25mm'
+        width: '100.75mm',
+        height: '144.25mm',
+        maxWidth: '100.75mm',
+        maxHeight: '144.25mm'
       }}
     >
-      {/* Header */}
+      {/* Header - Fixed Height */}
       <div 
-        className={`px-6 flex items-center justify-center ${headerHeight} shrink-0 border-b-2`}
+        className={`px-6 flex items-center justify-center ${headerH} shrink-0 border-b-2`}
         style={{ backgroundColor: 'var(--brand-green)', borderBottomColor: 'var(--brand-pink)' }}
       >
-        <h2 className="text-white text-center font-black text-[20px] uppercase tracking-wider leading-tight">
+        <h2 className="text-white text-center font-black text-[18px] uppercase tracking-wider leading-tight">
           {lang === 'de' ? bundle.name_de : bundle.name_en}
         </h2>
       </div>
 
-      {/* Main Content Area */}
+      {/* Main Content Area - Justify between to fill space evenly */}
       <div className="flex-1 px-8 py-2 flex flex-col overflow-hidden relative watermark">
-        <div className="flex-1 flex flex-col justify-center relative z-10 overflow-hidden">
+        <div className="flex-1 flex flex-col justify-around relative z-10 overflow-hidden">
           {bundle.items.map((item, idx) => (
             <div key={item.id} className={`flex justify-between items-center border-b border-gray-100 last:border-none ${itemPadding} w-full`}>
               <div className="flex-1 pr-4 min-w-0">
-                <div className={`font-black ${nameFontSize} leading-tight text-gray-950 break-words uppercase tracking-tight`}>
+                <div className={`font-black ${nameFS} leading-tight text-gray-950 uppercase tracking-tight overflow-hidden text-ellipsis`} style={{ display: '-webkit-box', WebkitLineClamp: '2', WebkitBoxOrient: 'vertical' }}>
                   {lang === 'de' ? item.item_name_de : item.item_name_en}
                 </div>
-                <div className="flex flex-wrap gap-1 mt-1.5">
+                <div className="flex flex-wrap gap-1 mt-1">
                   {item.allergens_de.split(/[,/]+/).map((alg, aIdx) => {
                     const trimmed = alg.trim();
                     if (!trimmed) return null;
                     return (
                       <span 
                         key={aIdx} 
-                        className={`font-black px-1.5 py-0.5 rounded-[1px] uppercase tracking-tighter whitespace-nowrap ${allergenFontSize}`}
+                        className={`font-black px-1 py-0.5 rounded-[1px] uppercase tracking-tighter whitespace-nowrap ${allergenFS}`}
                         style={{ backgroundColor: 'var(--brand-pink)', color: 'var(--text-on-pink)' }}
                       >
                         {trimmed}
@@ -225,11 +233,11 @@ const Label: React.FC<{ bundle: Bundle, lang: 'de' | 'en', packedOn: string, for
                   })}
                 </div>
               </div>
-              <div className="flex flex-col items-center min-w-[75px] text-center pt-1">
+              <div className="flex flex-col items-center min-w-[65px] text-center shrink-0">
                 <div className="mb-1">
-                  {getDietIcon(item.diet_de, iconSize)}
+                  {getDietIcon(item.diet_de, iconS)}
                 </div>
-                <span className="text-[9px] font-black uppercase tracking-tight text-[#024930] leading-none opacity-80">
+                <span className="text-[8px] font-black uppercase tracking-tight text-[#024930] leading-none opacity-80">
                   {item.diet_de}
                 </span>
               </div>
@@ -238,23 +246,22 @@ const Label: React.FC<{ bundle: Bundle, lang: 'de' | 'en', packedOn: string, for
         </div>
       </div>
 
-      {/* Footer - Filling the middle gap */}
+      {/* Footer - Fixed Height */}
       <div 
-        className={`${footerHeight} px-8 flex justify-between items-center shrink-0`}
+        className={`${footerH} px-8 flex justify-between items-center shrink-0`}
         style={{ backgroundColor: 'var(--footer-bg)', color: 'var(--text-on-pink)' }}
       >
-         <div className="flex flex-col items-start min-w-[30%]">
-           <span className="text-[9px] font-black uppercase tracking-widest opacity-70 leading-none">PACKED ON</span>
-           <span className="text-[15px] font-black leading-none mt-1">{packedOn}</span>
+         <div className="flex flex-col items-start">
+           <span className="text-[8px] font-black uppercase tracking-widest opacity-70 leading-none">PACKED ON</span>
+           <span className="text-[13px] font-black leading-none mt-1">{packedOn}</span>
          </div>
          
-         {/* Middle content to prevent empty appearance */}
-         <div className="flex flex-col items-center flex-1 px-2">
-            <span className="text-[8px] font-black tracking-widest uppercase opacity-40 whitespace-nowrap">Premium Catering</span>
-            <div className="h-1 w-1 rounded-full bg-current opacity-20 mt-1"></div>
+         <div className="hidden sm:flex flex-col items-center flex-1 px-2">
+            <span className="text-[7px] font-black tracking-widest uppercase opacity-40 whitespace-nowrap">Premium Catering</span>
+            <div className="h-0.5 w-0.5 rounded-full bg-current opacity-20 mt-1"></div>
          </div>
 
-         <div className="font-black text-[26px] tracking-tighter italic leading-none uppercase text-right min-w-[30%]">
+         <div className="font-black text-[22px] tracking-tighter italic leading-none uppercase text-right">
            BELLA&BONA
          </div>
       </div>
@@ -342,7 +349,6 @@ const App: React.FC = () => {
 
   return (
     <>
-      {/* PRINT LAYER - ABSOLUTE GRID */}
       <div className="print-only">
         {printGroups.map((group, groupIdx) => (
           <div key={groupIdx} className="label-page-group">

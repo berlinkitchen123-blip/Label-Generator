@@ -11,7 +11,6 @@
         @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap');
         
         :root {
-            /* Standard Brand Colors */
             --brand-green: #024930;
             --brand-pink: #FEACCF;
             --footer-bg: #C197AB;
@@ -35,7 +34,6 @@
         }
 
         @media print {
-            /* Lighter Brand Colors for Print (approx 10% closer to white) */
             :root {
                 --brand-green: #1B5B44;
                 --brand-pink: #FEB4D4;
@@ -58,45 +56,49 @@
                 margin: 0 !important;
                 padding: 0 !important;
                 background: #fff !important;
+                overflow: hidden !important;
             }
 
             @page {
                 size: A4;
-                margin: 4.25mm !important; /* Standard requested margin */
+                margin: 4.25mm !important;
             }
 
-            /* Container for the 2x2 grid - use 1fr to fill printable area automatically */
+            /* Container for the 2x2 grid - Use fixed rows to prevent overflow bleed to next page */
             .label-page-group {
                 display: grid !important;
-                grid-template-columns: 1fr 1fr !important;
-                grid-template-rows: 1fr 1fr !important;
-                width: 100% !important; 
-                height: 100% !important;
+                grid-template-columns: 100.75mm 100.75mm !important;
+                grid-template-rows: 144.25mm 144.25mm !important;
+                width: 201.5mm !important;
+                height: 288.5mm !important;
                 padding: 0 !important;
                 margin: 0 !important;
                 gap: 0 !important;
                 page-break-after: always;
+                page-break-inside: avoid;
                 overflow: hidden;
             }
 
             .label-card-container {
-                width: 100% !important;
-                height: 100% !important;
+                width: 100.75mm !important;
+                height: 144.25mm !important;
                 padding: 0 !important;
                 margin: 0 !important;
-                border: 0.05mm solid #f2f2f2; /* Extremely faint cut guide */
+                border: 0.1mm dashed #ddd; /* Light cutting guide */
                 display: flex !important;
                 overflow: hidden !important;
+                page-break-inside: avoid;
             }
 
             .label-card {
-                width: 100% !important;
-                height: 100% !important;
+                width: 100.75mm !important;
+                height: 144.25mm !important;
                 display: flex !important;
                 flex-direction: column !important;
                 margin: 0 !important;
                 border: none !important;
                 box-shadow: none !important;
+                overflow: hidden !important;
             }
         }
     </style>
@@ -109,9 +111,9 @@
     "lucide-react": "https://esm.sh/lucide-react@0.461.0",
     "firebase/app": "https://esm.sh/firebase@12.7.0/app",
     "firebase/firestore": "https://esm.sh/firebase@12.7.0/firestore",
-    "react/": "https://esm.sh/react@^19.2.3/",
+    "react-dom/": "https://esm.sh/react-dom@^19.2.3/",
     "firebase/": "https://esm.sh/firebase@^12.7.0/",
-    "react-dom/": "https://esm.sh/react-dom@^19.2.3/"
+    "react/": "https://esm.sh/react@^19.2.3/"
   }
 }
 </script>

@@ -142,42 +142,38 @@ const Label: React.FC<{ bundle: Bundle, lang: 'de' | 'en', packedOn: string, for
   };
 
   const itemCount = bundle.items.length;
-  // Adjusted threshold: bundles with 5+ items now use the "high density" compact layout 
-  // to ensure items like the 5th Granola item in the Brunchbox aren't cut off.
   const isHighDensity = itemCount >= 5;
   const isExtremeDensity = itemCount >= 9;
   
-  // Smoother font size scaling
+  // Font sizes: Keeping them as requested (standard readable style) but slightly tiered
   const nameFontSize = itemCount === 1 ? 'text-[28px]' : 
                      itemCount <= 3 ? 'text-[22px]' : 
-                     itemCount === 4 ? 'text-[19px]' : 
-                     itemCount <= 6 ? 'text-[15px]' :
-                     itemCount <= 8 ? 'text-[12px]' : 'text-[10px]';
+                     itemCount <= 5 ? 'text-[18px]' : 
+                     itemCount === 6 ? 'text-[16px]' :
+                     itemCount <= 8 ? 'text-[13px]' : 'text-[11px]';
   
-  // Smoother padding scaling
-  const itemVerticalPadding = itemCount === 1 ? 'py-12' : 
-                               itemCount <= 3 ? 'py-8' : 
-                               itemCount === 4 ? 'py-5' : 
-                               itemCount <= 6 ? 'py-3' :
-                               itemCount <= 8 ? 'py-1.5' : 'py-1';
+  // Item vertical padding: Tightened to provide more room for items
+  const itemVerticalPadding = itemCount === 1 ? 'py-10' : 
+                               itemCount <= 3 ? 'py-6' : 
+                               itemCount === 4 ? 'py-3' : 
+                               itemCount <= 6 ? 'py-2' :
+                               itemCount <= 8 ? 'py-1' : 'py-0.5';
   
   const allergenFontSize = itemCount > 6 ? 'text-[7px]' : 'text-[10px]';
   
-  // Proportional icon scaling
   const iconScaleClass = isExtremeDensity ? 'scale-[0.55]' : 
                          isHighDensity ? 'scale-[0.7]' : 
                          itemCount >= 4 ? 'scale-75' : 'scale-90';
 
-  // Header/Footer Responsive Sizing
-  // High density logic preserved exactly for >6 items, and now helps 5-6 items fit.
-  const headerMinHeight = isHighDensity ? 'min-h-[50px]' : 'min-h-[85px]';
-  const headerPadding = isHighDensity ? 'py-1' : 'py-4';
-  const headerTitleSize = isHighDensity ? 'text-[16px]' : 'text-[22px]';
+  // Header/Footer Responsive Sizing: Strongly reduced height to favor item space
+  const headerMinHeight = isHighDensity ? 'min-h-[45px]' : 'min-h-[60px]';
+  const headerPadding = isHighDensity ? 'py-1' : 'py-2';
+  const headerTitleSize = isHighDensity ? 'text-[16px]' : 'text-[20px]';
   
-  const footerPadding = isHighDensity ? 'py-2' : 'py-5';
-  const footerBrandSize = isHighDensity ? 'text-[20px]' : 'text-[30px]';
+  const footerPadding = isHighDensity ? 'py-1.5' : 'py-3';
+  const footerBrandSize = isHighDensity ? 'text-[20px]' : 'text-[26px]';
   const footerDateLabelSize = isHighDensity ? 'text-[8px]' : 'text-[9px]';
-  const footerDateSize = isHighDensity ? 'text-[12px]' : 'text-[16px]';
+  const footerDateSize = isHighDensity ? 'text-[12px]' : 'text-[15px]';
 
   return (
     <div 
@@ -191,7 +187,7 @@ const Label: React.FC<{ bundle: Bundle, lang: 'de' | 'en', packedOn: string, for
         height: forPrint ? '148.5mm' : undefined
       }}
     >
-      {/* Header */}
+      {/* Header - Height reduced as requested */}
       <div className={`bg-[#024930] ${headerPadding} px-6 flex items-center justify-center ${headerMinHeight} shrink-0 border-b-2 border-[#FEACCF]`}>
         <h2 className={`text-white text-center font-black ${headerTitleSize} uppercase tracking-wider leading-tight`}>
           {lang === 'de' ? bundle.name_de : bundle.name_en}
@@ -199,7 +195,7 @@ const Label: React.FC<{ bundle: Bundle, lang: 'de' | 'en', packedOn: string, for
       </div>
 
       {/* Main Content Area */}
-      <div className="flex-1 px-8 py-1 flex flex-col overflow-hidden relative watermark">
+      <div className="flex-1 px-8 py-0.5 flex flex-col overflow-hidden relative watermark">
         <div className="flex-1 flex flex-col justify-around relative z-10 overflow-hidden">
           {bundle.items.map((item, idx) => (
             <div key={item.id} className={`flex justify-between items-center border-b border-gray-100 last:border-none ${itemVerticalPadding} transition-all`}>
@@ -232,7 +228,7 @@ const Label: React.FC<{ bundle: Bundle, lang: 'de' | 'en', packedOn: string, for
         </div>
       </div>
 
-      {/* Footer */}
+      {/* Footer - Height reduced as requested */}
       <div className={`bg-[#C197AB] ${footerPadding} px-8 flex justify-between items-center text-[#024930] shrink-0`}>
          <div className="flex flex-col">
            <span className={`${footerDateLabelSize} font-black uppercase tracking-widest opacity-80 leading-none`}>PACKED ON</span>

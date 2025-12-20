@@ -132,21 +132,22 @@ const DataService = {
 };
 
 const Label: React.FC<{ bundle: Bundle, lang: 'de' | 'en', packedOn: string, forPrint?: boolean }> = ({ bundle, lang, packedOn, forPrint }) => {
-  const getDietIcon = (diet: string, isSmall: boolean) => {
+  const getDietIcon = (diet: string, isHighDensity: boolean) => {
     const d = diet.toLowerCase();
-    const size = isSmall ? 18 : 24;
+    const size = isHighDensity ? 18 : 24;
     if (d.includes('vegan')) return <Leaf size={size} className="text-green-600" />;
     if (d.includes('vegetarisch')) return <Sprout size={size} className="text-green-500" />;
-    if (d.includes('meat') || d.includes('fleisch') || d.includes('beef')) return <div className={isSmall ? "text-lg" : "text-2xl"}>🥩</div>;
+    if (d.includes('meat') || d.includes('fleisch') || d.includes('beef')) return <div className={isHighDensity ? "text-lg" : "text-2xl"}>🥩</div>;
     return <Soup size={size} className="text-blue-500" />;
   };
 
   const itemCount = bundle.items.length;
-  // Reduced threshold to more than 6 items as requested
+  // Threshold strictly set to more than 6 items
   const isHighDensity = itemCount > 6;
   const isExtremeDensity = itemCount >= 9;
   
-  // Dynamic font sizes and paddings
+  // Refined dynamic font sizes and paddings for ALL cases
+  // Ensuring perfect fit for 1-6 items while preserving 7-9 fix
   const nameFontSize = itemCount === 1 ? 'text-[28px]' : 
                      itemCount <= 3 ? 'text-[22px]' : 
                      itemCount <= 5 ? 'text-[18px]' : 
@@ -160,9 +161,14 @@ const Label: React.FC<{ bundle: Bundle, lang: 'de' | 'en', packedOn: string, for
                                itemCount <= 8 ? 'py-1.5' : 'py-1';
   
   const allergenFontSize = itemCount > 6 ? 'text-[7px]' : 'text-[10px]';
-  const iconScaleClass = isExtremeDensity ? 'scale-[0.55]' : isHighDensity ? 'scale-[0.7]' : 'scale-90';
+  
+  // Icon scaling logic
+  const iconScaleClass = isExtremeDensity ? 'scale-[0.55]' : 
+                         isHighDensity ? 'scale-[0.7]' : 
+                         itemCount >= 5 ? 'scale-75' : 'scale-90';
 
-  // Responsive Header/Footer Heights
+  // Header/Footer Scaling Logic
+  // High density bundles shrink the header/footer to save space
   const headerMinHeight = isHighDensity ? 'min-h-[50px]' : 'min-h-[85px]';
   const headerPadding = isHighDensity ? 'py-1' : 'py-4';
   const headerTitleSize = isHighDensity ? 'text-[16px]' : 'text-[22px]';
@@ -184,7 +190,7 @@ const Label: React.FC<{ bundle: Bundle, lang: 'de' | 'en', packedOn: string, for
         height: forPrint ? '148.5mm' : undefined
       }}
     >
-      {/* Header - Strongly reduced for density */}
+      {/* Header */}
       <div className={`bg-[#024930] ${headerPadding} px-6 flex items-center justify-center ${headerMinHeight} shrink-0 border-b-2 border-[#FEACCF]`}>
         <h2 className={`text-white text-center font-black ${headerTitleSize} uppercase tracking-wider leading-tight`}>
           {lang === 'de' ? bundle.name_de : bundle.name_en}
@@ -225,7 +231,7 @@ const Label: React.FC<{ bundle: Bundle, lang: 'de' | 'en', packedOn: string, for
         </div>
       </div>
 
-      {/* Footer - Strongly reduced for density */}
+      {/* Footer */}
       <div className={`bg-[#C197AB] ${footerPadding} px-8 flex justify-between items-center text-[#024930] shrink-0`}>
          <div className="flex flex-col">
            <span className={`${footerDateLabelSize} font-black uppercase tracking-widest opacity-80 leading-none`}>PACKED ON</span>

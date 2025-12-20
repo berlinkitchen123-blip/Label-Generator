@@ -36,7 +36,7 @@ const firebaseConfig = {
 const app = getApps().length === 0 ? initializeApp(firebaseConfig) : getApp();
 const db = getFirestore(app);
 
-const DB_KEY = 'bb_label_db_v6_fixed';
+const DB_KEY = 'bb_label_db_v7_perfect';
 
 const generateSafeId = () => Math.random().toString(36).substring(2, 15);
 
@@ -141,57 +141,64 @@ const Label: React.FC<{ bundle: Bundle, lang: 'de' | 'en', packedOn: string, for
 
   const itemCount = bundle.items.length;
   
-  const nameFontSize = itemCount === 1 ? 'text-[28px]' : itemCount > 6 ? 'text-[13px]' : 'text-[16px]';
-  const itemRowPadding = itemCount === 1 ? 'py-10' : itemCount > 6 ? 'py-1' : 'py-3';
+  // Dynamic styling for fitting up to 8+ items in 144.25mm height
+  const nameFontSize = itemCount === 1 ? 'text-[28px]' : 
+                     itemCount <= 4 ? 'text-[20px]' : 
+                     itemCount <= 6 ? 'text-[16px]' : 'text-[13px]';
+  
+  const itemVerticalPadding = itemCount === 1 ? 'py-12' : 
+                               itemCount <= 3 ? 'py-8' : 
+                               itemCount <= 5 ? 'py-5' : 
+                               itemCount <= 7 ? 'py-3' : 'py-2';
+  
   const allergenFontSize = itemCount > 6 ? 'text-[8px]' : 'text-[10px]';
-  const iconScaleClass = itemCount > 6 ? 'scale-75' : 'scale-100';
+  const iconScaleClass = itemCount > 7 ? 'scale-75' : 'scale-90';
 
   return (
     <div 
-      className={`label-card bg-white text-slate-900 flex flex-col overflow-hidden relative ${!forPrint ? 'shadow-2xl border border-slate-700 rounded-lg scale-90 sm:scale-100 origin-top h-[140mm] w-[100mm]' : 'h-full w-full'}`} 
+      className={`label-card bg-white text-slate-900 flex flex-col overflow-hidden relative ${!forPrint ? 'shadow-2xl border border-slate-700 rounded-lg h-[144.25mm] w-[100.75mm]' : 'h-full w-full'}`} 
       style={{ 
         fontFamily: "'Inter', sans-serif", 
         boxSizing: 'border-box',
         backgroundColor: '#fff',
-        color: '#000'
+        color: '#000',
+        width: forPrint ? '100.75mm' : undefined,
+        height: forPrint ? '144.25mm' : undefined
       }}
     >
-      {/* Header */}
-      <div className="bg-[#024930] py-4 px-6 flex items-center justify-center min-h-[75px] shrink-0">
+      {/* Header - Fixed Height to prevent layout shift */}
+      <div className="bg-[#024930] py-4 px-6 flex items-center justify-center min-h-[85px] shrink-0 border-b-2 border-[#FEACCF]">
         <h2 className="text-white text-center font-black text-[22px] uppercase tracking-wider leading-tight">
           {lang === 'de' ? bundle.name_de : bundle.name_en}
         </h2>
       </div>
 
-      {/* Brand Divider */}
-      <div className="w-full h-[2px] bg-[#FEACCF] shrink-0"></div>
-
-      {/* Content */}
-      <div className="flex-1 px-8 py-4 flex flex-col overflow-hidden relative watermark">
-        <div className="flex-1 flex flex-col justify-start relative z-10 overflow-hidden">
+      {/* Main Content Area */}
+      <div className="flex-1 px-8 py-2 flex flex-col overflow-hidden relative watermark">
+        <div className="flex-1 flex flex-col justify-around relative z-10 overflow-hidden">
           {bundle.items.map((item, idx) => (
-            <div key={item.id} className={`flex justify-between items-start border-b border-gray-100 last:border-none ${itemRowPadding}`}>
-              <div className="flex-1 pr-6">
+            <div key={item.id} className={`flex justify-between items-center border-b border-gray-100 last:border-none ${itemVerticalPadding} transition-all`}>
+              <div className="flex-1 pr-4">
                 <div className={`font-black ${nameFontSize} leading-tight text-gray-950`}>
                   {lang === 'de' ? item.item_name_de : item.item_name_en}
                 </div>
-                <div className="flex flex-wrap gap-2 mt-2">
+                <div className="flex flex-wrap gap-1.5 mt-2">
                   {item.allergens_de.split(/[,/]+/).map((alg, aIdx) => {
                     const trimmed = alg.trim();
                     if (!trimmed) return null;
                     return (
-                      <span key={aIdx} className={`bg-[#FEACCF] ${allergenFontSize} font-black px-2 py-0.5 rounded-[1px] uppercase text-[#024930] tracking-tighter`}>
+                      <span key={aIdx} className={`bg-[#FEACCF] ${allergenFontSize} font-black px-1.5 py-0.5 rounded-[1px] uppercase text-[#024930] tracking-tighter`}>
                         {trimmed}
                       </span>
                     );
                   })}
                 </div>
               </div>
-              <div className={`flex flex-col items-center min-w-[80px] text-center pt-1 transition-transform origin-top ${iconScaleClass}`}>
+              <div className={`flex flex-col items-center min-w-[75px] text-center pt-1 transition-transform origin-top ${iconScaleClass}`}>
                 <div className="mb-1">
                   {getDietIcon(item.diet_de)}
                 </div>
-                <span className="text-[11px] font-black uppercase tracking-tight text-[#024930] leading-none opacity-90">
+                <span className="text-[10px] font-black uppercase tracking-tight text-[#024930] leading-none opacity-80">
                   {item.diet_de}
                 </span>
               </div>
@@ -200,13 +207,13 @@ const Label: React.FC<{ bundle: Bundle, lang: 'de' | 'en', packedOn: string, for
         </div>
       </div>
 
-      {/* Footer */}
-      <div className="bg-[#C197AB] py-4 px-10 flex justify-between items-center text-[#024930] shrink-0">
+      {/* Footer - Fixed Height at Bottom */}
+      <div className="bg-[#C197AB] py-5 px-10 flex justify-between items-center text-[#024930] shrink-0">
          <div className="flex flex-col">
            <span className="text-[10px] font-black uppercase tracking-widest opacity-80 leading-none">PACKED ON</span>
-           <span className="text-[15px] font-black leading-none mt-1">{packedOn}</span>
+           <span className="text-[16px] font-black leading-none mt-1.5">{packedOn}</span>
          </div>
-         <div className="font-black text-[28px] tracking-tighter italic leading-none uppercase">BELLA&BONA</div>
+         <div className="font-black text-[30px] tracking-tighter italic leading-none uppercase">BELLA&BONA</div>
       </div>
     </div>
   );
@@ -443,7 +450,7 @@ const App: React.FC = () => {
             </div>
             <div className="flex-1 overflow-y-auto p-12 bg-slate-950 flex flex-col items-center gap-16">
               {printGroups.map((group, idx) => (
-                <div key={idx} className="bg-white shadow-2xl" style={{ width: '210mm', height: '297mm', minHeight: '297mm', padding: '4.25mm' }}>
+                <div key={idx} className="bg-white shadow-2xl" style={{ width: '210mm', height: '297mm', minHeight: '297mm', padding: '4.25mm', boxSizing: 'border-box' }}>
                    <div className="label-page-group">
                      {group.map((b, bi) => (
                        <div key={bi} className="label-card-container">

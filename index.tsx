@@ -498,7 +498,7 @@ const PreviewModal = ({ blobUrl, onClose, onDownload, t }: { blobUrl: string, on
           </div>
         </div>
         <div className="flex-1 bg-slate-950 p-6 relative">
-          <iframe src={blobUrl} className="w-full h-full rounded-2xl border border-slate-800 shadow-inner" />
+          <iframe src={blobUrl} title="PDF Preview" className="w-full h-full rounded-2xl border border-slate-800 shadow-inner" />
         </div>
       </div>
     </div>
@@ -648,7 +648,6 @@ const App = () => {
     if (selections.length === 0) return;
     setIsGenerating(true);
     
-    // Revoke previous blob if any
     if (previewBlobUrl) URL.revokeObjectURL(previewBlobUrl);
     
     const { jsPDF } = (window as any).jspdf;
@@ -670,7 +669,6 @@ const App = () => {
       const root = createRoot(labelEl);
       root.render(<LabelPreview bundle={bundle} date={packedOn} t={t} lang={lang} allergens={allergens} />);
       
-      // Delay to ensure rendering completes
       await new Promise(resolve => setTimeout(resolve, 850));
       
       const canvas = await html2canvas(labelEl, { 
@@ -868,8 +866,10 @@ const App = () => {
                         <p className="text-brand-pink break-all leading-relaxed font-bold">bundle_name_de, bundle_name_en, item_name_de, item_name_en, allergens_de, diet_de, quantity, packed_on</p>
                       </div>
                       <div className="mt-10 flex flex-col sm:flex-row gap-5">
-                        <button onClick={handleFileUpload as any} className="flex-1 hidden"><input type="file" id="csv-upload" accept=".csv, .xlsx, .xls" onChange={handleFileUpload} /></button>
-                        <label htmlFor="csv-upload" className="flex-1 brand-pink text-brand-green py-4 rounded-2xl font-black text-center cursor-pointer hover:brightness-110 transition shadow-xl flex items-center justify-center gap-3 uppercase text-xs tracking-widest"><Upload size={20} /> {t.uploadFile}</label>
+                        <label htmlFor="csv-upload" className="flex-1 brand-pink text-brand-green py-4 rounded-2xl font-black text-center cursor-pointer hover:brightness-110 transition shadow-xl flex items-center justify-center gap-3 uppercase text-xs tracking-widest">
+                          <Upload size={20} /> {t.uploadFile}
+                          <input type="file" id="csv-upload" accept=".csv, .xlsx, .xls" onChange={handleFileUpload} className="hidden" />
+                        </label>
                       </div>
                     </div>
                   </div>
@@ -933,5 +933,8 @@ const App = () => {
   );
 };
 
-const root = createRoot(document.getElementById('root')!);
-root.render(<App />);
+const rootEl = document.getElementById('root');
+if (rootEl) {
+  const root = createRoot(rootEl);
+  root.render(<App />);
+}

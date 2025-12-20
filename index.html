@@ -1,3 +1,4 @@
+
 <!DOCTYPE html>
 <html lang="en" class="dark">
 <head>
@@ -60,19 +61,19 @@
 
             @page {
                 size: A4;
-                margin: 4.25mm !important;
+                margin: 0 !important;
             }
 
             /* 
-               Printable area: 210 - 8.5 = 201.5mm wide, 297 - 8.5 = 288.5mm high.
-               Grid 2x2 needs exactly 100.75mm x 144.25mm per cell.
+               Printable area: 210mm wide, 297mm high.
+               Grid 2x2: Each cell is exactly 105mm x 148.5mm.
             */
             .label-page-group {
                 display: grid;
-                grid-template-columns: 100.75mm 100.75mm;
-                grid-template-rows: 144.25mm 144.25mm;
-                width: 201.5mm !important;
-                height: 288.5mm !important;
+                grid-template-columns: 105mm 105mm;
+                grid-template-rows: 148.5mm 148.5mm;
+                width: 210mm !important;
+                height: 297mm !important;
                 page-break-after: always;
                 margin: 0 !important;
                 padding: 0 !important;
@@ -81,18 +82,18 @@
             }
 
             .label-card-container {
-                width: 100.75mm !important;
-                height: 144.25mm !important;
+                width: 105mm !important;
+                height: 148.5mm !important;
                 box-sizing: border-box;
-                border: 0.1mm dashed #ddd; /* Cutting guide */
+                border: 0.01mm dashed rgba(0,0,0,0.1); /* Minimal cutting guide at the very edge */
                 padding: 0;
                 margin: 0;
                 overflow: hidden;
             }
 
             .label-card {
-                width: 100.75mm !important;
-                height: 144.25mm !important;
+                width: 105mm !important;
+                height: 148.5mm !important;
                 box-sizing: border-box;
                 border: none !important;
                 box-shadow: none !important;

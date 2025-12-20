@@ -1,3 +1,4 @@
+
 import React, { useState, useEffect, useMemo, useRef } from 'react';
 import { createRoot } from 'react-dom/client';
 import { 
@@ -141,7 +142,7 @@ const Label: React.FC<{ bundle: Bundle, lang: 'de' | 'en', packedOn: string, for
 
   const itemCount = bundle.items.length;
   
-  // Dynamic styling for fitting up to 8+ items in 144.25mm height
+  // Dynamic styling for fitting up to 8+ items in 148.5mm height
   const nameFontSize = itemCount === 1 ? 'text-[28px]' : 
                      itemCount <= 4 ? 'text-[20px]' : 
                      itemCount <= 6 ? 'text-[16px]' : 'text-[13px]';
@@ -156,14 +157,14 @@ const Label: React.FC<{ bundle: Bundle, lang: 'de' | 'en', packedOn: string, for
 
   return (
     <div 
-      className={`label-card bg-white text-slate-900 flex flex-col overflow-hidden relative ${!forPrint ? 'shadow-2xl border border-slate-700 rounded-lg h-[144.25mm] w-[100.75mm]' : 'h-full w-full'}`} 
+      className={`label-card bg-white text-slate-900 flex flex-col overflow-hidden relative ${!forPrint ? 'shadow-2xl border border-slate-700 rounded-lg h-[148.5mm] w-[105mm]' : 'h-full w-full'}`} 
       style={{ 
         fontFamily: "'Inter', sans-serif", 
         boxSizing: 'border-box',
         backgroundColor: '#fff',
         color: '#000',
-        width: forPrint ? '100.75mm' : undefined,
-        height: forPrint ? '144.25mm' : undefined
+        width: forPrint ? '105mm' : undefined,
+        height: forPrint ? '148.5mm' : undefined
       }}
     >
       {/* Header - Fixed Height to prevent layout shift */}

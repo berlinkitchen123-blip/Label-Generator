@@ -36,7 +36,7 @@ const firebaseConfig = {
 const app = getApps().length === 0 ? initializeApp(firebaseConfig) : getApp();
 const db = getFirestore(app);
 
-const DB_KEY = 'bb_label_db_v7_perfect';
+const DB_KEY = 'bb_label_db_v8_final_scaling';
 
 const generateSafeId = () => Math.random().toString(36).substring(2, 15);
 
@@ -131,74 +131,104 @@ const DataService = {
 };
 
 const Label: React.FC<{ bundle: Bundle, lang: 'de' | 'en', packedOn: string, forPrint?: boolean }> = ({ bundle, lang, packedOn, forPrint }) => {
-  const getDietIcon = (diet: string) => {
+  const getDietIcon = (diet: string, size: number) => {
     const d = diet.toLowerCase();
-    if (d.includes('vegan')) return <Leaf size={24} className="text-green-600" />;
-    if (d.includes('vegetarisch')) return <Sprout size={24} className="text-green-500" />;
-    if (d.includes('meat') || d.includes('fleisch') || d.includes('beef')) return <div className="text-red-700 text-2xl">🥩</div>;
-    return <Soup size={24} className="text-blue-500" />;
+    if (d.includes('vegan')) return <Leaf size={size} className="text-green-600" />;
+    if (d.includes('vegetarisch')) return <Sprout size={size} className="text-green-500" />;
+    if (d.includes('meat') || d.includes('fleisch') || d.includes('beef')) return <div style={{ fontSize: `${size * 1.2}px` }}>🥩</div>;
+    return <Soup size={size} className="text-blue-500" />;
   };
 
   const itemCount = bundle.items.length;
   
-  // Dynamic styling for fitting up to 8+ items in 144.25mm height
-  const nameFontSize = itemCount === 1 ? 'text-[28px]' : 
-                     itemCount <= 4 ? 'text-[20px]' : 
-                     itemCount <= 6 ? 'text-[16px]' : 'text-[13px]';
+  // GRANULAR SCALING LOGIC FOR 144.25MM HEIGHT
+  // Total height: 144.25mm
+  // Header: ~20mm
+  // Footer: ~18mm
+  // Remaining: ~106mm
   
-  const itemVerticalPadding = itemCount === 1 ? 'py-12' : 
-                               itemCount <= 3 ? 'py-8' : 
-                               itemCount <= 5 ? 'py-5' : 
-                               itemCount <= 7 ? 'py-3' : 'py-2';
+  const headerHeight = itemCount > 6 ? 'min-h-[60px]' : 'min-h-[75px]';
+  const footerHeight = itemCount > 6 ? 'py-3' : 'py-5';
   
-  const allergenFontSize = itemCount > 6 ? 'text-[8px]' : 'text-[10px]';
-  const iconScaleClass = itemCount > 7 ? 'scale-75' : 'scale-90';
+  // Font sizes in PX (approximate conversion for print)
+  let nameFontSize = 'text-[24px]';
+  let itemPadding = 'py-10';
+  let iconSize = 30;
+  let allergenFontSize = 'text-[10px]';
+
+  if (itemCount === 1) {
+    nameFontSize = 'text-[32px]';
+    itemPadding = 'py-16';
+  } else if (itemCount <= 3) {
+    nameFontSize = 'text-[22px]';
+    itemPadding = 'py-8';
+  } else if (itemCount <= 5) {
+    nameFontSize = 'text-[18px]';
+    itemPadding = 'py-4';
+    iconSize = 24;
+  } else if (itemCount <= 6) {
+    nameFontSize = 'text-[15px]';
+    itemPadding = 'py-3';
+    iconSize = 20;
+    allergenFontSize = 'text-[9px]';
+  } else if (itemCount <= 8) {
+    nameFontSize = 'text-[12px]';
+    itemPadding = 'py-1.5';
+    iconSize = 18;
+    allergenFontSize = 'text-[7.5px]';
+  } else {
+    // 9+ items
+    nameFontSize = 'text-[11px]';
+    itemPadding = 'py-1';
+    iconSize = 16;
+    allergenFontSize = 'text-[7px]';
+  }
 
   return (
     <div 
-      className={`label-card bg-white text-slate-900 flex flex-col overflow-hidden relative ${!forPrint ? 'shadow-2xl border border-slate-700 rounded-lg h-[144.25mm] w-[100.75mm]' : 'h-full w-full'}`} 
+      className={`label-card bg-white text-slate-900 flex flex-col overflow-hidden relative ${!forPrint ? 'shadow-2xl border border-slate-700 rounded-lg h-[144.25mm] w-[100.75mm]' : ''}`} 
       style={{ 
         fontFamily: "'Inter', sans-serif", 
         boxSizing: 'border-box',
         backgroundColor: '#fff',
         color: '#000',
-        width: forPrint ? '100.75mm' : undefined,
-        height: forPrint ? '144.25mm' : undefined
+        width: '100.75mm',
+        height: '144.25mm'
       }}
     >
-      {/* Header - Fixed Height to prevent layout shift */}
-      <div className="bg-[#024930] py-4 px-6 flex items-center justify-center min-h-[85px] shrink-0 border-b-2 border-[#FEACCF]">
-        <h2 className="text-white text-center font-black text-[22px] uppercase tracking-wider leading-tight">
+      {/* Header */}
+      <div className={`bg-[#024930] px-6 flex items-center justify-center ${headerHeight} shrink-0 border-b-2 border-[#FEACCF]`}>
+        <h2 className="text-white text-center font-black text-[20px] uppercase tracking-wider leading-tight">
           {lang === 'de' ? bundle.name_de : bundle.name_en}
         </h2>
       </div>
 
-      {/* Main Content Area */}
-      <div className="flex-1 px-8 py-2 flex flex-col overflow-hidden relative watermark">
-        <div className="flex-1 flex flex-col justify-around relative z-10 overflow-hidden">
+      {/* Main Content Area - Justify around distributes space equally */}
+      <div className="flex-1 px-8 py-1 flex flex-col overflow-hidden relative watermark">
+        <div className="flex-1 flex flex-col justify-center relative z-10 overflow-hidden">
           {bundle.items.map((item, idx) => (
-            <div key={item.id} className={`flex justify-between items-center border-b border-gray-100 last:border-none ${itemVerticalPadding} transition-all`}>
-              <div className="flex-1 pr-4">
-                <div className={`font-black ${nameFontSize} leading-tight text-gray-950`}>
+            <div key={item.id} className={`flex justify-between items-center border-b border-gray-100 last:border-none ${itemPadding} w-full`}>
+              <div className="flex-1 pr-4 min-w-0">
+                <div className={`font-black ${nameFontSize} leading-tight text-gray-950 break-words`}>
                   {lang === 'de' ? item.item_name_de : item.item_name_en}
                 </div>
-                <div className="flex flex-wrap gap-1.5 mt-2">
+                <div className="flex flex-wrap gap-1 mt-1.5">
                   {item.allergens_de.split(/[,/]+/).map((alg, aIdx) => {
                     const trimmed = alg.trim();
                     if (!trimmed) return null;
                     return (
-                      <span key={aIdx} className={`bg-[#FEACCF] ${allergenFontSize} font-black px-1.5 py-0.5 rounded-[1px] uppercase text-[#024930] tracking-tighter`}>
+                      <span key={aIdx} className={`bg-[#FEACCF] ${allergenFontSize} font-black px-1.5 py-0.5 rounded-[1px] uppercase text-[#024930] tracking-tighter whitespace-nowrap`}>
                         {trimmed}
                       </span>
                     );
                   })}
                 </div>
               </div>
-              <div className={`flex flex-col items-center min-w-[75px] text-center pt-1 transition-transform origin-top ${iconScaleClass}`}>
+              <div className="flex flex-col items-center min-w-[65px] text-center pt-0.5">
                 <div className="mb-1">
-                  {getDietIcon(item.diet_de)}
+                  {getDietIcon(item.diet_de, iconSize)}
                 </div>
-                <span className="text-[10px] font-black uppercase tracking-tight text-[#024930] leading-none opacity-80">
+                <span className="text-[8.5px] font-black uppercase tracking-tight text-[#024930] leading-none opacity-80">
                   {item.diet_de}
                 </span>
               </div>
@@ -207,13 +237,13 @@ const Label: React.FC<{ bundle: Bundle, lang: 'de' | 'en', packedOn: string, for
         </div>
       </div>
 
-      {/* Footer - Fixed Height at Bottom */}
-      <div className="bg-[#C197AB] py-5 px-10 flex justify-between items-center text-[#024930] shrink-0">
+      {/* Footer */}
+      <div className={`bg-[#C197AB] ${footerHeight} px-10 flex justify-between items-center text-[#024930] shrink-0`}>
          <div className="flex flex-col">
-           <span className="text-[10px] font-black uppercase tracking-widest opacity-80 leading-none">PACKED ON</span>
-           <span className="text-[16px] font-black leading-none mt-1.5">{packedOn}</span>
+           <span className="text-[9px] font-black uppercase tracking-widest opacity-80 leading-none">PACKED ON</span>
+           <span className="text-[14px] font-black leading-none mt-1">{packedOn}</span>
          </div>
-         <div className="font-black text-[30px] tracking-tighter italic leading-none uppercase">BELLA&BONA</div>
+         <div className="font-black text-[26px] tracking-tighter italic leading-none uppercase">BELLA&BONA</div>
       </div>
     </div>
   );
@@ -299,6 +329,7 @@ const App: React.FC = () => {
 
   return (
     <>
+      {/* PRINT LAYER - ABSOLUTE ALIGNMENT */}
       <div className="print-only">
         {printGroups.map((group, groupIdx) => (
           <div key={groupIdx} className="label-page-group">
@@ -451,7 +482,7 @@ const App: React.FC = () => {
             <div className="flex-1 overflow-y-auto p-12 bg-slate-950 flex flex-col items-center gap-16">
               {printGroups.map((group, idx) => (
                 <div key={idx} className="bg-white shadow-2xl" style={{ width: '210mm', height: '297mm', minHeight: '297mm', padding: '4.25mm', boxSizing: 'border-box' }}>
-                   <div className="label-page-group">
+                   <div className="label-page-group" style={{ display: 'grid', gridTemplateColumns: 'repeat(2, 100.75mm)', gridTemplateRows: 'repeat(2, 144.25mm)' }}>
                      {group.map((b, bi) => (
                        <div key={bi} className="label-card-container">
                          <Label bundle={b} lang={lang} packedOn={packedOn} forPrint />

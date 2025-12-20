@@ -33,70 +33,62 @@
         }
 
         @media print {
-            .no-print { 
-                display: none !important; 
-            }
-            
-            .print-only { 
-                display: block !important;
-                visibility: visible !important;
-            }
-
-            body, html { 
-                background: white !important; 
-                margin: 0 !important;
-                padding: 0 !important;
-                width: 210mm !important;
-                height: 297mm !important;
-                display: block !important;
+            /* Full Reset for Print */
+            *, *:before, *:after {
+                box-sizing: border-box !important;
                 -webkit-print-color-adjust: exact !important;
                 print-color-adjust: exact !important;
             }
 
-            #root {
+            .no-print { display: none !important; }
+            .print-only { display: block !important; visibility: visible !important; }
+
+            html, body {
+                width: 210mm !important;
+                height: 297mm !important;
                 margin: 0 !important;
                 padding: 0 !important;
+                background: #fff !important;
             }
 
             @page {
                 size: A4;
-                margin: 4.25mm !important;
+                margin: 4.25mm !important; /* Fixed 4.25mm margin on all sides */
             }
 
-            /* 
-               Printable area: 210 - 8.5 = 201.5mm wide, 297 - 8.5 = 288.5mm high.
-               Grid 2x2 needs exactly 100.75mm x 144.25mm per cell.
-            */
+            /* Container for the 2x2 grid */
             .label-page-group {
-                display: grid;
-                grid-template-columns: 100.75mm 100.75mm;
-                grid-template-rows: 144.25mm 144.25mm;
-                width: 201.5mm !important;
-                height: 288.5mm !important;
-                page-break-after: always;
-                margin: 0 !important;
+                display: grid !important;
+                grid-template-columns: 100.75mm 100.75mm !important;
+                grid-template-rows: 144.25mm 144.25mm !important;
+                width: 201.5mm !important; /* 210 - (2 * 4.25) */
+                height: 288.5mm !important; /* 297 - (2 * 4.25) */
                 padding: 0 !important;
-                box-sizing: border-box;
+                margin: 0 !important;
+                gap: 0 !important;
+                page-break-after: always;
                 overflow: hidden;
             }
 
             .label-card-container {
                 width: 100.75mm !important;
                 height: 144.25mm !important;
-                box-sizing: border-box;
-                border: 0.1mm dashed #ddd; /* Cutting guide */
-                padding: 0;
-                margin: 0;
-                overflow: hidden;
+                padding: 0 !important;
+                margin: 0 !important;
+                border: 0.05mm solid #eee; /* Minimal cut guide */
+                display: block !important;
+                overflow: hidden !important;
+                position: relative !important;
             }
 
             .label-card {
                 width: 100.75mm !important;
                 height: 144.25mm !important;
-                box-sizing: border-box;
+                display: flex !important;
+                flex-direction: column !important;
+                margin: 0 !important;
                 border: none !important;
                 box-shadow: none !important;
-                margin: 0 !important;
             }
         }
     </style>

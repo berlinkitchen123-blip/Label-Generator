@@ -1,5 +1,7 @@
 import React, { useState, useEffect, useMemo } from 'react';
 import { createRoot } from 'react-dom/client';
+import { initializeApp } from "firebase/app";
+import { getFirestore, collection, doc, onSnapshot, setDoc, deleteDoc } from "firebase/firestore";
 import { 
   Plus, 
   Trash2, 
@@ -22,8 +24,21 @@ import {
   Croissant
 } from 'lucide-react';
 
-// --- CONSTANTS ---
-const DB_KEY = 'bb_label_db_v13';
+// --- FIREBASE CONFIG ---
+const firebaseConfig = {
+  apiKey: "AIzaSyBlB6j_w_-Mb_ughrrz8BDFdiIJEDNTKGM",
+  authDomain: "label-c61eb.firebaseapp.com",
+  databaseURL: "https://label-c61eb-default-rtdb.europe-west1.firebasedatabase.app",
+  projectId: "label-c61eb",
+  storageBucket: "label-c61eb.appspot.com",
+  messagingSenderId: "168446433946",
+  appId: "1:168446433946:web:6536d1d40fb86ee1f61d23"
+};
+
+// Initialize Firebase
+const app = initializeApp(firebaseConfig);
+const db = getFirestore(app);
+
 
 interface BundleItem {
   id: string;
@@ -189,7 +204,7 @@ const BundleModal = ({ bundle, onSave, onClose }: { bundle: any; onSave: (b: Bun
 // --- MAIN APP ---
 
 const App = () => {
-  const [bundles, setBundles] = useState<Bundle[]>([]);
+  const [bundles, setBundles] = useState<Bundle[] | null>(null);
   const [selections, setSelections] = useState<Selection[]>([]);
   const [lang, setLang] = useState<'de' | 'en'>('en');
   const [searchTerm, setSearchTerm] = useState('');
@@ -199,16 +214,15 @@ const App = () => {
   const [previewUrl, setPreviewUrl] = useState<string | null>(null);
 
   useEffect(() => {
-    const saved = localStorage.getItem(DB_KEY);
-    if (saved) setBundles(JSON.parse(saved));
-    else {
-      setBundles([{ id: 'demo1', name_de: 'Standard Box', name_en: 'Standard Box', items: [{ id: 'i1', item_name_de: 'Buttercroissant', item_name_en: 'Butter Croissant', allergens_de: 'A,G', diet_de: 'Vegetarisch' }], created_at: new Date().toISOString() }]);
-    }
+    const unsubscribe = onSnapshot(collection(db, "bundles"), (snapshot) => {
+      const bundlesData = snapshot.docs.map(doc => ({ ...doc.data(), id: doc.id })) as Bundle[];
+      bundlesData.sort((a, b) => new Date(b.created_at).getTime() - new Date(a.created_at).getTime());
+      setBundles(bundlesData);
+    });
+    return () => unsubscribe();
   }, []);
 
-  useEffect(() => { if (bundles.length) localStorage.setItem(DB_KEY, JSON.stringify(bundles)); }, [bundles]);
-
-  const filtered = useMemo(() => bundles.filter(b => 
+  const filtered = useMemo(() => (bundles || []).filter(b => 
     b.name_de.toLowerCase().includes(searchTerm.toLowerCase()) || 
     b.name_en.toLowerCase().includes(searchTerm.toLowerCase())
   ), [bundles, searchTerm]);
@@ -227,7 +241,7 @@ const App = () => {
       const doc = new jsPDF('p', 'mm', 'a4');
       const container = document.getElementById('pdf-render-container')!;
       const queue: Bundle[] = [];
-      selections.forEach(s => { const b = bundles.find(x => x.id === s.bundleId); if (b) for(let i=0; i<s.quantity; i++) queue.push(b); });
+      selections.forEach(s => { const b = bundles?.find(x => x.id === s.bundleId); if (b) for(let i=0; i<s.quantity; i++) queue.push(b); });
 
       for (let i = 0; i < queue.length; i++) {
         const wrap = document.createElement('div');
@@ -255,11 +269,24 @@ const App = () => {
     } finally { setIsGenerating(false); }
   };
 
+  const onSaveBundle = async (bundle: Bundle) => {
+    const docRef = doc(db, "bundles", bundle.id);
+    const { id, ...dataToSave } = bundle;
+    await setDoc(docRef, dataToSave);
+    setEditingBundle(null);
+  };
+
+  const deleteBundle = async (id: string) => {
+    if (window.confirm('Are you sure you want to delete this production item? This cannot be undone.')) {
+        await deleteDoc(doc(db, "bundles", id));
+    }
+  };
+
   return (
     <div className="min-h-screen bg-[#fcfcfc] flex flex-col">
       <div id="pdf-render-container"></div>
       
-      {editingBundle && <BundleModal bundle={editingBundle === 'new' ? null : editingBundle} onClose={() => setEditingBundle(null)} onSave={b => { setBundles(p => p.find(x => x.id === b.id) ? p.map(x => x.id === b.id ? b : x) : [b, ...p]); setEditingBundle(null); }} />}
+      {editingBundle && <BundleModal bundle={editingBundle === 'new' ? null : editingBundle} onClose={() => setEditingBundle(null)} onSave={onSaveBundle} />}
       
       {previewUrl && (
         <div className="fixed inset-0 bg-[#024930]/95 backdrop-blur-xl z-[200] flex items-center justify-center p-12 animate-slide-up">
@@ -313,7 +340,19 @@ const App = () => {
               <h2 className="text-[11px] font-black text-slate-400 uppercase tracking-widest">Inventory Library</h2>
               <Sparkles className="text-[#FEACCF]" size={16} />
             </div>
-            {filtered.map(b => (
+            {!bundles && (
+              <div className="text-center py-20 text-slate-400 font-bold">
+                <RefreshCw className="animate-spin inline-block mr-2" /> Loading Inventory...
+              </div>
+            )}
+            {bundles && bundles.length === 0 && (
+              <div className="text-center py-20 text-slate-400 border-2 border-dashed border-slate-200 rounded-[2rem] m-4">
+                <Package size={48} className="mx-auto mb-4" />
+                <h3 className="font-bold text-lg text-slate-600">Inventory is Empty</h3>
+                <p className="text-sm">Click "+ New Item" to add your first production item.</p>
+              </div>
+            )}
+            {bundles && filtered.map(b => (
               <div key={b.id} className={`p-8 rounded-[2.5rem] flex justify-between items-center border-2 cursor-pointer transition-all relative ${selections.find(s => s.bundleId === b.id) ? 'border-[#FEACCF] bg-[#FEACCF]/5 ring-4 ring-[#FEACCF]/10' : 'border-transparent bg-slate-50 hover:bg-slate-100'}`} onClick={() => toggleSelection(b.id)}>
                 <div className="flex items-center gap-6">
                   <div className={`p-5 rounded-[1.5rem] transition-all ${selections.find(s => s.bundleId === b.id) ? 'bg-[#FEACCF]' : 'bg-white'}`}>
@@ -326,6 +365,7 @@ const App = () => {
                 </div>
                 <div className="flex gap-4">
                   <button onClick={e => { e.stopPropagation(); setEditingBundle(b); }} className="p-4 bg-white text-slate-300 hover:text-[#024930] rounded-2xl border border-slate-100 shadow-sm transition-all"><Edit2 size={20} /></button>
+                  <button onClick={e => { e.stopPropagation(); deleteBundle(b.id); }} className="p-4 bg-white text-slate-300 hover:text-rose-500 rounded-2xl border border-slate-100 shadow-sm transition-all"><Trash2 size={20} /></button>
                   <div className={`w-12 h-12 rounded-full border-2 flex items-center justify-center transition-all ${selections.find(s => s.bundleId === b.id) ? 'bg-[#FEACCF] border-[#FEACCF] scale-110 shadow-lg' : 'border-slate-200 bg-white'}`}>{selections.find(s => s.bundleId === b.id) ? <Plus size={24} className="text-[#024930]" /> : <ChevronRight className="text-slate-200" size={24} />}</div>
                 </div>
               </div>
@@ -338,11 +378,11 @@ const App = () => {
           <div className="bg-[#024930] text-white rounded-[3rem] p-10 flex flex-col flex-1 shadow-2xl border border-white/5">
             <div className="flex justify-between items-center mb-10">
               <h2 className="text-xs font-black text-[#FEACCF] uppercase tracking-widest">Print Queue</h2>
-              <span className="bg-white/10 text-[#FEACCF] text-[11px] font-black px-3 py-1.5 rounded-xl border border-white/10">{selections.length}</span>
+              <span className="bg-white/10 text-[#FEACCF] text-[11px] font-black px-3 py-1.5 rounded-xl border border-white/10">{selections.reduce((acc, s) => acc + s.quantity, 0)}</span>
             </div>
             <div className="flex-1 overflow-y-auto space-y-4 mb-8 pr-2 custom-scrollbar max-h-[400px]">
               {selections.map(s => {
-                const b = bundles.find(x => x.id === s.bundleId);
+                const b = bundles?.find(x => x.id === s.bundleId);
                 return b && (
                   <div key={s.bundleId} className="bg-white/5 rounded-2xl p-5 flex flex-col border border-white/5 group">
                     <div className="flex justify-between items-start mb-4">
@@ -351,7 +391,7 @@ const App = () => {
                     </div>
                     <div className="flex items-center justify-between">
                       <span className="text-[10px] font-black text-white/30 uppercase">Quantity</span>
-                      <input type="number" value={s.quantity} onChange={e => setSelections(selections.map(x => x.bundleId === s.bundleId ? { ...x, quantity: Math.max(1, parseInt(e.target.value)) } : x))} className="w-20 bg-black/30 border border-white/10 rounded-xl px-3 py-1.5 text-xs font-black text-[#FEACCF] text-center outline-none" />
+                      <input type="number" value={s.quantity} onChange={e => setSelections(selections.map(x => x.bundleId === s.bundleId ? { ...x, quantity: Math.max(1, parseInt(e.target.value) || 1) } : x))} className="w-20 bg-black/30 border border-white/10 rounded-xl px-3 py-1.5 text-xs font-black text-[#FEACCF] text-center outline-none" />
                     </div>
                   </div>
                 );
@@ -372,7 +412,7 @@ const App = () => {
       </main>
       
       <footer className="px-12 py-10 bg-white border-t border-slate-50 flex justify-between items-center text-slate-400">
-         <p className="text-[10px] font-black uppercase tracking-widest">BELLA&BONA CATERING OPS V1.3</p>
+         <p className="text-[10px] font-black uppercase tracking-widest">BELLA&BONA CATERING OPS V1.4</p>
          <div className="flex gap-8 text-[10px] font-black uppercase tracking-widest">
             <span>Production Hub</span>
             <span>Support</span>

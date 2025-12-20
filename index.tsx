@@ -36,7 +36,7 @@ const firebaseConfig = {
 const app = getApps().length === 0 ? initializeApp(firebaseConfig) : getApp();
 const db = getFirestore(app);
 
-const DB_KEY = 'bb_label_db_v5_final';
+const DB_KEY = 'bb_label_db_v6_fixed';
 
 const generateSafeId = () => Math.random().toString(36).substring(2, 15);
 
@@ -141,25 +141,22 @@ const Label: React.FC<{ bundle: Bundle, lang: 'de' | 'en', packedOn: string, for
 
   const itemCount = bundle.items.length;
   
-  // Dynamic scaling to ensure all items are visible as per reference image
   const nameFontSize = itemCount === 1 ? 'text-[28px]' : itemCount > 6 ? 'text-[13px]' : 'text-[16px]';
-  const itemRowPadding = itemCount === 1 ? 'py-10' : itemCount > 6 ? 'py-1' : 'py-4';
+  const itemRowPadding = itemCount === 1 ? 'py-10' : itemCount > 6 ? 'py-1' : 'py-3';
   const allergenFontSize = itemCount > 6 ? 'text-[8px]' : 'text-[10px]';
   const iconScaleClass = itemCount > 6 ? 'scale-75' : 'scale-100';
 
   return (
     <div 
-      className={`label-card bg-white text-slate-900 flex flex-col overflow-hidden relative ${!forPrint ? 'shadow-2xl border border-slate-700 rounded-lg scale-90 sm:scale-100 origin-top h-[140mm] w-[100mm]' : ''}`} 
+      className={`label-card bg-white text-slate-900 flex flex-col overflow-hidden relative ${!forPrint ? 'shadow-2xl border border-slate-700 rounded-lg scale-90 sm:scale-100 origin-top h-[140mm] w-[100mm]' : 'h-full w-full'}`} 
       style={{ 
         fontFamily: "'Inter', sans-serif", 
         boxSizing: 'border-box',
         backgroundColor: '#fff',
-        color: '#000',
-        width: '100%',
-        height: '100%'
+        color: '#000'
       }}
     >
-      {/* Header - Fixed Height */}
+      {/* Header */}
       <div className="bg-[#024930] py-4 px-6 flex items-center justify-center min-h-[75px] shrink-0">
         <h2 className="text-white text-center font-black text-[22px] uppercase tracking-wider leading-tight">
           {lang === 'de' ? bundle.name_de : bundle.name_en}
@@ -169,7 +166,7 @@ const Label: React.FC<{ bundle: Bundle, lang: 'de' | 'en', packedOn: string, for
       {/* Brand Divider */}
       <div className="w-full h-[2px] bg-[#FEACCF] shrink-0"></div>
 
-      {/* Main Content - Auto Spacing to show all items */}
+      {/* Content */}
       <div className="flex-1 px-8 py-4 flex flex-col overflow-hidden relative watermark">
         <div className="flex-1 flex flex-col justify-start relative z-10 overflow-hidden">
           {bundle.items.map((item, idx) => (
@@ -203,7 +200,7 @@ const Label: React.FC<{ bundle: Bundle, lang: 'de' | 'en', packedOn: string, for
         </div>
       </div>
 
-      {/* Footer - Fixed Height */}
+      {/* Footer */}
       <div className="bg-[#C197AB] py-4 px-10 flex justify-between items-center text-[#024930] shrink-0">
          <div className="flex flex-col">
            <span className="text-[10px] font-black uppercase tracking-widest opacity-80 leading-none">PACKED ON</span>
@@ -225,17 +222,13 @@ const App: React.FC = () => {
   const [activeTab, setActiveTab] = useState<'generator' | 'database'>('generator');
   const [isProcessingImport, setIsProcessingImport] = useState(false);
   const [isPreviewing, setIsPreviewing] = useState(false);
-  const [isSyncing, setIsSyncing] = useState(false);
   const fileInputRef = useRef<HTMLInputElement>(null);
 
   const init = async () => {
-    setIsSyncing(true);
     try {
       const b = await DataService.getBundles();
       setBundles(b);
-    } finally {
-      setIsSyncing(false);
-    }
+    } catch (e) {}
   };
 
   useEffect(() => { init(); }, []);
@@ -299,7 +292,6 @@ const App: React.FC = () => {
 
   return (
     <>
-      {/* PRINT AREA */}
       <div className="print-only">
         {printGroups.map((group, groupIdx) => (
           <div key={groupIdx} className="label-page-group">
@@ -443,16 +435,16 @@ const App: React.FC = () => {
       </div>
 
       {isPreviewing && (
-        <div className="no-print fixed inset-0 z-[200] bg-slate-950/95 backdrop-blur-xl flex items-center justify-center p-8 overflow-y-auto animate-in fade-in duration-300">
-          <div className="bg-slate-900 w-full max-w-6xl h-[90vh] rounded-3xl flex flex-col border border-slate-800 shadow-[0_0_50px_rgba(0,0,0,0.5)]">
+        <div className="no-print fixed inset-0 z-[200] bg-slate-950/95 backdrop-blur-xl flex items-center justify-center p-8 overflow-y-auto">
+          <div className="bg-slate-900 w-full max-w-6xl h-[90vh] rounded-3xl flex flex-col border border-slate-800 shadow-2xl">
             <div className="p-8 border-b border-slate-800 flex justify-between items-center">
-              <h2 className="text-2xl font-black text-white">Print Preview (2x2 A4 Grid)</h2>
-              <button onClick={() => setIsPreviewing(false)} className="text-white bg-slate-800 p-2 rounded-xl hover:bg-slate-700 transition-colors"><X size={24} /></button>
+              <h2 className="text-2xl font-black text-white">Print Preview</h2>
+              <button onClick={() => setIsPreviewing(false)} className="text-white bg-slate-800 p-2 rounded-xl hover:bg-slate-700"><X size={24} /></button>
             </div>
             <div className="flex-1 overflow-y-auto p-12 bg-slate-950 flex flex-col items-center gap-16">
               {printGroups.map((group, idx) => (
-                <div key={idx} className="bg-white shadow-[0_0_20px_rgba(0,0,0,0.3)] flex flex-col items-center justify-center p-[4.25mm]" style={{ width: '210mm', height: '297mm', minHeight: '297mm' }}>
-                   <div className="label-page-group border border-dashed border-slate-200">
+                <div key={idx} className="bg-white shadow-2xl" style={{ width: '210mm', height: '297mm', minHeight: '297mm', padding: '4.25mm' }}>
+                   <div className="label-page-group">
                      {group.map((b, bi) => (
                        <div key={bi} className="label-card-container">
                          <Label bundle={b} lang={lang} packedOn={packedOn} forPrint />
@@ -463,7 +455,7 @@ const App: React.FC = () => {
               ))}
             </div>
             <div className="p-8 border-t border-slate-800">
-              <button onClick={() => window.print()} className="w-full bg-emerald-500 text-slate-950 font-black py-5 rounded-2xl flex items-center justify-center gap-4 text-xl shadow-xl hover:bg-emerald-400 transition-all">
+              <button onClick={() => window.print()} className="w-full bg-emerald-500 text-slate-950 font-black py-5 rounded-2xl flex items-center justify-center gap-4 text-xl">
                 <Printer size={28} /> Confirm and Print
               </button>
             </div>

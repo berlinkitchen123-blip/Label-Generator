@@ -23,17 +23,14 @@
             background-color: #020617;
         }
 
-        /* Watermark pattern for labels matching the reference image icons */
         .watermark {
             background-image: url("data:image/svg+xml,%3Csvg width='100' height='100' viewBox='0 0 100 100' xmlns='http://www.w3.org/2000/svg'%3E%3Cg fill='%23024930' fill-opacity='0.03'%3E%3Cpath d='M20 20c0 5-4 9-9 9s-9-4-9-9 4-9 9-9 9 4 9 9zm50 40c0 5-4 9-9 9s-9-4-9-9 4-9 9-9 9 4 9 9zM30 80c0 3-2 5-5 5s-5-2-5-5 2-5 5-5 5 2 5 5z'/%3E%3C/g%3E%3C/svg%3E");
         }
 
-        /* Screen-only styles */
         @media screen {
             .print-only { display: none !important; }
         }
 
-        /* Print-only styles */
         @media print {
             .no-print { 
                 display: none !important; 
@@ -57,30 +54,40 @@
 
             @page {
                 size: A4;
-                margin: 4.25mm; /* Required: 4.25mm margin on all sides */
+                margin: 4.25mm !important; /* Fixed: 4.25mm margin on all sides */
             }
 
+            /* Calculation: 
+               Width: 210mm - (2 * 4.25mm) = 201.5mm
+               Height: 297mm - (2 * 4.25mm) = 288.5mm
+               Each Label (2x2):
+               Width: 100.75mm
+               Height: 144.25mm
+            */
             .label-page-group {
                 display: grid;
-                grid-template-columns: repeat(2, 1fr);
-                grid-template-rows: repeat(2, 1fr);
+                grid-template-columns: 100.75mm 100.75mm;
+                grid-template-rows: 144.25mm 144.25mm;
                 box-sizing: border-box;
-                width: 201.5mm; /* 210mm - (2 * 4.25mm) */
-                height: 288.5mm; /* 297mm - (2 * 4.25mm) */
+                width: 201.5mm;
+                height: 288.5mm;
                 page-break-after: always;
-                padding: 0;
-                margin: 0;
-                gap: 0;
+                padding: 0 !important;
+                margin: 0 !important;
+                gap: 0 !important;
+                overflow: hidden;
             }
 
             .label-card-container {
                 display: flex;
-                align-items: center;
-                justify-content: center;
-                width: 100%;
-                height: 100%;
+                align-items: stretch;
+                justify-content: stretch;
+                width: 100.75mm;
+                height: 144.25mm;
                 border: 0.1pt dashed #e5e7eb; /* Subtle cut lines */
                 box-sizing: border-box;
+                padding: 0;
+                margin: 0;
             }
 
             .label-card {

@@ -3,7 +3,6 @@ import { createRoot } from 'react-dom/client';
 import { 
   Plus, 
   Trash2, 
-  Download, 
   Search, 
   FileText, 
   X, 
@@ -14,20 +13,17 @@ import {
   Fish, 
   Utensils, 
   Beef, 
-  PlusCircle,
-  Printer,
-  Package,
-  Calendar,
-  RefreshCw,
-  Database,
-  Soup,
-  Croissant,
-  ChevronRight,
-  Sparkles
+  Printer, 
+  Package, 
+  Calendar, 
+  RefreshCw, 
+  ChevronRight, 
+  Sparkles,
+  Croissant
 } from 'lucide-react';
 
-// --- TYPES & CONSTANTS ---
-const DB_KEY = 'bb_label_db_v12';
+// --- CONSTANTS ---
+const DB_KEY = 'bb_label_db_v13';
 
 interface BundleItem {
   id: string;
@@ -50,7 +46,7 @@ interface Selection {
   quantity: number;
 }
 
-// --- UI COMPONENTS ---
+// --- SUB-COMPONENTS ---
 
 const DietSymbol = ({ type, size = 18 }: { type: string; size?: number }) => {
   const t = type.toLowerCase();
@@ -146,17 +142,23 @@ const BundleModal = ({ bundle, onSave, onClose }: { bundle: any; onSave: (b: Bun
     <div className="fixed inset-0 bg-[#024930]/90 backdrop-blur-xl z-[100] flex items-center justify-center p-6 animate-slide-up">
       <div className="bg-white rounded-[2.5rem] w-full max-w-4xl max-h-[90vh] overflow-hidden flex flex-col shadow-2xl">
         <div className="p-8 border-b flex justify-between items-center bg-slate-50">
-          <h2 className="text-2xl font-black text-[#024930] uppercase tracking-tighter">{bundle ? 'Edit Production Item' : 'New Production Item'}</h2>
+          <h2 className="text-2xl font-black text-[#024930] uppercase tracking-tighter">{bundle ? 'Edit Item' : 'New Production Item'}</h2>
           <button onClick={onClose} className="p-3 hover:bg-slate-200 rounded-full text-slate-400 transition-colors"><X size={24} /></button>
         </div>
         <div className="flex-1 overflow-y-auto p-10 space-y-8">
           <div className="grid grid-cols-2 gap-6">
-            <input placeholder="Item Name (DE)" className="w-full bg-slate-100 rounded-2xl p-4 font-bold outline-none border-2 border-transparent focus:border-[#FEACCF]" value={data.name_de} onChange={e => setData({...data, name_de: e.target.value})} />
-            <input placeholder="Item Name (EN)" className="w-full bg-slate-100 rounded-2xl p-4 font-bold outline-none border-2 border-transparent focus:border-[#FEACCF]" value={data.name_en} onChange={e => setData({...data, name_en: e.target.value})} />
+            <div className="space-y-1">
+                <label className="text-[10px] font-black text-slate-400 uppercase tracking-widest px-1">Name (DE)</label>
+                <input placeholder="Item Name (DE)" className="w-full bg-slate-100 rounded-2xl p-4 font-bold outline-none border-2 border-transparent focus:border-[#FEACCF]" value={data.name_de} onChange={e => setData({...data, name_de: e.target.value})} />
+            </div>
+            <div className="space-y-1">
+                <label className="text-[10px] font-black text-slate-400 uppercase tracking-widest px-1">Name (EN)</label>
+                <input placeholder="Item Name (EN)" className="w-full bg-slate-100 rounded-2xl p-4 font-bold outline-none border-2 border-transparent focus:border-[#FEACCF]" value={data.name_en} onChange={e => setData({...data, name_en: e.target.value})} />
+            </div>
           </div>
           <div className="space-y-4">
             <div className="flex justify-between items-center"><h3 className="font-black text-[#024930] uppercase text-sm">Components</h3>
-              <button onClick={addItem} className="bg-[#024930] text-white px-5 py-2.5 rounded-xl text-xs font-black flex items-center gap-2"><Plus size={16} /> ADD COMPONENT</button>
+              <button onClick={addItem} className="bg-[#024930] text-white px-5 py-2.5 rounded-xl text-xs font-black flex items-center gap-2"><Plus size={16} /> ADD</button>
             </div>
             {data.items.map((item) => (
               <div key={item.id} className="bg-slate-50 p-6 rounded-2xl border border-slate-100 relative group">
@@ -200,7 +202,7 @@ const App = () => {
     const saved = localStorage.getItem(DB_KEY);
     if (saved) setBundles(JSON.parse(saved));
     else {
-      setBundles([{ id: 'demo1', name_de: 'Frühstück Box', name_en: 'Breakfast Box', items: [{ id: 'i1', item_name_de: 'Buttercroissant', item_name_en: 'Butter Croissant', allergens_de: 'A,G', diet_de: 'Vegetarisch' }], created_at: new Date().toISOString() }]);
+      setBundles([{ id: 'demo1', name_de: 'Standard Box', name_en: 'Standard Box', items: [{ id: 'i1', item_name_de: 'Buttercroissant', item_name_en: 'Butter Croissant', allergens_de: 'A,G', diet_de: 'Vegetarisch' }], created_at: new Date().toISOString() }]);
     }
   }, []);
 
@@ -248,6 +250,8 @@ const App = () => {
         if (previewUrl) URL.revokeObjectURL(previewUrl);
         setPreviewUrl(URL.createObjectURL(doc.output('blob')));
       }
+    } catch (e) {
+        console.error("PDF generation error:", e);
     } finally { setIsGenerating(false); }
   };
 
@@ -278,7 +282,7 @@ const App = () => {
           <div className="bg-[#FEACCF] p-4 rounded-3xl shadow-lg rotate-3"><FileText className="text-[#024930]" size={32} /></div>
           <div>
             <h1 className="text-3xl font-black tracking-tighter leading-none">BELLA<span className="text-[#FEACCF]">&</span>BONA</h1>
-            <p className="text-[10px] font-black uppercase tracking-[0.4em] opacity-40 mt-1.5">Production Control System</p>
+            <p className="text-[10px] font-black uppercase tracking-[0.4em] opacity-40 mt-1.5">Production Cockpit</p>
           </div>
         </div>
         <div className="flex items-center gap-8">
@@ -292,7 +296,7 @@ const App = () => {
 
       <main className="flex-1 p-12 max-w-7xl mx-auto w-full grid grid-cols-12 gap-12">
         {/* Left Side: Library */}
-        <div className="col-span-8 bg-white rounded-[3rem] p-10 shadow-sm border border-slate-100 animate-slide-up">
+        <div className="col-span-12 lg:col-span-8 bg-white rounded-[3rem] p-10 shadow-sm border border-slate-100 animate-slide-up">
           <div className="flex gap-6 mb-10">
             <div className="relative flex-1 group">
               <Search className="absolute left-6 top-1/2 -translate-y-1/2 text-slate-300 transition-colors group-focus-within:text-[#FEACCF]" size={20} />
@@ -306,7 +310,7 @@ const App = () => {
 
           <div className="space-y-4">
             <div className="flex justify-between items-center px-4 mb-4">
-              <h2 className="text-[11px] font-black text-slate-400 uppercase tracking-widest">Available Library</h2>
+              <h2 className="text-[11px] font-black text-slate-400 uppercase tracking-widest">Inventory Library</h2>
               <Sparkles className="text-[#FEACCF]" size={16} />
             </div>
             {filtered.map(b => (
@@ -330,13 +334,13 @@ const App = () => {
         </div>
 
         {/* Right Side: Queue */}
-        <div className="col-span-4 flex flex-col h-[calc(100vh-180px)] sticky top-32 animate-slide-up" style={{ animationDelay: '0.1s' }}>
+        <div className="col-span-12 lg:col-span-4 flex flex-col h-fit lg:h-[calc(100vh-180px)] lg:sticky top-32 animate-slide-up" style={{ animationDelay: '0.1s' }}>
           <div className="bg-[#024930] text-white rounded-[3rem] p-10 flex flex-col flex-1 shadow-2xl border border-white/5">
             <div className="flex justify-between items-center mb-10">
-              <h2 className="text-xs font-black text-[#FEACCF] uppercase tracking-widest">Production Queue</h2>
+              <h2 className="text-xs font-black text-[#FEACCF] uppercase tracking-widest">Print Queue</h2>
               <span className="bg-white/10 text-[#FEACCF] text-[11px] font-black px-3 py-1.5 rounded-xl border border-white/10">{selections.length}</span>
             </div>
-            <div className="flex-1 overflow-y-auto space-y-4 mb-8 pr-2 custom-scrollbar">
+            <div className="flex-1 overflow-y-auto space-y-4 mb-8 pr-2 custom-scrollbar max-h-[400px]">
               {selections.map(s => {
                 const b = bundles.find(x => x.id === s.bundleId);
                 return b && (
@@ -360,7 +364,7 @@ const App = () => {
               )}
             </div>
             <div className="space-y-4 pt-6 border-t border-white/10">
-              <button disabled={!selections.length || isGenerating} onClick={() => generatePDF(false)} className="w-full bg-white/10 text-white py-5 rounded-2xl font-black text-xs uppercase tracking-widest flex items-center justify-center gap-3 hover:bg-white/20 active:scale-95 transition-all disabled:opacity-30">{isGenerating ? <RefreshCw className="animate-spin" size={20} /> : <Eye size={20} className="text-[#FEACCF]" />} Verification Preview</button>
+              <button disabled={!selections.length || isGenerating} onClick={() => generatePDF(false)} className="w-full bg-white/10 text-white py-5 rounded-2xl font-black text-xs uppercase tracking-widest flex items-center justify-center gap-3 hover:bg-white/20 active:scale-95 transition-all disabled:opacity-30">{isGenerating ? <RefreshCw className="animate-spin" size={20} /> : <Eye size={20} className="text-[#FEACCF]" />} Verification</button>
               <button disabled={!selections.length || isGenerating} onClick={() => generatePDF(true)} className="w-full bg-[#FEACCF] text-[#024930] py-5 rounded-2xl font-black text-xs uppercase tracking-widest flex items-center justify-center gap-3 shadow-[0_0_40px_rgba(254,172,207,0.3)] active:scale-95 transition-all disabled:opacity-30"><Printer size={20} /> Process Batch</button>
             </div>
           </div>
@@ -368,11 +372,10 @@ const App = () => {
       </main>
       
       <footer className="px-12 py-10 bg-white border-t border-slate-50 flex justify-between items-center text-slate-400">
-         <p className="text-[10px] font-black uppercase tracking-widest">BELLA&BONA CATERING OPS V1.2</p>
+         <p className="text-[10px] font-black uppercase tracking-widest">BELLA&BONA CATERING OPS V1.3</p>
          <div className="flex gap-8 text-[10px] font-black uppercase tracking-widest">
-            <span>Documentation</span>
+            <span>Production Hub</span>
             <span>Support</span>
-            <span>Privacy</span>
          </div>
       </footer>
     </div>

@@ -142,33 +142,34 @@ const Label: React.FC<{ bundle: Bundle, lang: 'de' | 'en', packedOn: string, for
   };
 
   const itemCount = bundle.items.length;
-  // Threshold strictly set to more than 6 items
-  const isHighDensity = itemCount > 6;
+  // Adjusted threshold: bundles with 5+ items now use the "high density" compact layout 
+  // to ensure items like the 5th Granola item in the Brunchbox aren't cut off.
+  const isHighDensity = itemCount >= 5;
   const isExtremeDensity = itemCount >= 9;
   
-  // Refined dynamic font sizes and paddings for ALL cases
-  // Ensuring perfect fit for 1-6 items while preserving 7-9 fix
+  // Smoother font size scaling
   const nameFontSize = itemCount === 1 ? 'text-[28px]' : 
                      itemCount <= 3 ? 'text-[22px]' : 
-                     itemCount <= 5 ? 'text-[18px]' : 
-                     itemCount === 6 ? 'text-[15px]' :
+                     itemCount === 4 ? 'text-[19px]' : 
+                     itemCount <= 6 ? 'text-[15px]' :
                      itemCount <= 8 ? 'text-[12px]' : 'text-[10px]';
   
+  // Smoother padding scaling
   const itemVerticalPadding = itemCount === 1 ? 'py-12' : 
                                itemCount <= 3 ? 'py-8' : 
-                               itemCount <= 5 ? 'py-4' : 
-                               itemCount === 6 ? 'py-2.5' :
+                               itemCount === 4 ? 'py-5' : 
+                               itemCount <= 6 ? 'py-3' :
                                itemCount <= 8 ? 'py-1.5' : 'py-1';
   
   const allergenFontSize = itemCount > 6 ? 'text-[7px]' : 'text-[10px]';
   
-  // Icon scaling logic
+  // Proportional icon scaling
   const iconScaleClass = isExtremeDensity ? 'scale-[0.55]' : 
                          isHighDensity ? 'scale-[0.7]' : 
-                         itemCount >= 5 ? 'scale-75' : 'scale-90';
+                         itemCount >= 4 ? 'scale-75' : 'scale-90';
 
-  // Header/Footer Scaling Logic
-  // High density bundles shrink the header/footer to save space
+  // Header/Footer Responsive Sizing
+  // High density logic preserved exactly for >6 items, and now helps 5-6 items fit.
   const headerMinHeight = isHighDensity ? 'min-h-[50px]' : 'min-h-[85px]';
   const headerPadding = isHighDensity ? 'py-1' : 'py-4';
   const headerTitleSize = isHighDensity ? 'text-[16px]' : 'text-[22px]';
@@ -198,7 +199,7 @@ const Label: React.FC<{ bundle: Bundle, lang: 'de' | 'en', packedOn: string, for
       </div>
 
       {/* Main Content Area */}
-      <div className="flex-1 px-8 py-0.5 flex flex-col overflow-hidden relative watermark">
+      <div className="flex-1 px-8 py-1 flex flex-col overflow-hidden relative watermark">
         <div className="flex-1 flex flex-col justify-around relative z-10 overflow-hidden">
           {bundle.items.map((item, idx) => (
             <div key={item.id} className={`flex justify-between items-center border-b border-gray-100 last:border-none ${itemVerticalPadding} transition-all`}>

@@ -1,17 +1,16 @@
 import React, { useState, useEffect, useMemo } from 'react';
 import { createRoot } from 'react-dom/client';
+import { initializeApp, getApp, getApps, FirebaseApp } from "firebase/app";
+import { getDatabase, ref, set, get, Database as FirebaseDatabase } from "firebase/database";
 import { 
   Plus, 
   Trash2, 
   Download, 
   Upload, 
   Search, 
-  Printer, 
   FileText, 
-  Calendar,
   X,
   Edit2,
-  Save,
   Info,
   PlusCircle,
   Leaf,
@@ -28,8 +27,33 @@ import {
   RefreshCw,
   Sparkles,
   Eye,
-  Maximize2
+  Cloud,
+  CloudOff
 } from 'lucide-react';
+
+/**
+ * FIREBASE CONFIGURATION
+ */
+const firebaseConfig = {
+  apiKey: "AIzaSyBlB6j_w_-Mb_ughrrz8BDFdiIJEDNTKGM",
+  authDomain: "label-c61eb.firebaseapp.com",
+  databaseURL: "https://label-c61eb-default-rtdb.europe-west1.firebasedatabase.app",
+  projectId: "label-c61eb",
+  storageBucket: "label-c61eb.firebasestorage.app",
+  messagingSenderId: "168446433946",
+  appId: "1:168446433946:web:6536d1d40fb86ee1f61d23"
+};
+
+// Singleton Initialization
+let app: FirebaseApp | undefined;
+let db: FirebaseDatabase | undefined;
+
+try {
+  app = getApps().length === 0 ? initializeApp(firebaseConfig) : getApp();
+  db = getDatabase(app);
+} catch (error) {
+  console.error("Firebase Initialization Failed:", error);
+}
 
 /**
  * BRAND CONSTANTS
@@ -63,161 +87,6 @@ const DEFAULT_ALLERGENS = [
 const CURRENT_DB_KEY = 'bb_label_db_v3';
 const CURRENT_ALLERGEN_KEY = 'bb_allergen_db_v3';
 
-// Migration/Recovery function
-const getInitialData = (): Bundle[] => {
-  const keys = ['bb_label_db_v3', 'bb_label_db_v2', 'bb_label_db'];
-  for (const key of keys) {
-    const saved = localStorage.getItem(key);
-    if (saved && saved !== '[]' && saved !== 'null') {
-      try {
-        const data = JSON.parse(saved);
-        if (Array.isArray(data) && data.length > 0) {
-          // If we found data in an old key, migrate it to the current one
-          if (key !== CURRENT_DB_KEY) {
-            localStorage.setItem(CURRENT_DB_KEY, saved);
-          }
-          return data;
-        }
-      } catch (e) {
-        console.error("Migration error for key " + key, e);
-      }
-    }
-  }
-  return [];
-};
-
-const getInitialAllergens = (): { code: string, name: string }[] => {
-  const keys = ['bb_allergen_db_v3', 'bb_allergen_db_v2', 'bb_allergen_db'];
-  for (const key of keys) {
-    const saved = localStorage.getItem(key);
-    if (saved && saved !== '[]' && saved !== 'null') {
-      try {
-        const data = JSON.parse(saved);
-        if (Array.isArray(data) && data.length > 0) {
-          if (key !== CURRENT_ALLERGEN_KEY) {
-            localStorage.setItem(CURRENT_ALLERGEN_KEY, saved);
-          }
-          return data;
-        }
-      } catch (e) {}
-    }
-  }
-  return DEFAULT_ALLERGENS;
-};
-
-const DEMO_BUNDLES: Bundle[] = [
-  {
-    id: 'demo-1',
-    name_de: 'Frühstücks-Box Klassik',
-    name_en: 'Breakfast Box Classic',
-    created_at: new Date().toISOString(),
-    items: [
-      { id: 'i1', bundle_id: 'demo-1', item_name_de: 'Buttercroissant', item_name_en: 'Butter Croissant', allergens_de: 'A, C, G', diet_de: 'Vegetarisch', created_at: '' },
-      { id: 'i2', bundle_id: 'demo-1', item_name_de: 'Frischer Obstsalat', item_name_en: 'Fresh Fruit Salad', allergens_de: '', diet_de: 'Vegan', created_at: '' },
-      { id: 'i3', bundle_id: 'demo-1', item_name_de: 'Griechischer Joghurt', item_name_en: 'Greek Yogurt', allergens_de: 'G', diet_de: 'Vegetarisch', created_at: '' }
-    ]
-  }
-];
-
-const getAllergenFullName = (input: string, legend: { code: string, name: string }[]): string => {
-  const clean = input.trim().toUpperCase();
-  const found = legend.find(a => a.code === clean || a.name.toUpperCase() === clean);
-  return found ? found.name : input.trim();
-};
-
-const TEXT = {
-  de: {
-    appTitle: 'Bella&Bona Etiketten-Generator',
-    labelGenerator: 'Etiketten-Generator',
-    importData: 'Datenbank & Import',
-    packedOn: 'Abgepackt am',
-    searchPlaceholder: 'Nach Bundles suchen...',
-    availableBundles: 'Verfügbare Bundles',
-    selectedBundles: 'Ausgewählte Bundles',
-    noBundles: 'Keine Bundles gefunden.',
-    add: 'Hinzufügen',
-    quantity: 'Anzahl',
-    clearAll: 'Alle löschen',
-    generatePdf: 'PDF generieren',
-    previewPdf: 'Vorschau',
-    importInstructions: 'Format-Anweisungen',
-    importRequired: 'Erforderlich',
-    importOptional: 'Optional',
-    downloadTemplate: 'Excel-Template herunterladen',
-    uploadFile: 'Excel/CSV hochladen',
-    allergens: 'Allergene',
-    diet: 'Ernährungsform',
-    brandName: 'BELLA&BONA',
-    successImport: 'Daten erfolgreich importiert!',
-    errorImport: 'Fehler beim Importieren.',
-    noSelected: 'Noch keine Bundles ausgewählt.',
-    createNew: 'Neues Bundle',
-    editBundle: 'Bundle bearbeiten',
-    saveBundle: 'Speichern',
-    deleteBundle: 'Löschen',
-    addItem: 'Item hinzufügen',
-    bundleName: 'Bundle Name',
-    itemName: 'Item Name',
-    allergenLegend: 'Allergen-Legende',
-    dbStats: 'Datenbank',
-    clearDb: 'Löschen',
-    confirmClear: 'Alle Daten löschen?',
-    manageAllergens: 'Allergene Verwalten',
-    allergenCode: 'Code (z.B. X)',
-    allergenName: 'Name (z.B. Hafer)',
-    addAllergen: 'Hinzufügen',
-    selectAllergens: 'Allergene wählen',
-    loadDemo: 'Demo Daten laden',
-    download: 'Herunterladen',
-    close: 'Schließen'
-  },
-  en: {
-    appTitle: 'Bella&Bona Label Generator',
-    labelGenerator: 'Label Generator',
-    importData: 'Database & Import',
-    packedOn: 'Packed On',
-    searchPlaceholder: 'Search bundles...',
-    availableBundles: 'Available Bundles',
-    selectedBundles: 'Selected Bundles',
-    noBundles: 'No bundles found.',
-    add: 'Add',
-    quantity: 'Qty',
-    clearAll: 'Clear All',
-    generatePdf: 'Generate PDF',
-    previewPdf: 'Preview',
-    importInstructions: 'Format Instructions',
-    importRequired: 'Required',
-    importOptional: 'Optional',
-    downloadTemplate: 'Download Excel Template',
-    uploadFile: 'Upload Excel/CSV',
-    allergens: 'Allergens',
-    diet: 'Diet Type',
-    brandName: 'BELLA&BONA',
-    successImport: 'Data imported successfully!',
-    errorImport: 'Error importing file.',
-    noSelected: 'No bundles selected yet.',
-    createNew: 'Create New Bundle',
-    editBundle: 'Edit Bundle',
-    saveBundle: 'Save Bundle',
-    deleteBundle: 'Delete',
-    addItem: 'Add Item',
-    bundleName: 'Bundle Name',
-    itemName: 'Item Name',
-    allergenLegend: 'Allergen Legend',
-    dbStats: 'Database',
-    clearDb: 'Clear DB',
-    confirmClear: 'Clear all data?',
-    manageAllergens: 'Manage Allergens',
-    allergenCode: 'Code (e.g. X)',
-    allergenName: 'Name (e.g. Oats)',
-    addAllergen: 'Add Allergen',
-    selectAllergens: 'Select Allergens',
-    loadDemo: 'Load Demo Data',
-    download: 'Download',
-    close: 'Close'
-  }
-};
-
 interface BundleItem {
   id: string;
   bundle_id: string;
@@ -241,6 +110,149 @@ interface Selection {
   quantity: number;
 }
 
+// Migration/Recovery function from LocalStorage
+const getInitialLocalData = (): Bundle[] => {
+  const keys = ['bb_label_db_v3', 'bb_label_db_v2', 'bb_label_db_v1', 'bb_label_db'];
+  for (const key of keys) {
+    const saved = localStorage.getItem(key);
+    if (saved && saved !== '[]' && saved !== 'null') {
+      try {
+        const data = JSON.parse(saved);
+        if (Array.isArray(data) && data.length > 0) {
+          if (key !== CURRENT_DB_KEY) {
+            console.log(`Migrating data from ${key} to ${CURRENT_DB_KEY}`);
+            localStorage.setItem(CURRENT_DB_KEY, saved);
+          }
+          return data;
+        }
+      } catch (e) {
+        console.error("Migration error for key " + key, e);
+      }
+    }
+  }
+  return [];
+};
+
+const getInitialLocalAllergens = (): { code: string, name: string }[] => {
+  const keys = ['bb_allergen_db_v3', 'bb_allergen_db_v2', 'bb_allergen_db_v1', 'bb_allergen_db'];
+  for (const key of keys) {
+    const saved = localStorage.getItem(key);
+    if (saved && saved !== '[]' && saved !== 'null') {
+      try {
+        const data = JSON.parse(saved);
+        if (Array.isArray(data) && data.length > 0) {
+          if (key !== CURRENT_ALLERGEN_KEY) {
+            localStorage.setItem(CURRENT_ALLERGEN_KEY, saved);
+          }
+          return data;
+        }
+      } catch (e) {}
+    }
+  }
+  return DEFAULT_ALLERGENS;
+};
+
+const TEXT = {
+  de: {
+    appTitle: 'Bella&Bona Etiketten-Generator',
+    labelGenerator: 'Etiketten-Generator',
+    importData: 'Datenbank & Import',
+    packedOn: 'Abgepackt am',
+    searchPlaceholder: 'Nach Bundles suchen...',
+    availableBundles: 'Verfügbare Bundles',
+    selectedBundles: 'Ausgewählte Bundles',
+    noBundles: 'Keine Bundles gefunden.',
+    add: 'Hinzufügen',
+    quantity: 'Anzahl',
+    clearAll: 'Alle löschen',
+    generatePdf: 'PDF generieren',
+    previewPdf: 'Vorschau',
+    importInstructions: 'Format-Anweisungen',
+    downloadTemplate: 'Excel-Template herunterladen',
+    uploadFile: 'Excel/CSV hochladen',
+    allergens: 'Allergene',
+    diet: 'Ernährungsform',
+    brandName: 'BELLA&BONA',
+    successImport: 'Daten erfolgreich importiert!',
+    errorImport: 'Fehler beim Importieren.',
+    noSelected: 'Noch keine Bundles ausgewählt.',
+    createNew: 'Neues Bundle',
+    editBundle: 'Bundle bearbeiten',
+    saveBundle: 'Speichern',
+    deleteBundle: 'Löschen',
+    addItem: 'Item hinzufügen',
+    bundleName: 'Bundle Name',
+    itemName: 'Item Name',
+    dbStats: 'Datenbank',
+    clearDb: 'Löschen',
+    confirmClear: 'Alle Daten löschen?',
+    manageAllergens: 'Allergene Verwalten',
+    allergenCode: 'Code (z.B. X)',
+    allergenName: 'Name (z.B. Hafer)',
+    addAllergen: 'Hinzufügen',
+    selectAllergens: 'Allergene wählen',
+    loadDemo: 'Demo Daten laden',
+    download: 'Herunterladen',
+    close: 'Schließen',
+    syncing: 'Synchronisieren...',
+    synced: 'Cloud-Sync Aktiv'
+  },
+  en: {
+    appTitle: 'Bella&Bona Label Generator',
+    labelGenerator: 'Label Generator',
+    importData: 'Database & Import',
+    packedOn: 'Packed On',
+    searchPlaceholder: 'Search bundles...',
+    availableBundles: 'Available Bundles',
+    selectedBundles: 'Selected Bundles',
+    noBundles: 'No bundles found.',
+    add: 'Add',
+    quantity: 'Qty',
+    clearAll: 'Clear All',
+    generatePdf: 'Generate PDF',
+    previewPdf: 'Preview',
+    importInstructions: 'Format Instructions',
+    downloadTemplate: 'Download Excel Template',
+    uploadFile: 'Upload Excel/CSV',
+    allergens: 'Allergens',
+    diet: 'Diet Type',
+    brandName: 'BELLA&BONA',
+    successImport: 'Data imported successfully!',
+    errorImport: 'Error importing file.',
+    noSelected: 'No bundles selected yet.',
+    createNew: 'Create New Bundle',
+    editBundle: 'Edit Bundle',
+    saveBundle: 'Save Bundle',
+    deleteBundle: 'Delete',
+    addItem: 'Add Item',
+    bundleName: 'Bundle Name',
+    itemName: 'Item Name',
+    dbStats: 'Database',
+    clearDb: 'Clear DB',
+    confirmClear: 'Clear all data?',
+    manageAllergens: 'Manage Allergens',
+    allergenCode: 'Code (e.g. X)',
+    allergenName: 'Name (e.g. Oats)',
+    addAllergen: 'Add Allergen',
+    selectAllergens: 'Select Allergens',
+    loadDemo: 'Load Demo Data',
+    download: 'Download',
+    close: 'Close',
+    syncing: 'Syncing...',
+    synced: 'Cloud Sync Active'
+  }
+};
+
+/**
+ * HELPERS
+ */
+const getAllergenFullName = (code: string, allergens: { code: string, name: string }[]) => {
+  if (!code) return '';
+  const trimmed = code.trim().toUpperCase();
+  const found = allergens.find(a => a.code.toUpperCase() === trimmed);
+  return found ? found.name : code;
+};
+
 const DietSymbol = ({ type, size = 20 }: { type: string, size?: number }) => {
   const t = type.toLowerCase();
   if (t.includes('vegan')) return <Leaf size={size} strokeWidth={2.5} className="text-green-600" />;
@@ -263,17 +275,15 @@ const WatermarkPattern = () => (
 
 const LabelPreview = ({ bundle, date, t, lang, allergens }: { bundle: Bundle, date: string, t: any, lang: 'de' | 'en', allergens: { code: string, name: string }[] }) => {
   const dateLocale = lang === 'de' ? 'de-DE' : 'en-GB';
+  const displayBundleName = lang === 'de' ? bundle.name_de : bundle.name_en;
   const itemCount = bundle.items.length;
 
   const config = useMemo(() => {
     if (itemCount <= 3) return { title: 28, item: 20, allergen: 10, dietIcon: 26, dietText: 12, spacing: 'py-10 gap-10', divider: true, headerMin: 100 };
     if (itemCount <= 5) return { title: 24, item: 16, allergen: 9, dietIcon: 22, dietText: 11, spacing: 'py-6 gap-6', divider: true, headerMin: 90 };
     if (itemCount <= 7) return { title: 22, item: 13, allergen: 8.5, dietIcon: 18, dietText: 10, spacing: 'py-4 gap-4', divider: true, headerMin: 80 };
-    if (itemCount <= 10) return { title: 20, item: 11, allergen: 7.5, dietIcon: 16, dietText: 9, spacing: 'py-3 gap-2.5', divider: false, headerMin: 70 };
     return { title: 18, item: 10, allergen: 7, dietIcon: 14, dietText: 8, spacing: 'py-2 gap-1.5', divider: false, headerMin: 65 };
   }, [itemCount]);
-
-  const displayBundleName = lang === 'de' ? bundle.name_de : bundle.name_en;
 
   return (
     <div 
@@ -409,7 +419,6 @@ const BundleEditor = ({ bundle, allergens, onSave, onCancel, t }: {
   const toggleAllergen = (itemId: string, allergenCode: string) => {
     const item = formData.items.find(i => i.id === itemId);
     if (!item) return;
-
     let current = item.allergens_de.split(',').map(s => s.trim()).filter(Boolean);
     if (current.includes(allergenCode)) {
       current = current.filter(c => c !== allergenCode);
@@ -502,35 +511,33 @@ const BundleEditor = ({ bundle, allergens, onSave, onCancel, t }: {
   );
 };
 
-const PreviewModal = ({ blobUrl, onClose, onDownload, t }: { blobUrl: string, onClose: () => void, onDownload: () => void, t: any }) => {
-  return (
-    <div className="fixed inset-0 bg-black/95 backdrop-blur-xl z-[150] flex items-center justify-center p-4 animate-fade-in">
-      <div className="bg-slate-900 border border-slate-800 rounded-[2.5rem] w-full max-w-6xl h-[90vh] overflow-hidden flex flex-col shadow-2xl">
-        <div className="p-8 border-b border-slate-800 flex justify-between items-center bg-slate-900/80 backdrop-blur-md">
-          <div className="flex items-center gap-4">
-            <div className="brand-pink p-2.5 rounded-2xl"><Eye size={24} className="text-brand-green" /></div>
-            <h2 className="text-xl font-black text-white uppercase tracking-tight">{t.previewPdf}</h2>
-          </div>
-          <div className="flex items-center gap-4">
-            <button onClick={onDownload} className="flex items-center gap-3 brand-green text-white px-8 py-3.5 rounded-2xl font-black text-sm uppercase tracking-widest shadow-xl hover:brightness-110 active:scale-[0.98] transition-all">
-              <Download size={18} /> {t.download}
-            </button>
-            <button onClick={onClose} className="p-3 text-slate-500 hover:text-white transition bg-slate-800 rounded-2xl">
-              <X size={24} />
-            </button>
-          </div>
+const PreviewModal = ({ blobUrl, onClose, onDownload, t }: { blobUrl: string, onClose: () => void, onDownload: () => void, t: any }) => (
+  <div className="fixed inset-0 bg-black/95 backdrop-blur-xl z-[150] flex items-center justify-center p-4 animate-fade-in">
+    <div className="bg-slate-900 border border-slate-800 rounded-[2.5rem] w-full max-w-6xl h-[90vh] overflow-hidden flex flex-col shadow-2xl">
+      <div className="p-8 border-b border-slate-800 flex justify-between items-center bg-slate-900/80 backdrop-blur-md">
+        <div className="flex items-center gap-4">
+          <div className="brand-pink p-2.5 rounded-2xl"><Eye size={24} className="text-brand-green" /></div>
+          <h2 className="text-xl font-black text-white uppercase tracking-tight">{t.previewPdf}</h2>
         </div>
-        <div className="flex-1 bg-slate-950 p-6 relative">
-          <iframe src={blobUrl} title="PDF Preview" className="w-full h-full rounded-2xl border border-slate-800 shadow-inner" />
+        <div className="flex items-center gap-4">
+          <button onClick={onDownload} className="flex items-center gap-3 brand-green text-white px-8 py-3.5 rounded-2xl font-black text-sm uppercase tracking-widest shadow-xl hover:brightness-110 active:scale-[0.98] transition-all">
+            <Download size={18} /> {t.download}
+          </button>
+          <button onClick={onClose} className="p-3 text-slate-500 hover:text-white transition bg-slate-800 rounded-2xl">
+            <X size={24} />
+          </button>
         </div>
       </div>
+      <div className="flex-1 bg-slate-950 p-6 relative">
+        <iframe src={blobUrl} title="PDF Preview" className="w-full h-full rounded-2xl border border-slate-800 shadow-inner" />
+      </div>
     </div>
-  );
-};
+  </div>
+);
 
 const App = () => {
-  const [bundles, setBundles] = useState<Bundle[]>(getInitialData);
-  const [allergens, setAllergens] = useState<{ code: string, name: string }[]>(getInitialAllergens);
+  const [bundles, setBundles] = useState<Bundle[]>(getInitialLocalData);
+  const [allergens, setAllergens] = useState<{ code: string, name: string }[]>(getInitialLocalAllergens);
   const [page, setPage] = useState<'generator' | 'import'>('generator');
   const [lang, setLang] = useState<'de' | 'en'>('en');
   const [searchTerm, setSearchTerm] = useState('');
@@ -539,20 +546,60 @@ const App = () => {
   const [isGenerating, setIsGenerating] = useState(false);
   const [editingBundle, setEditingBundle] = useState<Bundle | null | 'new'>(null);
   const [previewBlobUrl, setPreviewBlobUrl] = useState<string | null>(null);
+  const [syncStatus, setSyncStatus] = useState<'idle' | 'syncing' | 'synced' | 'error'>('idle');
 
   const [newAllergenCode, setNewAllergenCode] = useState('');
   const [newAllergenName, setNewAllergenName] = useState('');
 
   const t = (TEXT as any)[lang];
 
+  // Sync with LocalStorage
   useEffect(() => { localStorage.setItem(CURRENT_DB_KEY, JSON.stringify(bundles)); }, [bundles]);
   useEffect(() => { localStorage.setItem(CURRENT_ALLERGEN_KEY, JSON.stringify(allergens)); }, [allergens]);
 
+  // Sync with Firebase
   useEffect(() => {
-    return () => {
-      if (previewBlobUrl) URL.revokeObjectURL(previewBlobUrl);
-    };
-  }, [previewBlobUrl]);
+    if (db && bundles.length > 0) {
+      setSyncStatus('syncing');
+      set(ref(db, 'bundles'), bundles)
+        .then(() => setSyncStatus('synced'))
+        .catch(() => setSyncStatus('error'));
+    }
+  }, [bundles]);
+
+  useEffect(() => {
+    if (db) {
+      set(ref(db, 'allergens'), allergens);
+    }
+  }, [allergens]);
+
+  // Initial Data Recovery from Firebase
+  useEffect(() => {
+    if (!db) return;
+    const bundlesRef = ref(db, 'bundles');
+    const allergensRef = ref(db, 'allergens');
+
+    get(bundlesRef).then((snapshot) => {
+      if (snapshot.exists()) {
+        const cloudData = snapshot.val();
+        if (Array.isArray(cloudData) && cloudData.length > 0) {
+          setBundles(prev => {
+            if (prev.length === 0) return cloudData;
+            return prev; 
+          });
+        }
+      }
+    }).catch(e => console.error("Cloud bundles load failed:", e));
+
+    get(allergensRef).then((snapshot) => {
+      if (snapshot.exists()) {
+        const cloudAllergens = snapshot.val();
+        if (Array.isArray(cloudAllergens)) {
+          setAllergens(cloudAllergens);
+        }
+      }
+    }).catch(e => console.error("Cloud allergens load failed:", e));
+  }, []);
 
   const filteredBundles = useMemo(() => {
     return bundles.filter(b => 
@@ -588,42 +635,25 @@ const App = () => {
     }
   };
 
-  const loadDemoData = () => {
-    setBundles(DEMO_BUNDLES);
-  };
-
-  const clearDatabase = () => {
-    if (window.confirm(t.confirmClear)) {
-      setBundles([]);
-      setSelections([]);
-      localStorage.removeItem(CURRENT_DB_KEY);
-    }
-  };
-
   const handleFileUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
     if (!file) return;
-
     const reader = new FileReader();
     reader.onload = (event) => {
       const data = event.target?.result;
       if (!data) return;
-
       try {
         const XLSX = (window as any).XLSX;
         const workbook = XLSX.read(data, { type: 'binary' });
         const worksheet = workbook.Sheets[workbook.SheetNames[0]];
         const jsonData: any[] = XLSX.utils.sheet_to_json(worksheet, { defval: "" });
-
         if (jsonData.length === 0) return;
-
         const bundleMap = new Map<string, Bundle>();
         jsonData.forEach(row => {
           const norm: any = {};
           Object.keys(row).forEach(k => norm[k.toLowerCase().trim()] = row[k]);
           const bName = norm.bundle_name_de;
           if (!bName) return;
-
           let bundle = bundleMap.get(bName);
           if (!bundle) {
             bundle = {
@@ -645,7 +675,6 @@ const App = () => {
             created_at: new Date().toISOString()
           });
         });
-
         const newBundlesList = Array.from(bundleMap.values());
         setBundles(prev => {
           const updated = [...prev];
@@ -656,7 +685,6 @@ const App = () => {
           });
           return updated;
         });
-
         alert(t.successImport);
         setPage('generator');
       } catch (err) {
@@ -669,47 +697,31 @@ const App = () => {
   const generatePDF = async (shouldDownload: boolean = false) => {
     if (selections.length === 0) return;
     setIsGenerating(true);
-    
     if (previewBlobUrl) URL.revokeObjectURL(previewBlobUrl);
-    
     const { jsPDF } = (window as any).jspdf;
     const html2canvas = (window as any).html2canvas;
     const pdf = new jsPDF('p', 'mm', 'a4');
-    
     const flatLabels: Bundle[] = [];
     selections.forEach(sel => {
       const bundle = bundles.find(b => b.id === sel.bundleId);
       if (bundle) for (let i = 0; i < sel.quantity; i++) flatLabels.push(bundle);
     });
-
     const renderContainer = document.getElementById('pdf-render-container')!;
-    
     for (let i = 0; i < flatLabels.length; i++) {
       const bundle = flatLabels[i];
       const labelEl = document.createElement('div');
       renderContainer.appendChild(labelEl);
       const root = createRoot(labelEl);
       root.render(<LabelPreview bundle={bundle} date={packedOn} t={t} lang={lang} allergens={allergens} />);
-      
       await new Promise(resolve => setTimeout(resolve, 850));
-      
-      const canvas = await html2canvas(labelEl, { 
-        scale: 2.5, 
-        useCORS: true, 
-        width: 396.85, 
-        height: 561.26, 
-        logging: false 
-      });
-      
+      const canvas = await html2canvas(labelEl, { scale: 2.5, useCORS: true, width: 396.85, height: 561.26, logging: false });
       const imgData = canvas.toDataURL('image/png');
       const x = (i % 2) * 105;
       const y = (Math.floor(i / 2) % 2) * 148.5;
-      
       if (i > 0 && i % 4 === 0) pdf.addPage();
       pdf.addImage(imgData, 'PNG', x, y, 105, 148.5);
       renderContainer.removeChild(labelEl);
     }
-    
     if (shouldDownload) {
       pdf.save(`BellaBona_Labels_${packedOn}.pdf`);
     } else {
@@ -717,7 +729,6 @@ const App = () => {
       const url = URL.createObjectURL(blob);
       setPreviewBlobUrl(url);
     }
-    
     setIsGenerating(false);
   };
 
@@ -737,22 +748,11 @@ const App = () => {
       <div id="pdf-render-container"></div>
       
       {editingBundle && (
-        <BundleEditor 
-          allergens={allergens} 
-          bundle={editingBundle === 'new' ? undefined : editingBundle} 
-          onSave={saveBundle} 
-          onCancel={() => setEditingBundle(null)} 
-          t={t} 
-        />
+        <BundleEditor allergens={allergens} bundle={editingBundle === 'new' ? undefined : editingBundle} onSave={saveBundle} onCancel={() => setEditingBundle(null)} t={t} />
       )}
 
       {previewBlobUrl && (
-        <PreviewModal 
-          blobUrl={previewBlobUrl} 
-          onClose={() => setPreviewBlobUrl(null)} 
-          onDownload={() => generatePDF(true)}
-          t={t}
-        />
+        <PreviewModal blobUrl={previewBlobUrl} onClose={() => setPreviewBlobUrl(null)} onDownload={() => generatePDF(true)} t={t} />
       )}
       
       <nav className="brand-green text-white px-8 py-5 flex flex-col md:flex-row items-center justify-between shadow-2xl sticky top-0 z-50">
@@ -760,10 +760,14 @@ const App = () => {
           <div className="brand-pink text-brand-green p-2.5 rounded-2xl shadow-inner"><FileText size={28} strokeWidth={2.5} /></div>
           <div>
             <h1 className="text-xl font-black tracking-tighter uppercase leading-none">Bella<span className="text-brand-pink">&</span>Bona</h1>
-            <p className="text-[10px] font-bold uppercase tracking-[0.2em] opacity-60">Label Engine v2.5</p>
+            <p className="text-[10px] font-bold uppercase tracking-[0.2em] opacity-60">Label Engine v3.8</p>
           </div>
         </div>
         <div className="flex items-center gap-3">
+          <div className="hidden sm:flex items-center gap-2 mr-4 bg-slate-900/50 px-3 py-1.5 rounded-full border border-slate-800">
+             {syncStatus === 'syncing' ? <Cloud className="text-brand-pink cloud-syncing" size={14} /> : syncStatus === 'error' ? <CloudOff className="text-red-500" size={14} /> : <Cloud className="text-green-400" size={14} />}
+             <span className="text-[10px] font-bold uppercase tracking-widest text-slate-400">{syncStatus === 'syncing' ? t.syncing : t.synced}</span>
+          </div>
           <div className="bg-green-900/30 p-1 rounded-2xl flex border border-green-800/50 backdrop-blur-sm">
             <button onClick={() => setPage('generator')} className={`px-5 py-2 rounded-xl text-sm font-black transition-all duration-300 ${page === 'generator' ? 'brand-pink text-brand-green scale-105 shadow-lg' : 'text-slate-400 hover:text-white'}`}>{t.labelGenerator}</button>
             <button onClick={() => setPage('import')} className={`px-5 py-2 rounded-xl text-sm font-black transition-all duration-300 ${page === 'import' ? 'brand-pink text-brand-green scale-105 shadow-lg' : 'text-slate-400 hover:text-white'}`}>{t.importData}</button>
@@ -816,11 +820,6 @@ const App = () => {
                     <div className="p-24 text-center">
                       <div className="mb-6 flex justify-center text-slate-800"><Database size={64} /></div>
                       <p className="text-slate-600 font-black uppercase tracking-widest text-sm mb-8">{t.noBundles}</p>
-                      {bundles.length === 0 && (
-                        <button onClick={loadDemoData} className="inline-flex items-center gap-2 brand-pink/10 text-brand-pink border border-brand-pink/20 px-6 py-3 rounded-2xl font-black text-xs uppercase tracking-widest hover:bg-brand-pink/20 transition-all">
-                          <Sparkles size={16} /> {t.loadDemo}
-                        </button>
-                      )}
                     </div>
                   )}
                 </div>
@@ -854,18 +853,10 @@ const App = () => {
                 </div>
                 <div className="p-8 border-t border-slate-800 bg-slate-900/50 space-y-4">
                   <div className="grid grid-cols-2 gap-4">
-                    <button 
-                      disabled={selections.length === 0 || isGenerating} 
-                      onClick={() => generatePDF(false)} 
-                      className="flex-1 brand-pink text-brand-green py-5 rounded-3xl font-black text-lg uppercase tracking-widest disabled:opacity-20 shadow-2xl hover:brightness-110 transition-all active:scale-[0.98] relative overflow-hidden flex items-center justify-center gap-3"
-                    >
+                    <button disabled={selections.length === 0 || isGenerating} onClick={() => generatePDF(false)} className="flex-1 brand-pink text-brand-green py-5 rounded-3xl font-black text-lg uppercase tracking-widest disabled:opacity-20 shadow-2xl hover:brightness-110 transition-all active:scale-[0.98] relative overflow-hidden flex items-center justify-center gap-3">
                       {isGenerating ? <RefreshCw className="animate-spin" size={20} /> : <><Eye size={20} /> {t.previewPdf}</>}
                     </button>
-                    <button 
-                      disabled={selections.length === 0 || isGenerating} 
-                      onClick={() => generatePDF(true)} 
-                      className="flex-1 brand-green text-white py-5 rounded-3xl font-black text-lg uppercase tracking-widest disabled:opacity-20 shadow-2xl hover:brightness-110 transition-all active:scale-[0.98] relative overflow-hidden flex items-center justify-center gap-3"
-                    >
+                    <button disabled={selections.length === 0 || isGenerating} onClick={() => generatePDF(true)} className="flex-1 brand-green text-white py-5 rounded-3xl font-black text-lg uppercase tracking-widest disabled:opacity-20 shadow-2xl hover:brightness-110 transition-all active:scale-[0.98] relative overflow-hidden flex items-center justify-center gap-3">
                       {isGenerating ? <RefreshCw className="animate-spin" size={20} /> : <><Download size={20} /> {t.download}</>}
                     </button>
                   </div>
@@ -880,19 +871,17 @@ const App = () => {
                 <div className="bg-slate-900 rounded-[3rem] p-12 border border-slate-800 shadow-2xl relative overflow-hidden">
                   <div className="absolute top-0 left-0 w-2 h-full brand-pink"></div>
                   <h2 className="text-4xl font-black text-white uppercase tracking-tighter mb-10">{t.importData}</h2>
-                  <div className="space-y-8">
-                    <div className="bg-slate-800/30 p-8 rounded-[2rem] border border-slate-800">
-                      <h3 className="font-black mb-6 text-brand-pink flex items-center gap-3 uppercase text-xs tracking-[0.2em]"><Info size={18} /> {t.importInstructions}</h3>
-                      <div className="text-[11px] text-slate-400 space-y-4 font-mono bg-slate-950 p-6 rounded-2xl border border-slate-800">
-                        <p className="opacity-50 tracking-widest">EXPECTED COLUMNS:</p>
-                        <p className="text-brand-pink break-all leading-relaxed font-bold">bundle_name_de, bundle_name_en, item_name_de, item_name_en, allergens_de, diet_de, quantity, packed_on</p>
-                      </div>
-                      <div className="mt-10 flex flex-col sm:flex-row gap-5">
-                        <label htmlFor="csv-upload" className="flex-1 brand-pink text-brand-green py-4 rounded-2xl font-black text-center cursor-pointer hover:brightness-110 transition shadow-xl flex items-center justify-center gap-3 uppercase text-xs tracking-widest">
-                          <Upload size={20} /> {t.uploadFile}
-                          <input type="file" id="csv-upload" accept=".csv, .xlsx, .xls" onChange={handleFileUpload} className="hidden" />
-                        </label>
-                      </div>
+                  <div className="bg-slate-800/30 p-8 rounded-[2rem] border border-slate-800">
+                    <h3 className="font-black mb-6 text-brand-pink flex items-center gap-3 uppercase text-xs tracking-[0.2em]"><Info size={18} /> {t.importInstructions}</h3>
+                    <div className="text-[11px] text-slate-400 space-y-4 font-mono bg-slate-950 p-6 rounded-2xl border border-slate-800">
+                      <p className="opacity-50 tracking-widest">EXPECTED COLUMNS:</p>
+                      <p className="text-brand-pink break-all leading-relaxed font-bold">bundle_name_de, bundle_name_en, item_name_de, item_name_en, allergens_de, diet_de, quantity, packed_on</p>
+                    </div>
+                    <div className="mt-10">
+                      <label htmlFor="csv-upload" className="w-full brand-pink text-brand-green py-4 rounded-2xl font-black text-center cursor-pointer hover:brightness-110 transition shadow-xl flex items-center justify-center gap-3 uppercase text-xs tracking-widest">
+                        <Upload size={20} /> {t.uploadFile}
+                        <input type="file" id="csv-upload" accept=".csv, .xlsx, .xls" onChange={handleFileUpload} className="hidden" />
+                      </label>
                     </div>
                   </div>
                 </div>
@@ -901,16 +890,10 @@ const App = () => {
                    <h3 className="font-black mb-10 text-white uppercase text-xs tracking-[0.2em] flex items-center gap-3"><Tag size={20} className="text-brand-pink" /> {t.manageAllergens}</h3>
                    <div className="bg-slate-800/30 p-8 rounded-[2rem] border border-slate-800 mb-10">
                      <div className="grid grid-cols-1 sm:grid-cols-2 gap-6 mb-6">
-                       <div>
-                         <label className="block text-[10px] font-black text-slate-500 uppercase mb-2 tracking-widest">{t.allergenCode}</label>
-                         <input type="text" placeholder="X" value={newAllergenCode} onChange={e => setNewAllergenCode(e.target.value)} className="w-full bg-slate-900 border border-slate-700 rounded-2xl px-5 py-3 text-sm text-white font-bold outline-none focus:border-brand-pink"/>
-                       </div>
-                       <div>
-                         <label className="block text-[10px] font-black text-slate-500 uppercase mb-2 tracking-widest">{t.allergenName}</label>
-                         <input type="text" placeholder="Special Nut Mix" value={newAllergenName} onChange={e => setNewAllergenName(e.target.value)} className="w-full bg-slate-900 border border-slate-700 rounded-2xl px-5 py-3 text-sm text-white font-bold outline-none focus:border-brand-pink"/>
-                       </div>
+                       <input type="text" placeholder={t.allergenCode} value={newAllergenCode} onChange={e => setNewAllergenCode(e.target.value)} className="bg-slate-900 border border-slate-700 rounded-2xl px-5 py-3 text-white outline-none focus:border-brand-pink"/>
+                       <input type="text" placeholder={t.allergenName} value={newAllergenName} onChange={e => setNewAllergenName(e.target.value)} className="bg-slate-900 border border-slate-700 rounded-2xl px-5 py-3 text-white outline-none focus:border-brand-pink"/>
                      </div>
-                     <button onClick={handleAddAllergen} className="w-full py-4 rounded-2xl brand-pink text-brand-green font-black uppercase text-xs tracking-[0.2em] shadow-xl hover:brightness-110 active:scale-[0.98] transition-all flex items-center justify-center gap-2">
+                     <button onClick={handleAddAllergen} className="w-full py-4 rounded-2xl brand-pink text-brand-green font-black uppercase text-xs tracking-[0.2em] shadow-xl hover:brightness-110 transition-all flex items-center justify-center gap-2">
                        <Plus size={16} /> {t.addAllergen}
                      </button>
                    </div>
@@ -929,21 +912,19 @@ const App = () => {
               <div className="space-y-10">
                 <div className="bg-slate-900 rounded-[3rem] p-10 border border-slate-800 shadow-2xl">
                   <h3 className="font-black mb-8 text-white uppercase text-xs tracking-[0.2em] flex items-center gap-3"><Database size={18} className="text-brand-pink" /> {t.dbStats}</h3>
-                  <div className="bg-slate-800/30 p-10 rounded-[2.5rem] text-center space-y-3 border border-slate-800">
+                  <div className="bg-slate-800/30 p-10 rounded-[2.5rem] text-center border border-slate-800">
                     <p className="text-6xl font-black text-brand-pink tracking-tighter">{bundles.length}</p>
                     <p className="text-[10px] text-slate-500 uppercase font-black tracking-[0.2em]">{t.availableBundles}</p>
                   </div>
-                  <button onClick={clearDatabase} className="w-full mt-10 border border-red-900/20 text-red-500 py-4 rounded-2xl font-black text-[10px] uppercase tracking-widest hover:bg-red-900/10 transition flex items-center justify-center gap-2"><Trash2 size={14} /> {t.clearDb}</button>
                 </div>
-
                 <div className="bg-brand-green/10 p-10 rounded-[2.5rem] border border-brand-green/20 relative overflow-hidden">
                   <div className="absolute top-0 right-0 p-4 opacity-10 text-brand-green rotate-12"><Croissant size={80} /></div>
-                  <div className="flex items-center gap-4 text-brand-pink mb-6 relative z-10">
+                  <div className="flex items-center gap-4 text-brand-pink mb-6">
                     <AlertTriangle size={28} />
-                    <p className="font-black uppercase text-xs tracking-[0.2em]">Pro Tip</p>
+                    <p className="font-black uppercase text-xs tracking-[0.2em]">Safety Note</p>
                   </div>
-                  <p className="text-xs text-slate-400 leading-relaxed font-bold italic opacity-80 relative z-10">
-                    "The bundle system automatically saves your data. Every time you import new data, it is added to the list on the left for easy access."
+                  <p className="text-xs text-slate-400 leading-relaxed font-bold italic opacity-80">
+                    "Data is now synchronized with the cloud using Firebase. Your bundles are safe even if you clear browser data."
                   </p>
                 </div>
               </div>

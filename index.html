@@ -9,6 +9,8 @@
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
+    <!-- Babel standalone for browser-side TSX transpilation to fix Chrome MIME type errors -->
+    <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
     <style>
         @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap');
         
@@ -63,9 +65,14 @@
   }
 }
 </script>
+    <script>
+      // Mock process for compatibility
+      window.process = { env: { API_KEY: "" } };
+    </script>
 </head>
 <body>
     <div id="root"></div>
-    <script type="module" src="index.tsx"></script>
+    <!-- Using text/babel with typescript preset to handle browser-side compilation and .tsx extension loading issues -->
+    <script type="text/babel" data-presets="typescript,react" data-type="module" src="index.tsx"></script>
 </body>
 </html>

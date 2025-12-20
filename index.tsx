@@ -36,7 +36,7 @@ const firebaseConfig = {
 const app = getApps().length === 0 ? initializeApp(firebaseConfig) : getApp();
 const db = getFirestore(app);
 
-const DB_KEY = 'bb_label_db_v5';
+const DB_KEY = 'bb_label_db_v5_final';
 
 const generateSafeId = () => Math.random().toString(36).substring(2, 15);
 
@@ -133,19 +133,19 @@ const DataService = {
 const Label: React.FC<{ bundle: Bundle, lang: 'de' | 'en', packedOn: string, forPrint?: boolean }> = ({ bundle, lang, packedOn, forPrint }) => {
   const getDietIcon = (diet: string) => {
     const d = diet.toLowerCase();
-    if (d.includes('vegan')) return <Leaf size={28} className="text-green-600" />;
-    if (d.includes('vegetarisch')) return <Sprout size={28} className="text-green-500" />;
-    if (d.includes('meat') || d.includes('fleisch') || d.includes('beef')) return <div className="text-red-700 text-3xl">🥩</div>;
-    return <Soup size={28} className="text-blue-500" />;
+    if (d.includes('vegan')) return <Leaf size={24} className="text-green-600" />;
+    if (d.includes('vegetarisch')) return <Sprout size={24} className="text-green-500" />;
+    if (d.includes('meat') || d.includes('fleisch') || d.includes('beef')) return <div className="text-red-700 text-2xl">🥩</div>;
+    return <Soup size={24} className="text-blue-500" />;
   };
 
   const itemCount = bundle.items.length;
   
-  // Dynamic styling based on item count to match reference image scale
-  const nameFontSize = itemCount === 1 ? 'text-[24px]' : itemCount > 6 ? 'text-[12px]' : 'text-[15px]';
-  const itemRowPadding = itemCount === 1 ? 'py-6' : itemCount > 6 ? 'py-1' : 'py-3';
-  const allergenFontSize = itemCount > 6 ? 'text-[7px]' : 'text-[10px]';
-  const iconSizeClass = itemCount > 6 ? 'scale-75' : 'scale-100';
+  // Dynamic scaling to ensure all items are visible as per reference image
+  const nameFontSize = itemCount === 1 ? 'text-[28px]' : itemCount > 6 ? 'text-[13px]' : 'text-[16px]';
+  const itemRowPadding = itemCount === 1 ? 'py-10' : itemCount > 6 ? 'py-1' : 'py-4';
+  const allergenFontSize = itemCount > 6 ? 'text-[8px]' : 'text-[10px]';
+  const iconScaleClass = itemCount > 6 ? 'scale-75' : 'scale-100';
 
   return (
     <div 
@@ -154,22 +154,24 @@ const Label: React.FC<{ bundle: Bundle, lang: 'de' | 'en', packedOn: string, for
         fontFamily: "'Inter', sans-serif", 
         boxSizing: 'border-box',
         backgroundColor: '#fff',
-        color: '#000'
+        color: '#000',
+        width: '100%',
+        height: '100%'
       }}
     >
-      {/* Header Section */}
-      <div className="bg-[#024930] py-4 px-8 flex items-center justify-center min-h-[70px]">
+      {/* Header - Fixed Height */}
+      <div className="bg-[#024930] py-4 px-6 flex items-center justify-center min-h-[75px] shrink-0">
         <h2 className="text-white text-center font-black text-[22px] uppercase tracking-wider leading-tight">
           {lang === 'de' ? bundle.name_de : bundle.name_en}
         </h2>
       </div>
 
       {/* Brand Divider */}
-      <div className="w-full h-[2px] bg-[#FEACCF]"></div>
+      <div className="w-full h-[2px] bg-[#FEACCF] shrink-0"></div>
 
-      {/* Body with Watermark */}
-      <div className="flex-1 px-8 py-6 flex flex-col overflow-hidden relative watermark">
-        <div className="flex-1 flex flex-col justify-start relative z-10">
+      {/* Main Content - Auto Spacing to show all items */}
+      <div className="flex-1 px-8 py-4 flex flex-col overflow-hidden relative watermark">
+        <div className="flex-1 flex flex-col justify-start relative z-10 overflow-hidden">
           {bundle.items.map((item, idx) => (
             <div key={item.id} className={`flex justify-between items-start border-b border-gray-100 last:border-none ${itemRowPadding}`}>
               <div className="flex-1 pr-6">
@@ -188,7 +190,7 @@ const Label: React.FC<{ bundle: Bundle, lang: 'de' | 'en', packedOn: string, for
                   })}
                 </div>
               </div>
-              <div className={`flex flex-col items-center min-w-[85px] text-center pt-1 transition-transform ${iconSizeClass}`}>
+              <div className={`flex flex-col items-center min-w-[80px] text-center pt-1 transition-transform origin-top ${iconScaleClass}`}>
                 <div className="mb-1">
                   {getDietIcon(item.diet_de)}
                 </div>
@@ -201,13 +203,13 @@ const Label: React.FC<{ bundle: Bundle, lang: 'de' | 'en', packedOn: string, for
         </div>
       </div>
 
-      {/* Footer Section */}
-      <div className="bg-[#C197AB] py-4 px-10 flex justify-between items-center text-[#024930] mt-auto">
+      {/* Footer - Fixed Height */}
+      <div className="bg-[#C197AB] py-4 px-10 flex justify-between items-center text-[#024930] shrink-0">
          <div className="flex flex-col">
            <span className="text-[10px] font-black uppercase tracking-widest opacity-80 leading-none">PACKED ON</span>
-           <span className="text-[14px] font-black leading-none mt-1">{packedOn}</span>
+           <span className="text-[15px] font-black leading-none mt-1">{packedOn}</span>
          </div>
-         <div className="font-black text-3xl tracking-tighter italic leading-none uppercase">BELLA&BONA</div>
+         <div className="font-black text-[28px] tracking-tighter italic leading-none uppercase">BELLA&BONA</div>
       </div>
     </div>
   );
@@ -297,6 +299,7 @@ const App: React.FC = () => {
 
   return (
     <>
+      {/* PRINT AREA */}
       <div className="print-only">
         {printGroups.map((group, groupIdx) => (
           <div key={groupIdx} className="label-page-group">
@@ -313,16 +316,31 @@ const App: React.FC = () => {
         <div className="flex flex-1">
           <aside className="w-20 lg:w-64 bg-slate-900 border-r border-slate-800 flex flex-col">
             <div className="p-6 border-b border-slate-800 flex items-center gap-3">
-              <div className="w-10 h-10 rounded-xl bg-[#FEACCF] flex items-center justify-center"><Sprout size={24} color="#024930" /></div>
-              <div className="hidden lg:block"><h1 className="font-black text-sm text-white">BELLA&BONA</h1><p className="text-[9px] text-slate-500 uppercase">Label Factory</p></div>
+              <div className="w-10 h-10 rounded-xl bg-[#FEACCF] flex items-center justify-center">
+                <Sprout size={24} color="#024930" />
+              </div>
+              <div className="hidden lg:block">
+                <h1 className="font-black text-sm text-white">BELLA&BONA</h1>
+                <p className="text-[9px] text-slate-500 uppercase">Label Factory</p>
+              </div>
             </div>
             <nav className="flex-1 p-4 space-y-2">
-              <button onClick={() => setActiveTab('generator')} className={`w-full flex items-center gap-4 px-4 py-3 rounded-xl ${activeTab === 'generator' ? 'bg-[#FEACCF] text-[#024930]' : 'text-slate-400 hover:bg-slate-800'}`}><Printer size={20} /><span className="hidden lg:block font-bold">Generator</span></button>
-              <button onClick={() => setActiveTab('database')} className={`w-full flex items-center gap-4 px-4 py-3 rounded-xl ${activeTab === 'database' ? 'bg-[#FEACCF] text-[#024930]' : 'text-slate-400 hover:bg-slate-800'}`}><Database size={20} /><span className="hidden lg:block font-bold">Database</span></button>
+              <button onClick={() => setActiveTab('generator')} className={`w-full flex items-center gap-4 px-4 py-3 rounded-xl ${activeTab === 'generator' ? 'bg-[#FEACCF] text-[#024930]' : 'text-slate-400 hover:bg-slate-800'}`}>
+                <Printer size={20} /><span className="hidden lg:block font-bold">Generator</span>
+              </button>
+              <button onClick={() => setActiveTab('database')} className={`w-full flex items-center gap-4 px-4 py-3 rounded-xl ${activeTab === 'database' ? 'bg-[#FEACCF] text-[#024930]' : 'text-slate-400 hover:bg-slate-800'}`}>
+                <Database size={20} /><span className="hidden lg:block font-bold">Database</span>
+              </button>
             </nav>
             <div className="p-4 border-t border-slate-800 space-y-4">
-              <div className="hidden lg:block px-2"><label className="text-[10px] uppercase text-slate-500 font-bold">Packed On</label><input type="text" value={packedOn} onChange={e => setPackedOn(e.target.value)} className="w-full bg-slate-800 rounded px-2 py-1 text-white text-xs mt-1" /></div>
-              <div className="flex bg-slate-800 rounded p-1"><button onClick={() => setLang('de')} className={`flex-1 py-1 text-xs rounded ${lang === 'de' ? 'bg-slate-700' : ''}`}>DE</button><button onClick={() => setLang('en')} className={`flex-1 py-1 text-xs rounded ${lang === 'en' ? 'bg-slate-700' : ''}`}>EN</button></div>
+              <div className="hidden lg:block px-2">
+                <label className="text-[10px] uppercase text-slate-500 font-bold">Packed On</label>
+                <input type="text" value={packedOn} onChange={e => setPackedOn(e.target.value)} className="w-full bg-slate-800 rounded px-2 py-1 text-white text-xs mt-1 border-none focus:ring-1 focus:ring-pink-400" />
+              </div>
+              <div className="flex bg-slate-800 rounded p-1">
+                <button onClick={() => setLang('de')} className={`flex-1 py-1 text-xs rounded transition-all ${lang === 'de' ? 'bg-slate-700 text-white shadow-sm' : 'text-slate-500'}`}>DE</button>
+                <button onClick={() => setLang('en')} className={`flex-1 py-1 text-xs rounded transition-all ${lang === 'en' ? 'bg-slate-700 text-white shadow-sm' : 'text-slate-500'}`}>EN</button>
+              </div>
             </div>
           </aside>
 
@@ -330,35 +348,58 @@ const App: React.FC = () => {
             {activeTab === 'generator' ? (
               <div className="grid grid-cols-1 xl:grid-cols-12 gap-10">
                 <div className="xl:col-span-5 space-y-8">
-                  <div className="relative"><Search className="absolute left-5 top-1/2 -translate-y-1/2 text-slate-500" size={20} /><input type="text" placeholder={t.searchPlaceholder} value={searchTerm} onChange={e => setSearchTerm(e.target.value)} className="w-full bg-slate-900 rounded-2xl pl-14 pr-6 py-4 text-sm text-white focus:ring-2 focus:ring-emerald-500" /></div>
+                  <div className="relative">
+                    <Search className="absolute left-5 top-1/2 -translate-y-1/2 text-slate-500" size={20} />
+                    <input type="text" placeholder={t.searchPlaceholder} value={searchTerm} onChange={e => setSearchTerm(e.target.value)} className="w-full bg-slate-900 rounded-2xl pl-14 pr-6 py-4 text-sm text-white focus:ring-2 focus:ring-emerald-500 shadow-xl" />
+                  </div>
                   <div className="space-y-4 max-h-[60vh] overflow-y-auto pr-3">
                     {filteredBundles.map(bundle => (
-                      <div key={bundle.id} onClick={() => addSelection(bundle.id)} className="bg-slate-900 border border-slate-800 rounded-2xl p-5 flex items-center justify-between cursor-pointer hover:border-emerald-500 transition-all">
-                        <div className="flex items-center gap-4"><Soup size={22} className="text-emerald-400" /><div><p className="font-black text-slate-200">{lang === 'de' ? bundle.name_de : bundle.name_en}</p><p className="text-[10px] font-bold text-slate-500">{bundle.items.length} items</p></div></div><Plus size={20} />
+                      <div key={bundle.id} onClick={() => addSelection(bundle.id)} className="bg-slate-900 border border-slate-800 rounded-2xl p-5 flex items-center justify-between cursor-pointer hover:border-emerald-500 hover:bg-slate-800/50 transition-all shadow-lg">
+                        <div className="flex items-center gap-4">
+                          <Soup size={22} className="text-emerald-400" />
+                          <div>
+                            <p className="font-black text-slate-200">{lang === 'de' ? bundle.name_de : bundle.name_en}</p>
+                            <p className="text-[10px] font-bold text-slate-500">{bundle.items.length} items</p>
+                          </div>
+                        </div>
+                        <Plus size={20} />
                       </div>
                     ))}
                   </div>
                 </div>
                 <div className="xl:col-span-7">
-                  <section className="bg-slate-900 border border-slate-800 rounded-3xl p-8 flex flex-col min-h-[500px]">
-                    <div className="flex justify-between mb-10"><h2 className="text-2xl font-black">Selected <span className="text-emerald-500">{selections.length}</span></h2>{selections.length > 0 && <button onClick={() => setSelections([])} className="text-red-400 font-bold uppercase text-xs">Clear All</button>}</div>
+                  <section className="bg-slate-900 border border-slate-800 rounded-3xl p-8 flex flex-col min-h-[500px] shadow-2xl">
+                    <div className="flex justify-between mb-10">
+                      <h2 className="text-2xl font-black">Selected <span className="text-emerald-500">{selections.length}</span></h2>
+                      {selections.length > 0 && <button onClick={() => setSelections([])} className="text-red-400 font-bold uppercase text-xs hover:text-red-300">Clear All</button>}
+                    </div>
                     <div className="flex-1 space-y-4">
                       {selections.map(sel => {
                         const b = bundles.find(x => x.id === sel.bundleId);
                         if (!b) return null;
                         return (
-                          <div key={sel.bundleId} className="flex items-center gap-4 bg-slate-800 rounded-xl p-4">
-                            <div className="flex-1"><p className="font-bold">{lang === 'de' ? b.name_de : b.name_en}</p></div>
-                            <input type="number" min="1" value={sel.quantity} onChange={e => setSelections(prev => prev.map(s => s.bundleId === sel.bundleId ? { ...s, quantity: parseInt(e.target.value) || 1 } : s))} className="w-16 bg-slate-900 rounded p-2 text-center text-emerald-400 font-bold" />
-                            <button onClick={() => setSelections(prev => prev.filter(s => s.bundleId !== sel.bundleId))}><X size={20} /></button>
+                          <div key={sel.bundleId} className="flex items-center gap-4 bg-slate-800/50 rounded-xl p-4 border border-slate-700">
+                            <div className="flex-1"><p className="font-bold text-slate-100">{lang === 'de' ? b.name_de : b.name_en}</p></div>
+                            <input type="number" min="1" value={sel.quantity} onChange={e => setSelections(prev => prev.map(s => s.bundleId === sel.bundleId ? { ...s, quantity: parseInt(e.target.value) || 1 } : s))} className="w-16 bg-slate-950 rounded p-2 text-center text-emerald-400 font-bold border-none" />
+                            <button onClick={() => setSelections(prev => prev.filter(s => s.bundleId !== sel.bundleId))} className="text-slate-500 hover:text-red-400"><X size={20} /></button>
                           </div>
                         );
                       })}
+                      {selections.length === 0 && (
+                        <div className="h-full flex flex-col items-center justify-center opacity-30 text-slate-500 mt-20">
+                          <Printer size={64} className="mb-4" />
+                          <p className="font-bold">No bundles selected</p>
+                        </div>
+                      )}
                     </div>
                     {selections.length > 0 && (
                       <div className="mt-8 pt-8 border-t border-slate-800 flex justify-between items-center">
-                        <button onClick={() => setIsPreviewing(true)} className="flex items-center gap-2 text-emerald-400 font-bold"><Eye size={20} /> Preview</button>
-                        <button onClick={() => window.print()} className="bg-emerald-500 text-slate-950 font-black px-10 py-4 rounded-xl flex items-center gap-2"><Printer size={24} /> Print A4 Grid</button>
+                        <button onClick={() => setIsPreviewing(true)} className="flex items-center gap-2 text-emerald-400 font-bold hover:text-emerald-300 transition-colors">
+                          <Eye size={20} /> Preview
+                        </button>
+                        <button onClick={() => window.print()} className="bg-emerald-500 text-slate-950 font-black px-10 py-4 rounded-xl flex items-center gap-2 shadow-xl active:scale-95 transition-all">
+                          <Printer size={24} /> Print A4 Grid
+                        </button>
                       </div>
                     )}
                   </section>
@@ -366,8 +407,8 @@ const App: React.FC = () => {
               </div>
             ) : (
               <div className="max-w-4xl mx-auto space-y-8">
-                <section className="bg-slate-900 p-10 rounded-3xl border border-slate-800">
-                  <h2 className="text-3xl font-black mb-8">Data Management</h2>
+                <section className="bg-slate-900 p-10 rounded-3xl border border-slate-800 shadow-2xl">
+                  <h2 className="text-3xl font-black mb-8 text-[#FEACCF]">Data Management</h2>
                   <div className="grid md:grid-cols-2 gap-6 mb-10">
                     <div onClick={() => {
                       const template = [{ 'bundle_name_de': 'Brunch Set', 'bundle_name_en': 'Brunch Set', 'item_name_de': 'Croissant', 'item_name_en': 'Croissant', 'allergens_de': 'Gluten, Eier', 'diet_de': 'Vegetarisch' }];
@@ -375,20 +416,22 @@ const App: React.FC = () => {
                       const wb = XLSX.utils.book_new();
                       XLSX.utils.book_append_sheet(wb, ws, "Labels");
                       XLSX.writeFile(wb, "BellaBona_Template.xlsx");
-                    }} className="bg-slate-800 p-8 rounded-2xl border-2 border-dashed border-slate-700 cursor-pointer hover:border-emerald-500 transition-all">
-                      <FileSpreadsheet size={32} className="text-emerald-500 mb-4" /><p className="font-bold">Download Template</p>
+                    }} className="bg-slate-800/30 p-8 rounded-2xl border-2 border-dashed border-slate-700 cursor-pointer hover:border-emerald-500 transition-all group">
+                      <FileSpreadsheet size={32} className="text-emerald-500 mb-4 group-hover:scale-110 transition-transform" />
+                      <p className="font-bold">Download Template</p>
                     </div>
-                    <div onClick={() => fileInputRef.current?.click()} className="bg-slate-800 p-8 rounded-2xl border-2 border-dashed border-slate-700 cursor-pointer hover:border-pink-400 transition-all relative">
-                      {isProcessingImport && <div className="absolute inset-0 bg-slate-900/50 flex items-center justify-center rounded-2xl"><Loader2 className="animate-spin" /></div>}
-                      <Upload size={32} className="text-pink-400 mb-4" /><p className="font-bold">Upload Excel</p>
+                    <div onClick={() => fileInputRef.current?.click()} className="bg-slate-800/30 p-8 rounded-2xl border-2 border-dashed border-slate-700 cursor-pointer hover:border-pink-400 transition-all relative group">
+                      {isProcessingImport && <div className="absolute inset-0 bg-slate-900/80 flex items-center justify-center rounded-2xl z-20"><Loader2 className="animate-spin text-pink-400" size={32} /></div>}
+                      <Upload size={32} className="text-pink-400 mb-4 group-hover:scale-110 transition-transform" />
+                      <p className="font-bold">Upload Excel</p>
                       <input type="file" ref={fileInputRef} className="hidden" accept=".xlsx" onChange={handleFileUpload} />
                     </div>
                   </div>
-                  <div className="space-y-2">
+                  <div className="space-y-2 max-h-[400px] overflow-y-auto pr-2">
                     {bundles.map(b => (
-                      <div key={b.id} className="flex justify-between p-4 bg-slate-950 rounded-lg border border-slate-800 items-center">
-                        <span className="font-bold">{b.name_de}</span>
-                        <button onClick={async () => { if(confirm('Delete?')) { setBundles(prev => prev.filter(x => x.id !== b.id)); await DataService.deleteBundle(b.id); }}} className="text-red-500"><Trash2 size={18} /></button>
+                      <div key={b.id} className="flex justify-between p-4 bg-slate-950 rounded-lg border border-slate-800 items-center hover:bg-slate-900 transition-colors">
+                        <span className="font-bold text-slate-300">{b.name_de}</span>
+                        <button onClick={async () => { if(confirm('Delete "' + b.name_de + '"?')) { setBundles(prev => prev.filter(x => x.id !== b.id)); await DataService.deleteBundle(b.id); }}} className="text-slate-600 hover:text-red-500 transition-colors"><Trash2 size={18} /></button>
                       </div>
                     ))}
                   </div>
@@ -400,25 +443,29 @@ const App: React.FC = () => {
       </div>
 
       {isPreviewing && (
-        <div className="no-print fixed inset-0 z-[200] bg-slate-950/95 backdrop-blur-xl flex items-center justify-center p-8 overflow-y-auto">
-          <div className="bg-slate-900 w-full max-w-6xl h-[90vh] rounded-3xl flex flex-col border border-slate-800">
-            <div className="p-8 border-b border-slate-800 flex justify-between">
-              <h2 className="text-2xl font-black text-white">Preview A4 Page Groups</h2>
-              <button onClick={() => setIsPreviewing(false)} className="text-white bg-slate-800 p-2 rounded-lg"><X size={24} /></button>
+        <div className="no-print fixed inset-0 z-[200] bg-slate-950/95 backdrop-blur-xl flex items-center justify-center p-8 overflow-y-auto animate-in fade-in duration-300">
+          <div className="bg-slate-900 w-full max-w-6xl h-[90vh] rounded-3xl flex flex-col border border-slate-800 shadow-[0_0_50px_rgba(0,0,0,0.5)]">
+            <div className="p-8 border-b border-slate-800 flex justify-between items-center">
+              <h2 className="text-2xl font-black text-white">Print Preview (2x2 A4 Grid)</h2>
+              <button onClick={() => setIsPreviewing(false)} className="text-white bg-slate-800 p-2 rounded-xl hover:bg-slate-700 transition-colors"><X size={24} /></button>
             </div>
-            <div className="flex-1 overflow-y-auto p-12 bg-slate-950 space-y-12">
+            <div className="flex-1 overflow-y-auto p-12 bg-slate-950 flex flex-col items-center gap-16">
               {printGroups.map((group, idx) => (
-                <div key={idx} className="bg-white shadow-2xl mx-auto flex items-center justify-center p-4" style={{ width: '210mm', height: '297mm', minHeight: '297mm' }}>
-                   <div className="grid grid-cols-2 gap-4 w-full h-full p-4 border border-dashed border-slate-200">
+                <div key={idx} className="bg-white shadow-[0_0_20px_rgba(0,0,0,0.3)] flex flex-col items-center justify-center p-[4.25mm]" style={{ width: '210mm', height: '297mm', minHeight: '297mm' }}>
+                   <div className="label-page-group border border-dashed border-slate-200">
                      {group.map((b, bi) => (
-                       <div key={bi} className="flex items-center justify-center border border-slate-100"><Label bundle={b} lang={lang} packedOn={packedOn} /></div>
+                       <div key={bi} className="label-card-container">
+                         <Label bundle={b} lang={lang} packedOn={packedOn} forPrint />
+                       </div>
                      ))}
                    </div>
                 </div>
               ))}
             </div>
             <div className="p-8 border-t border-slate-800">
-              <button onClick={() => window.print()} className="w-full bg-emerald-500 text-slate-950 font-black py-5 rounded-2xl flex items-center justify-center gap-2"><Printer size={24} /> Print Final PDF</button>
+              <button onClick={() => window.print()} className="w-full bg-emerald-500 text-slate-950 font-black py-5 rounded-2xl flex items-center justify-center gap-4 text-xl shadow-xl hover:bg-emerald-400 transition-all">
+                <Printer size={28} /> Confirm and Print
+              </button>
             </div>
           </div>
         </div>

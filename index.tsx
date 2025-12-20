@@ -145,19 +145,19 @@ const Label: React.FC<{ bundle: Bundle, lang: 'de' | 'en', packedOn: string, for
   const isHighDensity = itemCount >= 5;
   const isExtremeDensity = itemCount >= 9;
   
-  // Font sizes: Keeping them as requested (standard readable style) but slightly tiered
+  // Font sizes: Keeping current style as requested
   const nameFontSize = itemCount === 1 ? 'text-[28px]' : 
                      itemCount <= 3 ? 'text-[22px]' : 
                      itemCount <= 5 ? 'text-[18px]' : 
                      itemCount === 6 ? 'text-[16px]' :
                      itemCount <= 8 ? 'text-[13px]' : 'text-[11px]';
   
-  // Item vertical padding: Tightened to provide more room for items
-  const itemVerticalPadding = itemCount === 1 ? 'py-10' : 
-                               itemCount <= 3 ? 'py-6' : 
-                               itemCount === 4 ? 'py-3' : 
-                               itemCount <= 6 ? 'py-2' :
-                               itemCount <= 8 ? 'py-1' : 'py-0.5';
+  // Item vertical padding: Further decreased to reduce inter-item space as requested
+  const itemVerticalPadding = itemCount === 1 ? 'py-6' : 
+                               itemCount <= 3 ? 'py-4' : 
+                               itemCount === 4 ? 'py-2' : 
+                               itemCount <= 6 ? 'py-1.5' :
+                               itemCount <= 8 ? 'py-0.5' : 'py-0.25';
   
   const allergenFontSize = itemCount > 6 ? 'text-[7px]' : 'text-[10px]';
   
@@ -165,15 +165,17 @@ const Label: React.FC<{ bundle: Bundle, lang: 'de' | 'en', packedOn: string, for
                          isHighDensity ? 'scale-[0.7]' : 
                          itemCount >= 4 ? 'scale-75' : 'scale-90';
 
-  // Header/Footer Responsive Sizing: Strongly reduced height to favor item space
-  const headerMinHeight = isHighDensity ? 'min-h-[45px]' : 'min-h-[60px]';
+  // Header/Footer: Sizing reduced equally as requested
+  // Header min-height and padding reduced significantly
+  const headerMinHeight = isHighDensity ? 'min-h-[40px]' : 'min-h-[50px]';
   const headerPadding = isHighDensity ? 'py-1' : 'py-2';
-  const headerTitleSize = isHighDensity ? 'text-[16px]' : 'text-[20px]';
+  const headerTitleSize = isHighDensity ? 'text-[16px]' : 'text-[18px]';
   
-  const footerPadding = isHighDensity ? 'py-1.5' : 'py-3';
-  const footerBrandSize = isHighDensity ? 'text-[20px]' : 'text-[26px]';
-  const footerDateLabelSize = isHighDensity ? 'text-[8px]' : 'text-[9px]';
-  const footerDateSize = isHighDensity ? 'text-[12px]' : 'text-[15px]';
+  // Footer padding reduced significantly to match header reduction
+  const footerPadding = isHighDensity ? 'py-1' : 'py-2';
+  const footerBrandSize = isHighDensity ? 'text-[18px]' : 'text-[22px]';
+  const footerDateLabelSize = isHighDensity ? 'text-[7px]' : 'text-[8px]';
+  const footerDateSize = isHighDensity ? 'text-[11px]' : 'text-[14px]';
 
   return (
     <div 
@@ -187,14 +189,14 @@ const Label: React.FC<{ bundle: Bundle, lang: 'de' | 'en', packedOn: string, for
         height: forPrint ? '148.5mm' : undefined
       }}
     >
-      {/* Header - Height reduced as requested */}
+      {/* Header - Height reduced equally with footer */}
       <div className={`bg-[#024930] ${headerPadding} px-6 flex items-center justify-center ${headerMinHeight} shrink-0 border-b-2 border-[#FEACCF]`}>
         <h2 className={`text-white text-center font-black ${headerTitleSize} uppercase tracking-wider leading-tight`}>
           {lang === 'de' ? bundle.name_de : bundle.name_en}
         </h2>
       </div>
 
-      {/* Main Content Area */}
+      {/* Main Content Area - justify-around ensures equal spacing between all items */}
       <div className="flex-1 px-8 py-0.5 flex flex-col overflow-hidden relative watermark">
         <div className="flex-1 flex flex-col justify-around relative z-10 overflow-hidden">
           {bundle.items.map((item, idx) => (
@@ -228,7 +230,7 @@ const Label: React.FC<{ bundle: Bundle, lang: 'de' | 'en', packedOn: string, for
         </div>
       </div>
 
-      {/* Footer - Height reduced as requested */}
+      {/* Footer - Height reduced equally with header */}
       <div className={`bg-[#C197AB] ${footerPadding} px-8 flex justify-between items-center text-[#024930] shrink-0`}>
          <div className="flex flex-col">
            <span className={`${footerDateLabelSize} font-black uppercase tracking-widest opacity-80 leading-none`}>PACKED ON</span>

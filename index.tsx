@@ -16,6 +16,9 @@ import {
   FileSpreadsheet,
   Beef,
   Leaf,
+  Fish,
+  Egg,
+  Milk,
   RefreshCw,
   CheckCircle2
 } from 'lucide-react';
@@ -132,27 +135,49 @@ const DataService = {
 };
 
 const Label: React.FC<{ bundle: Bundle, lang: 'de' | 'en', packedOn: string, forPrint?: boolean }> = ({ bundle, lang, packedOn, forPrint }) => {
-  const getDietIcon = (diet: string, isHighDensity: boolean) => {
-    const d = diet.toLowerCase();
-    const size = isHighDensity ? 18 : 24;
-    if (d.includes('vegan')) return <Leaf size={size} className="text-green-600" />;
-    if (d.includes('vegetarisch')) return <Sprout size={size} className="text-green-500" />;
-    if (d.includes('meat') || d.includes('fleisch') || d.includes('beef')) return <div className={isHighDensity ? "text-lg" : "text-2xl"}>🥩</div>;
-    return <Soup size={size} className="text-blue-500" />;
+  const getItemIcons = (item: BundleItem, isHighDensity: boolean) => {
+    const diet = item.diet_de.toLowerCase();
+    const allergens = item.allergens_de.toLowerCase();
+    const size = isHighDensity ? 16 : 22;
+    const icons: React.ReactNode[] = [];
+
+    // 1. Diet-based Icons
+    if (diet.includes('vegan')) {
+      icons.push(<Leaf size={size} className="text-green-600" key="vegan" />);
+    } else if (diet.includes('vegetarisch')) {
+      icons.push(<Sprout size={size} className="text-green-500" key="veggie" />);
+    } else if (diet.includes('fish') || diet.includes('fisch')) {
+      icons.push(<Fish size={size} className="text-blue-500" key="fish" />);
+    } else if (diet.includes('meat') || diet.includes('fleisch') || diet.includes('beef')) {
+      icons.push(<div className={isHighDensity ? "text-base" : "text-xl"} key="meat">🥩</div>);
+    }
+
+    // 2. Allergen-based Icons (Requested: Egg and Milk Bottle for Lactose)
+    if (allergens.includes('egg') || allergens.includes('ei')) {
+      icons.push(<Egg size={size} className="text-amber-500" key="egg" />);
+    }
+    if (allergens.includes('lactose') || allergens.includes('milch')) {
+      icons.push(<Milk size={size} className="text-blue-400" key="milk" />);
+    }
+
+    // Fallback if absolutely nothing matches
+    if (icons.length === 0) {
+      icons.push(<Soup size={size} className="text-blue-500" key="fallback" />);
+    }
+
+    return icons;
   };
 
   const itemCount = bundle.items.length;
   const isHighDensity = itemCount >= 5;
   const isExtremeDensity = itemCount >= 9;
   
-  // Font sizes: Keeping current style as requested
   const nameFontSize = itemCount === 1 ? 'text-[28px]' : 
                      itemCount <= 3 ? 'text-[22px]' : 
                      itemCount <= 5 ? 'text-[18px]' : 
                      itemCount === 6 ? 'text-[16px]' :
                      itemCount <= 8 ? 'text-[13px]' : 'text-[11px]';
   
-  // Item vertical padding: Further decreased to reduce inter-item space as requested
   const itemVerticalPadding = itemCount === 1 ? 'py-6' : 
                                itemCount <= 3 ? 'py-4' : 
                                itemCount === 4 ? 'py-2' : 
@@ -165,13 +190,10 @@ const Label: React.FC<{ bundle: Bundle, lang: 'de' | 'en', packedOn: string, for
                          isHighDensity ? 'scale-[0.7]' : 
                          itemCount >= 4 ? 'scale-75' : 'scale-90';
 
-  // Header/Footer: Sizing reduced equally as requested
-  // Header min-height and padding reduced significantly
   const headerMinHeight = isHighDensity ? 'min-h-[40px]' : 'min-h-[50px]';
   const headerPadding = isHighDensity ? 'py-1' : 'py-2';
   const headerTitleSize = isHighDensity ? 'text-[16px]' : 'text-[18px]';
   
-  // Footer padding reduced significantly to match header reduction
   const footerPadding = isHighDensity ? 'py-1' : 'py-2';
   const footerBrandSize = isHighDensity ? 'text-[18px]' : 'text-[22px]';
   const footerDateLabelSize = isHighDensity ? 'text-[7px]' : 'text-[8px]';
@@ -189,14 +211,12 @@ const Label: React.FC<{ bundle: Bundle, lang: 'de' | 'en', packedOn: string, for
         height: forPrint ? '148.5mm' : undefined
       }}
     >
-      {/* Header - Height reduced equally with footer */}
       <div className={`bg-[#024930] ${headerPadding} px-6 flex items-center justify-center ${headerMinHeight} shrink-0 border-b-2 border-[#FEACCF]`}>
         <h2 className={`text-white text-center font-black ${headerTitleSize} uppercase tracking-wider leading-tight`}>
           {lang === 'de' ? bundle.name_de : bundle.name_en}
         </h2>
       </div>
 
-      {/* Main Content Area - justify-around ensures equal spacing between all items */}
       <div className="flex-1 px-8 py-0.5 flex flex-col overflow-hidden relative watermark">
         <div className="flex-1 flex flex-col justify-around relative z-10 overflow-hidden">
           {bundle.items.map((item, idx) => (
@@ -217,9 +237,9 @@ const Label: React.FC<{ bundle: Bundle, lang: 'de' | 'en', packedOn: string, for
                   })}
                 </div>
               </div>
-              <div className={`flex flex-col items-center min-w-[55px] text-center transition-transform origin-center ${iconScaleClass}`}>
-                <div className="mb-0">
-                  {getDietIcon(item.diet_de, isHighDensity)}
+              <div className={`flex flex-col items-center min-w-[65px] text-center transition-transform origin-center ${iconScaleClass}`}>
+                <div className="flex flex-wrap justify-center gap-1.5 mb-0.5">
+                  {getItemIcons(item, isHighDensity)}
                 </div>
                 <span className="text-[8px] font-black uppercase tracking-tight text-[#024930] leading-none opacity-80">
                   {item.diet_de}
@@ -230,7 +250,6 @@ const Label: React.FC<{ bundle: Bundle, lang: 'de' | 'en', packedOn: string, for
         </div>
       </div>
 
-      {/* Footer - Height reduced equally with header */}
       <div className={`bg-[#C197AB] ${footerPadding} px-8 flex justify-between items-center text-[#024930] shrink-0`}>
          <div className="flex flex-col">
            <span className={`${footerDateLabelSize} font-black uppercase tracking-widest opacity-80 leading-none`}>PACKED ON</span>

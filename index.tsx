@@ -19,6 +19,9 @@ import {
   Fish,
   Egg,
   Milk,
+  Wheat,
+  Bean,
+  Nut,
   RefreshCw,
   CheckCircle2
 } from 'lucide-react';
@@ -138,7 +141,9 @@ const Label: React.FC<{ bundle: Bundle, lang: 'de' | 'en', packedOn: string, for
   const getItemIcons = (item: BundleItem, isHighDensity: boolean) => {
     const diet = item.diet_de.toLowerCase();
     const allergens = item.allergens_de.toLowerCase();
-    const size = isHighDensity ? 16 : 22;
+    
+    // Increased base sizes for icons
+    const size = isHighDensity ? 22 : 32;
     const icons: React.ReactNode[] = [];
 
     // 1. Diet-based Icons
@@ -149,15 +154,24 @@ const Label: React.FC<{ bundle: Bundle, lang: 'de' | 'en', packedOn: string, for
     } else if (diet.includes('fish') || diet.includes('fisch')) {
       icons.push(<Fish size={size} className="text-blue-500" key="fish" />);
     } else if (diet.includes('meat') || diet.includes('fleisch') || diet.includes('beef')) {
-      icons.push(<div className={isHighDensity ? "text-base" : "text-xl"} key="meat">🥩</div>);
+      icons.push(<div className={isHighDensity ? "text-xl" : "text-3xl"} key="meat">🥩</div>);
     }
 
-    // 2. Allergen-based Icons (Requested: Egg and Milk Bottle for Lactose)
+    // 2. Allergen-based Icons (Expanded List)
+    if (allergens.includes('gluten') || allergens.includes('weizen')) {
+      icons.push(<Wheat size={size} className="text-amber-600" key="gluten" />);
+    }
     if (allergens.includes('egg') || allergens.includes('ei')) {
       icons.push(<Egg size={size} className="text-amber-500" key="egg" />);
     }
     if (allergens.includes('lactose') || allergens.includes('milch')) {
       icons.push(<Milk size={size} className="text-blue-400" key="milk" />);
+    }
+    if (allergens.includes('soja') || allergens.includes('soy')) {
+      icons.push(<Bean size={size} className="text-green-700" key="soy" />);
+    }
+    if (allergens.includes('nuss') || allergens.includes('nut') || allergens.includes('mandel') || allergens.includes('hazel')) {
+      icons.push(<Nut size={size} className="text-amber-800" key="nut" />);
     }
 
     // Fallback if absolutely nothing matches
@@ -187,8 +201,8 @@ const Label: React.FC<{ bundle: Bundle, lang: 'de' | 'en', packedOn: string, for
   const allergenFontSize = itemCount > 6 ? 'text-[7px]' : 'text-[10px]';
   
   const iconScaleClass = isExtremeDensity ? 'scale-[0.55]' : 
-                         isHighDensity ? 'scale-[0.7]' : 
-                         itemCount >= 4 ? 'scale-75' : 'scale-90';
+                         isHighDensity ? 'scale-[0.75]' : 
+                         itemCount >= 4 ? 'scale-90' : 'scale-100';
 
   const headerMinHeight = isHighDensity ? 'min-h-[40px]' : 'min-h-[50px]';
   const headerPadding = isHighDensity ? 'py-1' : 'py-2';
@@ -201,11 +215,11 @@ const Label: React.FC<{ bundle: Bundle, lang: 'de' | 'en', packedOn: string, for
 
   return (
     <div 
-      className={`label-card bg-white text-slate-900 flex flex-col overflow-hidden relative ${!forPrint ? 'shadow-2xl border border-slate-700 rounded-lg h-[148.5mm] w-[105mm]' : 'h-full w-full'}`} 
+      className={`label-card text-slate-900 flex flex-col overflow-hidden relative ${!forPrint ? 'shadow-2xl border border-slate-700 rounded-lg h-[148.5mm] w-[105mm]' : 'h-full w-full'}`} 
       style={{ 
         fontFamily: "'Inter', sans-serif", 
         boxSizing: 'border-box',
-        backgroundColor: '#fff',
+        backgroundColor: '#FFF1F6', // Light baby pink background
         color: '#000',
         width: forPrint ? '105mm' : undefined,
         height: forPrint ? '148.5mm' : undefined
@@ -217,7 +231,7 @@ const Label: React.FC<{ bundle: Bundle, lang: 'de' | 'en', packedOn: string, for
         </h2>
       </div>
 
-      <div className="flex-1 px-8 py-0.5 flex flex-col overflow-hidden relative watermark">
+      <div className="flex-1 px-8 py-0.5 flex flex-col overflow-hidden relative watermark bg-[#FFF1F6]">
         <div className="flex-1 flex flex-col justify-around relative z-10 overflow-hidden">
           {bundle.items.map((item, idx) => (
             <div key={item.id} className={`flex justify-between items-center border-b border-gray-100 last:border-none ${itemVerticalPadding} transition-all`}>
@@ -237,11 +251,11 @@ const Label: React.FC<{ bundle: Bundle, lang: 'de' | 'en', packedOn: string, for
                   })}
                 </div>
               </div>
-              <div className={`flex flex-col items-center min-w-[65px] text-center transition-transform origin-center ${iconScaleClass}`}>
-                <div className="flex flex-wrap justify-center gap-1.5 mb-0.5">
+              <div className={`flex flex-col items-center min-w-[85px] text-center transition-transform origin-center ${iconScaleClass}`}>
+                <div className="flex flex-wrap justify-center gap-2 mb-1">
                   {getItemIcons(item, isHighDensity)}
                 </div>
-                <span className="text-[8px] font-black uppercase tracking-tight text-[#024930] leading-none opacity-80">
+                <span className="text-[9px] font-black uppercase tracking-tight text-[#024930] leading-none opacity-80">
                   {item.diet_de}
                 </span>
               </div>

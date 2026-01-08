@@ -544,53 +544,47 @@ const App: React.FC = () => {
     return groups;
   }, [selections, cateringSelections, bundles, activeTab, isPreviewing, previewType]);
 
-  // Menu Print Logic (A4) - Optimized for 100% Space & Readability
+  // Menu Print Logic (A4) - Redesigned: Elegant, Centered, Restaurant Style
   const MenuPrint = () => {
     const selectedBundles = cateringSelections.map(s => bundles.find(b => b.id === s.bundleId)).filter(Boolean) as Bundle[];
 
     return (
-      <div className="w-[210mm] h-[297mm] bg-white relative flex flex-col">
-        {/* Top Branding Strip */}
-        <div className="bg-[#00543A] text-white p-8 flex justify-between items-center h-[35mm]">
-          <BrandLogo size={40} color="#F5E6D3" />
-          <div className="text-right">
-            <div className="text-[#F4B7D5] uppercase tracking-[0.2em] text-xs font-bold mb-1">Event Menu</div>
-            <div className="text-xl font-serif italic">{cateringDate}</div>
-          </div>
+      <div className="w-[210mm] h-[297mm] bg-white relative flex flex-col items-center py-[20mm] px-[20mm]">
+        {/* Elegant Header */}
+        <div className="flex flex-col items-center w-full mb-16">
+          <BrandLogo className="h-16 mb-6" />
+          <div className="text-[#00543A] uppercase tracking-[0.3em] text-sm font-bold opacity-80 mb-2">Catering Menu</div>
+          <div className="h-[1px] w-24 bg-[#00543A] opacity-20 mb-2"></div>
+          <div className="font-serif italic text-slate-500 text-lg">{cateringDate}</div>
         </div>
 
-        {/* Main Content Area */}
-        <div className="flex-1 p-[15mm] flex flex-col gap-10">
+        {/* Menu Content - Centered Single Column */}
+        <div className="flex-1 w-full pl-8 pr-8 flex flex-col gap-12">
           {selectedBundles.map((b, idx) => (
-            <div key={idx} className="flex flex-col gap-6">
-              {/* Course Title */}
-              <div className="flex items-center gap-4">
-                <h2 className="text-3xl font-black text-[#00543A] uppercase font-serif tracking-wide shrink-0">
+            <div key={idx} className="flex flex-col items-center w-full">
+              {/* Course / Bundle Name */}
+              <div className="text-center mb-6">
+                <h2 className="text-2xl font-black text-[#00543A] uppercase font-serif tracking-widest border-b-[2px] border-[#F4B7D5] inline-block pb-2 px-4 shadow-[0_2px_0_white]">
                   {lang === 'de' ? b.name_de : b.name_en}
                 </h2>
-                <div className="h-[2px] bg-[#F4B7D5] flex-1 mt-1 opacity-50" />
               </div>
 
-              {/* Items Grid */}
-              <div className="grid grid-cols-1 gap-6">
+              {/* Detailed List */}
+              <div className="flex flex-col gap-8 w-full">
                 {b.items.map((item, iIdx) => (
-                  <div key={iIdx} className="flex items-start justify-between gap-6 group">
-                    {/* Left: Name & Diet */}
-                    <div className="flex-1">
-                      <div className="flex items-center gap-3 mb-1">
-                        <span className="text-xl font-bold text-slate-800 leading-snug">
-                          {lang === 'de' ? item.item_name_de : item.item_name_en}
-                        </span>
-                        <div className="scale-90 origin-left">{getDietIcons(item.diet_de, false)}</div>
-                      </div>
+                  <div key={iIdx} className="flex flex-col items-center text-center w-full">
+                    {/* Name */}
+                    <div className="text-xl font-bold text-slate-800 font-serif leading-tight max-w-[85%]">
+                      {lang === 'de' ? item.item_name_de : item.item_name_en}
                     </div>
 
-                    {/* Right: Allergens */}
-                    <div className="flex items-center gap-2 pt-1.5 shrink-0 opacity-80 group-hover:opacity-100 transition-opacity">
-                      <div className="flex gap-2">
-                        {getAllergenIcons(item.allergens_de, 14)}
-                      </div>
-                      {!item.allergens_de && <span className="text-xs text-slate-300 italic">No Allergens</span>}
+                    {/* Diet & Allergen Row */}
+                    <div className="flex items-center gap-4 mt-2 justify-center bg-[#F8F9FA] px-4 py-1.5 rounded-full border border-slate-100">
+                      <div className="scale-90">{getDietIcons(item.diet_de, true)}</div>
+                      {item.allergens_de && <div className="w-[1px] h-3 bg-slate-300 mx-1" />}
+                      <span className="text-[10px] text-slate-500 uppercase tracking-widest font-semibold">
+                        {item.allergens_de || 'No Allergens'}
+                      </span>
                     </div>
                   </div>
                 ))}
@@ -599,9 +593,12 @@ const App: React.FC = () => {
           ))}
         </div>
 
-        {/* Bottom Strip */}
-        <div className="h-[15mm] bg-[#F5E6D3] flex items-center justify-center text-[#00543A] border-t border-[#00543A]/10">
-          <span className="font-serif italic font-semibold">Freshly prepared by Bella&Bona</span>
+        {/* Footer */}
+        <div className="w-full text-center mt-auto pt-8 border-t border-slate-100 flex flex-col items-center gap-2">
+          <div className="flex gap-4 text-[10px] text-slate-400 uppercase tracking-widest">
+            <span>G: Gluten</span><span>E: Egg</span><span>D: Dairy</span><span>S: Soy</span><span>N: Nuts</span>
+          </div>
+          <span className="font-serif italic text-[#00543A] opacity-80 mt-2">Bon Appétit</span>
         </div>
       </div>
     );

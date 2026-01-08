@@ -257,7 +257,7 @@ const getAllergenIcons = (allergens: string) => {
   if (list.includes('ei') || list.includes('egg')) foundIcons.push(createIcon('egg', Icons.egg, 'Egg'));
   if (list.includes('fisch') || list.includes('fish')) foundIcons.push(createIcon('fish', Icons.fish, 'Fish'));
   if (list.includes('erdnuss') || list.includes('peanut')) foundIcons.push(createIcon('peanut', Icons.peanut, 'Peanuts'));
-  if (list.includes('soja') || list.includes('soy')) foundIcons.push(createIcon('soy', Icons.soy', 'Soy'));
+  if (list.includes('soja') || list.includes('soy') || list.includes('bean')) foundIcons.push(createIcon('soy', Icons.soy, 'Soy'));
   if (list.includes('milch') || list.includes('milk') || list.includes('lactose')) foundIcons.push(createIcon('milk', Icons.milk, 'Milk'));
   if (list.includes('nuss') || list.includes('nut') || list.includes('mandel')) foundIcons.push(createIcon('nuts', Icons.nuts, 'Tree Nuts'));
   if (list.includes('sellerie') || list.includes('celery')) foundIcons.push(createIcon('celery', Icons.celery, 'Celery'));

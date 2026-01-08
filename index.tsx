@@ -746,7 +746,12 @@ const App: React.FC = () => {
               <div className="flex items-center gap-6 mb-6">
                 <div className="h-[2px] bg-[#FEACCF] flex-1"></div>
                 <h2 className="text-2xl font-black text-[#00543A] uppercase font-serif tracking-[0.25em] px-4 bg-[#FFF1F6]">
-                  {groupTitle}
+                  {lang === 'de' ? (
+                    groupTitle === 'Vegetarian' ? 'VEGETARISCH' :
+                      groupTitle === 'Meat' ? 'FLEISCH' :
+                        groupTitle === 'Fish' ? 'FISCH' :
+                          groupTitle
+                  ) : groupTitle}
                 </h2>
                 <div className="h-[2px] bg-[#FEACCF] flex-1"></div>
               </div>
@@ -758,16 +763,12 @@ const App: React.FC = () => {
                     <div className="flex justify-between items-baseline w-full">
                       <div className="flex-1">
                         <span className="text-xl font-bold text-[#00543A] leading-tight tracking-wide">
-                          {item.item_name_de.toUpperCase()}
+                          {(lang === 'de' ? item.item_name_de : item.item_name_en).toUpperCase()}
                         </span>
                       </div>
                       <div className="flex items-center gap-2 ml-4">
                         {getAllergenIcons(item.allergens_de)}
                       </div>
-                    </div>
-                    {/* English Desc */}
-                    <div className="mt-1 text-[#00543A]/60 font-medium italic text-sm">
-                      {item.item_name_en}
                     </div>
                     {/* Dotted Leader */}
                     <div className="border-b-2 border-dotted border-[#00543A]/20 w-full mt-3 opacity-0 group-hover:opacity-100 transition-opacity" />

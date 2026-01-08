@@ -152,51 +152,86 @@ const DataService = {
   }
 };
 
-const Label: React.FC<{ bundle: Bundle, lang: 'de' | 'en', packedOn: string, forPrint?: boolean }> = ({ bundle, lang, packedOn, forPrint }) => {
-  const getItemIcons = (item: BundleItem, isHighDensity: boolean) => {
+const Label: React.FC<{ bundle: Bundle, lang: 'de' | 'en', packedOn: string, forPrint?: boolean, variant?: 'standard' | 'catering' }> = ({ bundle, lang, packedOn, forPrint, variant = 'standard' }) => {
+  const getItemIcons = (item: BundleItem, isHighDensity: boolean, colorClass: string = "text-slate-700") => {
     const diet = item.diet_de.toLowerCase();
     const allergens = item.allergens_de.toLowerCase();
 
-    // Increased base sizes for icons
-    const size = isHighDensity ? 22 : 32;
+    // Catering uses fixed size mostly
+    const size = variant === 'catering' ? 20 : (isHighDensity ? 22 : 32);
     const icons: React.ReactNode[] = [];
 
     // 1. Diet-based Icons
     if (diet.includes('vegan')) {
-      icons.push(<Leaf size={size} className="text-green-600" key="vegan" />);
+      icons.push(<Leaf size={size} className={variant === 'catering' ? "text-[#024930]" : "text-green-600"} key="vegan" />);
     } else if (diet.includes('vegetarisch')) {
-      icons.push(<Sprout size={size} className="text-green-500" key="veggie" />);
+      icons.push(<Sprout size={size} className={variant === 'catering' ? "text-[#024930]" : "text-green-500"} key="veggie" />);
     } else if (diet.includes('fish') || diet.includes('fisch')) {
-      icons.push(<Fish size={size} className="text-blue-500" key="fish" />);
+      icons.push(<Fish size={size} className={variant === 'catering' ? "text-[#024930]" : "text-blue-500"} key="fish" />);
     } else if (diet.includes('meat') || diet.includes('fleisch') || diet.includes('beef')) {
-      icons.push(<div className={isHighDensity ? "text-xl" : "text-3xl"} key="meat">🥩</div>);
+      icons.push(<div className={variant === 'catering' ? "text-lg grayscale" : (isHighDensity ? "text-xl" : "text-3xl")} key="meat">🥩</div>);
     }
 
-    // 2. Allergen-based Icons (Expanded List)
-    if (allergens.includes('gluten') || allergens.includes('weizen')) {
-      icons.push(<Wheat size={size} className="text-amber-600" key="gluten" />);
-    }
-    if (allergens.includes('egg') || allergens.includes('ei')) {
-      icons.push(<Egg size={size} className="text-amber-500" key="egg" />);
-    }
-    if (allergens.includes('lactose') || allergens.includes('milch')) {
-      icons.push(<Milk size={size} className="text-blue-400" key="milk" />);
-    }
-    if (allergens.includes('soja') || allergens.includes('soy')) {
-      icons.push(<Bean size={size} className="text-green-700" key="soy" />);
-    }
-    if (allergens.includes('nuss') || allergens.includes('nut') || allergens.includes('mandel') || allergens.includes('hazel')) {
-      icons.push(<Nut size={size} className="text-amber-800" key="nut" />);
-    }
-
-    // Fallback if absolutely nothing matches
-    if (icons.length === 0) {
-      icons.push(<Soup size={size} className="text-blue-500" key="fallback" />);
+    // 2. Allergen-based Icons (Catering: maybe just text or minimal icons? Let's use text for catering mostly, icons for standard)
+    if (variant === 'standard') {
+      if (allergens.includes('gluten') || allergens.includes('weizen')) icons.push(<Wheat size={size} className="text-amber-600" key="gluten" />);
+      if (allergens.includes('egg') || allergens.includes('ei')) icons.push(<Egg size={size} className="text-amber-500" key="egg" />);
+      if (allergens.includes('lactose') || allergens.includes('milch')) icons.push(<Milk size={size} className="text-blue-400" key="milk" />);
+      if (allergens.includes('soja') || allergens.includes('soy')) icons.push(<Bean size={size} className="text-green-700" key="soy" />);
+      if (allergens.includes('nuss') || allergens.includes('nut') || allergens.includes('mandel') || allergens.includes('hazel')) icons.push(<Nut size={size} className="text-amber-800" key="nut" />);
+      if (icons.length === 0) icons.push(<Soup size={size} className="text-blue-500" key="fallback" />);
     }
 
     return icons;
   };
 
+  // --- CATERING VARIANT DESIGN ---
+  if (variant === 'catering') {
+    return (
+      <div
+        className={`relative bg-white flex flex-col items-center justify-between p-8 text-center border-[1px] border-gray-200 overflow-hidden ${!forPrint ? 'shadow-xl w-[105mm] h-[148.5mm]' : 'w-full h-full'}`}
+        style={{ width: forPrint ? '105mm' : undefined, height: forPrint ? '148.5mm' : undefined, fontFamily: 'serif' }}
+      >
+        {/* Elegant Border Frame */}
+        <div className="absolute inset-4 border-2 border-[#024930] opacity-20 pointer-events-none" />
+        <div className="absolute inset-5 border border-[#024930] opacity-10 pointer-events-none" />
+
+        {/* Header */}
+        <div className="mt-8 z-10 w-full flex flex-col items-center">
+          <span className="text-[10px] uppercase font-sans tracking-[0.3em] text-[#024930] opacity-60 mb-2">Special Selection</span>
+          <h2 className="text-3xl font-bold text-[#024930] leading-tight uppercase font-serif px-4">
+            {lang === 'de' ? bundle.name_de : bundle.name_en}
+          </h2>
+          <div className="w-16 h-[2px] bg-[#FEACCF] mt-4 mb-2" />
+        </div>
+
+        {/* Body: Items List */}
+        <div className="flex-1 flex flex-col justify-center items-center gap-4 w-full px-6 z-10">
+          {bundle.items.map((item, i) => (
+            <div key={i} className="flex flex-col items-center">
+              <span className="text-lg font-medium text-slate-800 italic font-serif">
+                {lang === 'de' ? item.item_name_de : item.item_name_en}
+              </span>
+              <div className="flex items-center gap-2 mt-1">
+                {getItemIcons(item, false)}
+                <span className="text-[10px] uppercase font-sans tracking-widest text-[#024930] border border-[#024930] px-1.5 py-0.5 rounded-sm opacity-50">
+                  {item.allergens_de || 'No Allergens'}
+                </span>
+              </div>
+            </div>
+          ))}
+        </div>
+
+        {/* Footer */}
+        <div className="mb-8 z-10 flex flex-col items-center">
+          <span className="font-sans text-[9px] uppercase tracking-widest text-slate-400 mb-1">Prepared Fresh</span>
+          <span className="font-serif text-[#024930] italic">Bella&Bona Kitchen</span>
+        </div>
+      </div>
+    );
+  }
+
+  // --- STANDARD VARIANT DESIGN (Existing) ---
   const itemCount = bundle.items.length;
   const isHighDensity = itemCount >= 5;
   const isExtremeDensity = itemCount >= 9;
@@ -432,43 +467,50 @@ const App: React.FC = () => {
     const selectedBundles = cateringSelections.map(s => bundles.find(b => b.id === s.bundleId)).filter(Boolean) as Bundle[];
 
     return (
-      <div className="w-[210mm] h-[297mm] bg-white p-[20mm] relative flex flex-col items-center">
-        {/* Decorative Header */}
-        <div className="w-full text-center border-b-4 border-[#024930] pb-8 mb-8">
-          <div className="flex justify-center mb-4 text-[#FEACCF]">
-            <ChefHat size={64} strokeWidth={1.5} />
-          </div>
-          <h1 className="text-5xl font-black text-[#024930] uppercase tracker-widest mb-2 font-serif">Menu</h1>
-          <div className="text-xl text-[#C197AB] font-bold uppercase tracking-[0.3em]">{companyName || 'Special Catering'}</div>
-        </div>
+      <div className="w-[210mm] h-[297mm] bg-[#fdfaf5] p-[20mm] relative flex flex-col font-serif">
+        {/* Background Texture Effect (Subtle) */}
+        <div className="absolute inset-0 opacity-20 pointer-events-none" style={{ backgroundImage: 'radial-gradient(circle, #024930 0.5px, transparent 0.5px)', backgroundSize: '20px 20px' }} />
 
-        {/* Date */}
-        <div className="absolute top-[20mm] right-[20mm] flex flex-col items-end">
-          <span className="text-xs font-bold text-[#024930] uppercase tracking-widest">Date</span>
-          <span className="text-lg font-serif text-[#024930]">{cateringDate}</span>
+        {/* Header */}
+        <div className="w-full text-center pb-12 z-10">
+          <div className="flex justify-center mb-6 text-[#024930]">
+            <ChefHat size={50} strokeWidth={1} />
+          </div>
+          <h1 className="text-6xl text-[#024930] uppercase tracking-widest mb-4" style={{ fontFamily: 'Times New Roman, serif', fontWeight: 900 }}>Menu</h1>
+          <div className="h-[2px] w-[60mm] bg-[#024930] mx-auto mb-4" />
+          <div className="text-xl text-slate-700 tracking-[0.2em] font-sans uppercase font-medium">{companyName || 'Private Event'}</div>
+          <div className="text-sm text-slate-500 mt-2 font-sans">{cateringDate}</div>
         </div>
 
         {/* Menu Items */}
-        <div className="w-full flex-1 flex flex-col gap-6">
+        <div className="w-full flex-1 flex flex-col gap-10 z-10 px-8">
           {selectedBundles.map((b, idx) => (
-            <div key={idx} className="flex flex-col items-center text-center pb-6 border-b border-gray-100 last:border-none">
-              <h2 className="text-2xl font-bold text-[#024930] mb-2">{lang === 'de' ? b.name_de : b.name_en}</h2>
-              <div className="text-sm text-gray-500 max-w-[80%] italic leading-relaxed">
-                {b.items.map(i => lang === 'de' ? i.item_name_de : i.item_name_en).join(' • ')}
+            <div key={idx} className="flex justify-between items-start group">
+              <div className="flex-1 pr-8">
+                <h2 className="text-2xl font-bold text-[#024930] mb-2">{lang === 'de' ? b.name_de : b.name_en}</h2>
+                <div className="text-sm text-slate-600 leading-relaxed font-sans italic">
+                  {b.items.map(i => lang === 'de' ? i.item_name_de : i.item_name_en).join(' • ')}
+                </div>
               </div>
-              <div className="flex gap-2 mt-2 justify-center">
-                {/* We could show allergens here too if needed */}
+              <div className="flex flex-col items-end gap-1 min-w-[120px]">
+                <div className="flex gap-2">
+                  {/* Extract unique diet types for these icons */}
+                  {Array.from(new Set(b.items.map(i => i.diet_de))).map((diet, dIdx) => (
+                    <span key={dIdx} className="text-xs uppercase bg-[#024930] text-white px-2 py-0.5 rounded-full tracking-wider font-sans">{diet.substring(0, 3)}</span>
+                  ))}
+                </div>
+                <div className="text-[10px] text-slate-400 uppercase tracking-widest font-sans mt-1 text-right max-w-[150px]">
+                  {Array.from(new Set(b.items.flatMap(i => i.allergens_de.split(/[,/]+/).map(a => a.trim()).filter(Boolean)))).join(', ')}
+                </div>
               </div>
             </div>
           ))}
         </div>
 
         {/* Footer */}
-        <div className="w-full text-center mt-auto border-t border-[#FEACCF] pt-6">
-          <div className="flex items-center justify-center gap-2 text-[#024930] font-black text-xl italic uppercase">
-            <span>Bella</span><span className="text-[#FEACCF]">&</span><span>Bona</span>
-          </div>
-          <p className="text-[10px] text-gray-400 mt-2 uppercase tracking-widest">Bon Appétit</p>
+        <div className="w-full text-center mt-auto pt-10 border-t border-[#024930]/20 z-10">
+          <div className="font-serif italic text-slate-500 text-sm">~ Bon Appétit ~</div>
+          <div className="text-[9px] text-slate-300 mt-2 uppercase tracking-widest font-sans">Catering by Bella&Bona</div>
         </div>
       </div>
     );
@@ -484,7 +526,7 @@ const App: React.FC = () => {
             <div key={groupIdx} className="label-page-group">
               {group.map((bundle, bIdx) => (
                 <div key={bIdx} className="label-card-container">
-                  <Label bundle={bundle} lang={lang} packedOn={activeTab === 'catering' ? cateringDate : packedOn} forPrint />
+                  <Label bundle={bundle} lang={lang} packedOn={activeTab === 'catering' ? cateringDate : packedOn} forPrint variant={activeTab === 'catering' ? 'catering' : 'standard'} />
                 </div>
               ))}
             </div>
@@ -754,7 +796,7 @@ const App: React.FC = () => {
                     <div className="label-page-group">
                       {group.map((b, bi) => (
                         <div key={bi} className="label-card-container">
-                          <Label bundle={b} lang={lang} packedOn={activeTab === 'catering' ? cateringDate : packedOn} forPrint />
+                          <Label bundle={b} lang={lang} packedOn={activeTab === 'catering' ? cateringDate : packedOn} forPrint variant={activeTab === 'catering' ? 'catering' : 'standard'} />
                         </div>
                       ))}
                     </div>

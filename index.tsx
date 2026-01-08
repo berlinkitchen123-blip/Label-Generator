@@ -850,7 +850,7 @@ const App: React.FC = () => {
                 ))}
               </div>
             ))
-          )}
+          ))}
       </div>
 
       <div className="no-print min-h-screen flex flex-col bg-slate-950 text-slate-100">

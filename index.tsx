@@ -109,6 +109,57 @@ interface Selection {
   bundleId: string;
   quantity: number;
 }
+// Helper to get raw icons for Catering Item Label
+const getItemIconsRaw = (item: BundleItem, size: number = 20) => {
+  const diet = item.diet_de.toLowerCase();
+  const icons: React.ReactNode[] = [];
+  if (diet.includes('vegan')) icons.push(<Leaf size={size} className="text-[#024930]" key="vegan" />);
+  else if (diet.includes('vegetarisch')) icons.push(<Sprout size={size} className="text-[#024930]" key="veggie" />);
+  else if (diet.includes('fish') || diet.includes('fisch')) icons.push(<Fish size={size} className="text-[#024930]" key="fish" />);
+  else if (diet.includes('meat') || diet.includes('fleisch') || diet.includes('beef')) icons.push(<div className="text-lg grayscale" key="meat">🥩</div>);
+  return icons;
+};
+
+const CateringItemLabel: React.FC<{ item: BundleItem, lang: 'de' | 'en', forPrint?: boolean }> = ({ item, lang, forPrint }) => {
+  return (
+    <div
+      className={`relative bg-white flex flex-col items-center justify-between p-6 text-center border-[1px] border-gray-200 overflow-hidden ${!forPrint ? 'shadow-xl w-[105mm] h-[148.5mm]' : 'w-full h-full'}`}
+      style={{ width: forPrint ? '105mm' : undefined, height: forPrint ? '148.5mm' : undefined, fontFamily: 'serif' }}
+    >
+      {/* Elegant Border Frame */}
+      <div className="absolute inset-4 border-[3px] border-[#024930] opacity-100 pointer-events-none" />
+      <div className="absolute inset-3 border border-[#024930] opacity-30 pointer-events-none" />
+
+      {/* Header */}
+      <div className="mt-12 z-10 w-full flex flex-col items-center">
+        <span className="text-[12px] uppercase font-sans tracking-[0.4em] text-[#024930] opacity-80 mb-4">Buffet Selection</span>
+        <div className="w-12 h-[2px] bg-[#FEACCF] mb-4" />
+      </div>
+
+      {/* Main Dish Name */}
+      <div className="flex-1 flex flex-col justify-center items-center w-full px-8 z-10">
+        <h2 className="text-4xl leading-tight font-black text-[#024930] uppercase font-serif drop-shadow-sm">
+          {lang === 'de' ? item.item_name_de : item.item_name_en}
+        </h2>
+
+        <div className="flex items-center justify-center gap-4 mt-8">
+          {getItemIconsRaw(item, 32)}
+          {item.allergens_de && (
+            <span className="text-xs uppercase font-sans tracking-widest text-[#024930] border border-[#024930] px-3 py-1 rounded-full">
+              {item.allergens_de}
+            </span>
+          )}
+        </div>
+      </div>
+
+      {/* Footer */}
+      <div className="mb-12 z-10 flex flex-col items-center">
+        <span className="font-serif text-[#024930] italic text-lg">Bella&Bona</span>
+        <span className="font-sans text-[8px] uppercase tracking-widest text-slate-400 mt-1">Culinary Excellence</span>
+      </div>
+    </div>
+  );
+};
 
 const DataService = {
   getBundles: async (): Promise<Bundle[]> => {
@@ -462,55 +513,56 @@ const App: React.FC = () => {
     return groups;
   }, [selections, cateringSelections, bundles, activeTab, isPreviewing, previewType]);
 
-  // Menu Print Logic
+  // Menu Print Logic (A4) - now uses the Elegant Framed Design (previously A6)
   const MenuPrint = () => {
     const selectedBundles = cateringSelections.map(s => bundles.find(b => b.id === s.bundleId)).filter(Boolean) as Bundle[];
 
     return (
-      <div className="w-[210mm] h-[297mm] bg-[#fdfaf5] p-[20mm] relative flex flex-col font-serif">
-        {/* Background Texture Effect (Subtle) */}
-        <div className="absolute inset-0 opacity-20 pointer-events-none" style={{ backgroundImage: 'radial-gradient(circle, #024930 0.5px, transparent 0.5px)', backgroundSize: '20px 20px' }} />
+      <div className="w-[210mm] h-[297mm] bg-white p-[15mm] flex flex-col items-center">
+        {/* We can repeat the frame or use a full page frame. Let's use a nice full page frame. */}
+        <div className="w-full h-full border-[6px] border-[#024930] p-2 relative flex flex-col">
+          <div className="absolute inset-2 border-[1px] border-[#024930] pointer-events-none opacity-50" />
 
-        {/* Header */}
-        <div className="w-full text-center pb-12 z-10">
-          <div className="flex justify-center mb-6 text-[#024930]">
-            <ChefHat size={50} strokeWidth={1} />
+          {/* Header */}
+          <div className="pt-16 pb-12 w-full text-center z-10">
+            <span className="text-sm font-sans tracking-[0.5em] text-[#024930] uppercase mb-4 block">Special Catering</span>
+            <h1 className="text-6xl font-black text-[#024930] uppercase font-serif px-8 leading-tight">
+              {companyName || 'Menu'}
+            </h1>
+            <div className="text-lg text-[#024930] mt-4 font-serif italic">{cateringDate}</div>
+            <div className="w-32 h-[3px] bg-[#FEACCF] mx-auto mt-8" />
           </div>
-          <h1 className="text-6xl text-[#024930] uppercase tracking-widest mb-4" style={{ fontFamily: 'Times New Roman, serif', fontWeight: 900 }}>Menu</h1>
-          <div className="h-[2px] w-[60mm] bg-[#024930] mx-auto mb-4" />
-          <div className="text-xl text-slate-700 tracking-[0.2em] font-sans uppercase font-medium">{companyName || 'Private Event'}</div>
-          <div className="text-sm text-slate-500 mt-2 font-sans">{cateringDate}</div>
-        </div>
 
-        {/* Menu Items */}
-        <div className="w-full flex-1 flex flex-col gap-10 z-10 px-8">
-          {selectedBundles.map((b, idx) => (
-            <div key={idx} className="flex justify-between items-start group">
-              <div className="flex-1 pr-8">
-                <h2 className="text-2xl font-bold text-[#024930] mb-2">{lang === 'de' ? b.name_de : b.name_en}</h2>
-                <div className="text-sm text-slate-600 leading-relaxed font-sans italic">
-                  {b.items.map(i => lang === 'de' ? i.item_name_de : i.item_name_en).join(' • ')}
-                </div>
-              </div>
-              <div className="flex flex-col items-end gap-1 min-w-[120px]">
-                <div className="flex gap-2">
-                  {/* Extract unique diet types for these icons */}
-                  {Array.from(new Set(b.items.map(i => i.diet_de))).map((diet, dIdx) => (
-                    <span key={dIdx} className="text-xs uppercase bg-[#024930] text-white px-2 py-0.5 rounded-full tracking-wider font-sans">{diet.substring(0, 3)}</span>
+          {/* Menu Content: Listing Bundles as Courses */}
+          <div className="flex-1 flex flex-col gap-12 px-12 z-10 overflow-hidden">
+            {selectedBundles.map((b, idx) => (
+              <div key={idx} className="flex flex-col items-center text-center">
+                <h2 className="text-3xl font-bold text-[#024930] mb-4 font-serif">{lang === 'de' ? b.name_de : b.name_en}</h2>
+                <div className="flex flex-wrap justify-center gap-x-4 gap-y-1 text-slate-600 italic font-serif text-lg leading-relaxed max-w-[80%]">
+                  {b.items.map((i, itemIdx) => (
+                    <span key={itemIdx} className="whitespace-nowrap">
+                      {lang === 'de' ? i.item_name_de : i.item_name_en}
+                      {itemIdx < b.items.length - 1 && <span className="text-[#FEACCF] mx-2">•</span>}
+                    </span>
                   ))}
                 </div>
-                <div className="text-[10px] text-slate-400 uppercase tracking-widest font-sans mt-1 text-right max-w-[150px]">
-                  {Array.from(new Set(b.items.flatMap(i => i.allergens_de.split(/[,/]+/).map(a => a.trim()).filter(Boolean)))).join(', ')}
+                {/* Optional: Show aggregated diet icons for the bundle */}
+                <div className="flex gap-2 mt-3 opacity-60">
+                  {Array.from(new Set(b.items.map(i => i.diet_de))).map((d, di) => (
+                    <span key={di} className="text-[10px] uppercase border border-slate-400 px-2 py-0.5 rounded-full text-slate-500">{d}</span>
+                  ))}
                 </div>
               </div>
-            </div>
-          ))}
-        </div>
+            ))}
+          </div>
 
-        {/* Footer */}
-        <div className="w-full text-center mt-auto pt-10 border-t border-[#024930]/20 z-10">
-          <div className="font-serif italic text-slate-500 text-sm">~ Bon Appétit ~</div>
-          <div className="text-[9px] text-slate-300 mt-2 uppercase tracking-widest font-sans">Catering by Bella&Bona</div>
+          {/* Footer */}
+          <div className="pb-12 text-center z-10">
+            <div className="flex items-center justify-center gap-2 mb-2">
+              <ChefHat size={24} className="text-[#024930]" />
+            </div>
+            <span className="font-serif text-[#024930] italic text-xl">Bella&Bona Kitchen</span>
+          </div>
         </div>
       </div>
     );
@@ -521,17 +573,43 @@ const App: React.FC = () => {
       <div className="print-only">
         {previewType === 'menu' && activeTab === 'catering' ? (
           <MenuPrint />
-        ) : (
-          printGroups.map((group, groupIdx) => (
-            <div key={groupIdx} className="label-page-group">
-              {group.map((bundle, bIdx) => (
-                <div key={bIdx} className="label-card-container">
-                  <Label bundle={bundle} lang={lang} packedOn={activeTab === 'catering' ? cateringDate : packedOn} forPrint variant={activeTab === 'catering' ? 'catering' : 'standard'} />
-                </div>
-              ))}
+        ) :                // Label View (A6) Logic
+                // If Catering, we Flatten Print Groups per Item
+                if (activeTab === 'catering' && previewType === 'labels') {
+                   // Flatten all items from all selections
+                   const allItems = cateringSelections.flatMap(sel => {
+                      const b = bundles.find(x => x.id === sel.bundleId);
+        if (!b) return [];
+                      return Array(sel.quantity).fill(b).flatMap(() => b.items);
+                   });
+
+        return (
+        <div className="label-card-container">
+          {/* Just showing first one in preview or a list? The preview logic usually shows mapping. */}
+          {/* We use a grid for preview */}
+          <div className="grid grid-cols-2 gap-8">
+            {allItems.map((item, idx) => (
+              <div key={idx} className="scale-[0.6] origin-top-left">
+                <CateringItemLabel item={item} lang={lang} forPrint />
+              </div>
+            ))}
+          </div>
+        </div>
+        );
+                } else {
+                   // Standard Bundle Labels Preview
+                   return printGroups.flatMap((group, groupIdx) => (
+        <div key={groupIdx} className="label-page-group mb-10">
+          {group.map((bundle, bIdx) => (
+            <div key={bIdx} className="label-card-container">
+              <Label bundle={bundle} lang={lang} packedOn={packedOn} forPrint variant="standard" />
             </div>
-          ))
-        )}
+          ))}
+        </div>
+        ));
+                }
+              })()
+            )}
       </div>
 
       <div className="no-print min-h-screen flex flex-col bg-slate-950 text-slate-100">
@@ -791,17 +869,48 @@ const App: React.FC = () => {
                   <MenuPrint />
                 </div>
               ) : (
-                printGroups.map((group, idx) => (
-                  <div key={idx} className="bg-white shadow-2xl" style={{ width: '210mm', height: '297mm', minHeight: '297mm', minWidth: '210mm' }}>
-                    <div className="label-page-group">
-                      {group.map((b, bi) => (
-                        <div key={bi} className="label-card-container">
-                          <Label bundle={b} lang={lang} packedOn={activeTab === 'catering' ? cateringDate : packedOn} forPrint variant={activeTab === 'catering' ? 'catering' : 'standard'} />
+                // Catering uses Item Level Labels
+                activeTab === 'catering' ? (
+                  // We need to paginate the flattened items
+                  // Calculate pages for items (4 per page)
+                  (() => {
+                    const allItems = cateringSelections.flatMap(sel => {
+                      const b = bundles.find(x => x.id === sel.bundleId);
+                      if (!b) return [];
+                      return Array(sel.quantity).fill(b).flatMap(() => b.items);
+                    });
+
+                    const pages = [];
+                    for (let i = 0; i < allItems.length; i += 4) {
+                      pages.push(allItems.slice(i, i + 4));
+                    }
+
+                    return pages.map((pageItems, pIdx) => (
+                      <div key={pIdx} className="bg-white shadow-2xl" style={{ width: '210mm', height: '297mm', minHeight: '297mm', minWidth: '210mm' }}>
+                        <div className="label-page-group">
+                          {pageItems.map((item, iIdx) => (
+                            <div key={iIdx} className="label-card-container">
+                              <CateringItemLabel item={item} lang={lang} forPrint />
+                            </div>
+                          ))}
                         </div>
-                      ))}
+                      </div>
+                    ));
+                  })()
+                ) : (
+                  // Standard Generator Prints (Bundle Level)
+                  printGroups.map((group, idx) => (
+                    <div key={idx} className="bg-white shadow-2xl" style={{ width: '210mm', height: '297mm', minHeight: '297mm', minWidth: '210mm' }}>
+                      <div className="label-page-group">
+                        {group.map((b, bi) => (
+                          <div key={bi} className="label-card-container">
+                            <Label bundle={b} lang={lang} packedOn={packedOn} forPrint variant="standard" />
+                          </div>
+                        ))}
+                      </div>
                     </div>
-                  </div>
-                ))
+                  ))
+                )
               )}
             </div>
             <div className="p-8 border-t border-slate-800">

@@ -109,53 +109,61 @@ interface Selection {
   bundleId: string;
   quantity: number;
 }
-// Helper to get raw icons for Catering Item Label
-const getItemIconsRaw = (item: BundleItem, size: number = 20) => {
-  const diet = item.diet_de.toLowerCase();
+// Helper for Allergen Icons
+const getAllergenIcons = (allergens: string, size: number = 18) => {
+  const list = allergens.toLowerCase();
   const icons: React.ReactNode[] = [];
-  if (diet.includes('vegan')) icons.push(<Leaf size={size} className="text-[#024930]" key="vegan" />);
-  else if (diet.includes('vegetarisch')) icons.push(<Sprout size={size} className="text-[#024930]" key="veggie" />);
-  else if (diet.includes('fish') || diet.includes('fisch')) icons.push(<Fish size={size} className="text-[#024930]" key="fish" />);
-  else if (diet.includes('meat') || diet.includes('fleisch') || diet.includes('beef')) icons.push(<div className="text-lg grayscale" key="meat">🥩</div>);
+
+  if (list.includes('gluten') || list.includes('weizen')) icons.push(<div key="gluten" className="flex flex-col items-center" title="Gluten"><Wheat size={size} /><span className="text-[8px] uppercase">Gluten</span></div>);
+  if (list.includes('egg') || list.includes('ei')) icons.push(<div key="egg" className="flex flex-col items-center" title="Egg"><Egg size={size} /><span className="text-[8px] uppercase">Egg</span></div>);
+  if (list.includes('lactose') || list.includes('milch') || list.includes('milk')) icons.push(<div key="milk" className="flex flex-col items-center" title="Lactose"><Milk size={size} /><span className="text-[8px] uppercase">Dairy</span></div>);
+  if (list.includes('soja') || list.includes('soy') || list.includes('bean')) icons.push(<div key="soy" className="flex flex-col items-center" title="Soy"><Bean size={size} /><span className="text-[8px] uppercase">Soy</span></div>);
+  if (list.includes('nuss') || list.includes('nut') || list.includes('mandel') || list.includes('hazel')) icons.push(<div key="nut" className="flex flex-col items-center" title="Nuts"><Nut size={size} /><span className="text-[8px] uppercase">Nut</span></div>);
+
   return icons;
+};
+
+// Helper for Diet Icons
+const getDietIcons = (diet: string, size: number = 20) => {
+  const d = diet.toLowerCase();
+  if (d.includes('vegan')) return <div className="flex items-center gap-1 text-[#024930] font-bold uppercase text-[10px]"><Leaf size={size} /> Vegan</div>;
+  if (d.includes('vegetarisch')) return <div className="flex items-center gap-1 text-[#024930] font-bold uppercase text-[10px]"><Sprout size={size} /> Veggie</div>;
+  if (d.includes('fish') || d.includes('fisch')) return <div className="flex items-center gap-1 text-blue-600 font-bold uppercase text-[10px]"><Fish size={size} /> Fish</div>;
+  if (d.includes('meat') || d.includes('fleisch') || d.includes('beef')) return <div className="flex items-center gap-1 text-slate-600 font-bold uppercase text-[10px]"><span className="text-xl">🥩</span> Meat</div>;
+  return null;
 };
 
 const CateringItemLabel: React.FC<{ item: BundleItem, lang: 'de' | 'en', forPrint?: boolean }> = ({ item, lang, forPrint }) => {
   return (
     <div
-      className={`relative bg-white flex flex-col items-center justify-between p-6 text-center border-[1px] border-gray-200 overflow-hidden ${!forPrint ? 'shadow-xl w-[105mm] h-[148.5mm]' : 'w-full h-full'}`}
+      className={`relative bg-white flex flex-col items-center justify-between p-6 text-center border-[1px] border-gray-100 overflow-hidden ${!forPrint ? 'shadow-xl w-[105mm] h-[148.5mm]' : 'w-full h-full'}`}
       style={{ width: forPrint ? '105mm' : undefined, height: forPrint ? '148.5mm' : undefined, fontFamily: 'serif' }}
     >
-      {/* Elegant Border Frame */}
-      <div className="absolute inset-4 border-[3px] border-[#024930] opacity-100 pointer-events-none" />
-      <div className="absolute inset-3 border border-[#024930] opacity-30 pointer-events-none" />
+      {/* Elegant Frame */}
+      <div className="absolute inset-2 border-[2px] border-[#024930] opacity-80 pointer-events-none" />
 
       {/* Header */}
-      <div className="mt-12 z-10 w-full flex flex-col items-center">
-        <span className="text-[12px] uppercase font-sans tracking-[0.4em] text-[#024930] opacity-80 mb-4">Buffet Selection</span>
-        <div className="w-12 h-[2px] bg-[#FEACCF] mb-4" />
+      <div className="mt-14 z-10 w-full flex flex-col items-center">
+        <span className="text-[10px] uppercase font-sans tracking-[0.3em] text-[#024930] mb-3">Buffet Selection</span>
+        <div className="flex justify-center">{getDietIcons(item.diet_de, 24)}</div>
       </div>
 
       {/* Main Dish Name */}
-      <div className="flex-1 flex flex-col justify-center items-center w-full px-8 z-10">
-        <h2 className="text-4xl leading-tight font-black text-[#024930] uppercase font-serif drop-shadow-sm">
+      <div className="flex-1 flex flex-col justify-center items-center w-full px-4 z-10">
+        <h2 className="text-3xl leading-snug font-black text-[#024930] uppercase font-serif mb-2">
           {lang === 'de' ? item.item_name_de : item.item_name_en}
         </h2>
-
-        <div className="flex items-center justify-center gap-4 mt-8">
-          {getItemIconsRaw(item, 32)}
-          {item.allergens_de && (
-            <span className="text-xs uppercase font-sans tracking-widest text-[#024930] border border-[#024930] px-3 py-1 rounded-full">
-              {item.allergens_de}
-            </span>
-          )}
-        </div>
       </div>
 
-      {/* Footer */}
-      <div className="mb-12 z-10 flex flex-col items-center">
-        <span className="font-serif text-[#024930] italic text-lg">Bella&Bona</span>
-        <span className="font-sans text-[8px] uppercase tracking-widest text-slate-400 mt-1">Culinary Excellence</span>
+      {/* Allergens Footer - Fixed at bottom */}
+      <div className="mb-10 z-10 w-full px-8">
+        <div className="border-t border-[#024930]/30 pt-4 flex flex-col items-center gap-2">
+          <span className="text-[8px] uppercase font-sans tracking-widest text-slate-400">Allergens</span>
+          <div className="flex gap-4 text-[#024930] justify-center flex-wrap">
+            {getAllergenIcons(item.allergens_de, 20)}
+            {!item.allergens_de && <span className="text-[10px] text-slate-400 italic">No Common Allergens</span>}
+          </div>
+        </div>
       </div>
     </div>
   );
@@ -340,7 +348,7 @@ const Label: React.FC<{ bundle: Bundle, lang: 'de' | 'en', packedOn: string, for
                 <div className={`font-black ${nameFontSize} leading-tight text-gray-950`}>
                   {lang === 'de' ? item.item_name_de : item.item_name_en}
                 </div>
-                <div className={`flex flex-wrap gap-1 mt-0.5 ${isHighDensity ? 'opacity-90' : ''}`}>
+                <div className="flex flex-wrap gap-1 mt-0.5">
                   {item.allergens_de.split(/[,/]+/).map((alg, aIdx) => {
                     const trimmed = alg.trim();
                     if (!trimmed) return null;
@@ -513,56 +521,50 @@ const App: React.FC = () => {
     return groups;
   }, [selections, cateringSelections, bundles, activeTab, isPreviewing, previewType]);
 
-  // Menu Print Logic (A4) - now uses the Elegant Framed Design (previously A6)
+  // Menu Print Logic (A4)
   const MenuPrint = () => {
     const selectedBundles = cateringSelections.map(s => bundles.find(b => b.id === s.bundleId)).filter(Boolean) as Bundle[];
 
     return (
-      <div className="w-[210mm] h-[297mm] bg-white p-[15mm] flex flex-col items-center">
-        {/* We can repeat the frame or use a full page frame. Let's use a nice full page frame. */}
-        <div className="w-full h-full border-[6px] border-[#024930] p-2 relative flex flex-col">
-          <div className="absolute inset-2 border-[1px] border-[#024930] pointer-events-none opacity-50" />
+      <div className="w-[210mm] h-[297mm] bg-white p-[20mm] flex flex-col">
+        {/* Minimal Header */}
+        <div className="w-full text-center pb-8 border-b-2 border-[#024930]">
+          <div className="flex justify-center mb-4 text-[#024930]"><ChefHat size={40} /></div>
+          <h1 className="text-5xl font-serif font-black text-[#024930] uppercase tracking-wide">Menu</h1>
+          <div className="text-slate-500 font-sans uppercase tracking-[0.2em] mt-2 text-sm">{companyName || 'Special Event'} • {cateringDate}</div>
+        </div>
 
-          {/* Header */}
-          <div className="pt-16 pb-12 w-full text-center z-10">
-            <span className="text-sm font-sans tracking-[0.5em] text-[#024930] uppercase mb-4 block">Special Catering</span>
-            <h1 className="text-6xl font-black text-[#024930] uppercase font-serif px-8 leading-tight">
-              {companyName || 'Menu'}
-            </h1>
-            <div className="text-lg text-[#024930] mt-4 font-serif italic">{cateringDate}</div>
-            <div className="w-32 h-[3px] bg-[#FEACCF] mx-auto mt-8" />
-          </div>
+        {/* Items List - High End Restaurant Style */}
+        <div className="flex-1 flex flex-col gap-10 py-10 px-4">
+          {selectedBundles.map((b, idx) => {
+            // Aggregate diet/allergens from components for the main dish line
+            const diets = Array.from(new Set(b.items.map(i => i.diet_de))).map(d => getDietIcons(d, 16));
+            const allAllergens = Array.from(new Set(b.items.flatMap(i => i.allergens_de.split(/[,/]+/).map(a => a.trim()).filter(Boolean)))).join(', ');
 
-          {/* Menu Content: Listing Bundles as Courses */}
-          <div className="flex-1 flex flex-col gap-12 px-12 z-10 overflow-hidden">
-            {selectedBundles.map((b, idx) => (
-              <div key={idx} className="flex flex-col items-center text-center">
-                <h2 className="text-3xl font-bold text-[#024930] mb-4 font-serif">{lang === 'de' ? b.name_de : b.name_en}</h2>
-                <div className="flex flex-wrap justify-center gap-x-4 gap-y-1 text-slate-600 italic font-serif text-lg leading-relaxed max-w-[80%]">
-                  {b.items.map((i, itemIdx) => (
-                    <span key={itemIdx} className="whitespace-nowrap">
-                      {lang === 'de' ? i.item_name_de : i.item_name_en}
-                      {itemIdx < b.items.length - 1 && <span className="text-[#FEACCF] mx-2">•</span>}
-                    </span>
-                  ))}
+            return (
+              <div key={idx} className="flex flex-col gap-2">
+                <div className="flex justify-between items-baseline border-b border-dotted border-gray-300 pb-2">
+                  <h2 className="text-2xl font-serif font-bold text-[#024930] uppercase">{lang === 'de' ? b.name_de : b.name_en}</h2>
+                  <div className="flex gap-4 items-center">
+                    {diets}
+                  </div>
                 </div>
-                {/* Optional: Show aggregated diet icons for the bundle */}
-                <div className="flex gap-2 mt-3 opacity-60">
-                  {Array.from(new Set(b.items.map(i => i.diet_de))).map((d, di) => (
-                    <span key={di} className="text-[10px] uppercase border border-slate-400 px-2 py-0.5 rounded-full text-slate-500">{d}</span>
-                  ))}
+                <div className="flex justify-between items-start pl-2">
+                  <div className="text-slate-600 font-serif italic text-lg w-[70%]">
+                    {b.items.map(i => lang === 'de' ? i.item_name_de : i.item_name_en).join(' • ')}
+                  </div>
+                  <div className="flex gap-3 pt-1">
+                    {getAllergenIcons(allAllergens, 16)}
+                  </div>
                 </div>
               </div>
-            ))}
-          </div>
+            );
+          })}
+        </div>
 
-          {/* Footer */}
-          <div className="pb-12 text-center z-10">
-            <div className="flex items-center justify-center gap-2 mb-2">
-              <ChefHat size={24} className="text-[#024930]" />
-            </div>
-            <span className="font-serif text-[#024930] italic text-xl">Bella&Bona Kitchen</span>
-          </div>
+        {/* Footer */}
+        <div className="w-full text-center pt-8 border-t-2 border-[#024930] text-[#024930]">
+          <span className="font-serif italic text-xl">Bon Appétit</span>
         </div>
       </div>
     );
@@ -888,16 +890,15 @@ const App: React.FC = () => {
                     }
 
                     return pages.map((pageItems, pIdx) => (
-                      <div key={pIdx} className="bg-white shadow-2xl" style={{ width: '210mm', height: '297mm', minHeight: '297mm', minWidth: '210mm' }}>
-                        <div className="label-page-group">
-                          {pageItems.map((item, iIdx) => (
-                            <div key={iIdx} className="label-card-container">
-                              <CateringItemLabel item={item} lang={lang} forPrint />
-                            </div>
-                          ))}
-                        </div>
+                      <div key={pIdx} className="bg-white" style={{ width: '210mm', height: '297mm', padding: 0, margin: 0, display: 'grid', gridTemplateColumns: '105mm 105mm', gridTemplateRows: '148.5mm 148.5mm' }}>
+                        {pageItems.map((item, iIdx) => (
+                          <div key={iIdx} style={{ width: '105mm', height: '148.5mm' }}>
+                            <CateringItemLabel item={item} lang={lang} forPrint />
+                          </div>
+                        ))}
                       </div>
                     ));
+
                   })()
                 ) : (
                   // Standard Generator Prints (Bundle Level)

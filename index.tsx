@@ -122,26 +122,92 @@ const BrandLogo = ({ className = "h-12" }: { className?: string }) => (
 );
 
 // Helper for Allergen Icons (Refined)
-// Helper for Allergen Icons (Dynamic & Generic)
+// Helper for Allergen Icons (Professional SVG Set - EU 14)
 const getAllergenIcons = (allergens: string) => {
   if (!allergens) return null;
-  // Split by comma or slash, trim, filter empty
-  const list = allergens.split(/[,/]+/).map(s => s.trim()).filter(Boolean);
-  if (list.length === 0) return null;
+  const list = allergens.toLowerCase();
 
-  return (
-    <div className="flex flex-wrap gap-1 justify-end">
-      {list.map((alg, i) => {
-        // Create a 1-2 letter code (e.g. "Gl", "So")
-        const code = alg.slice(0, 2).toUpperCase();
-        return (
-          <div key={i} className="flex items-center justify-center w-5 h-5 border border-[#00543A] rounded-full text-[8px] font-bold text-[#00543A] bg-[#f8fcfb]" title={alg}>
-            {code}
-          </div>
-        );
-      })}
+  // Custom SVG Paths for specialized allergens to ensure professional look without missing icon libs
+  const Svgs = {
+    crustacean: <path d="M12 12c-2-2-2-5 0-7l1.5 1.5M12 12c2-2 2-5 0-7l-1.5 1.5m0 16.5c2 0 4-2 4-5v-2c0-2.5-4-3-4-3s-4 .5-4 3v2c0 3 2 5 4 5zM15 15l3 3m-6-3l-3 3" />, // Abstract Crab/Shell
+    celery: <path d="M12 2v20M5 7c0-1.5 1-3 3-3s3 2 3 3v13h2V7c0-1 2-3 4-3s2 1.5 2 3" />, // Celery Stalk
+    mustard: <path d="M8 17h8a2 2 0 0 0 2-2V9a2 2 0 0 0-2-2h-1V5a2 2 0 0 0-2-2h-2a2 2 0 0 0-2 2v2H8a2 2 0 0 0-2 2v6a2 2 0 0 0 2 2zM12 2v3" />, // Jar
+    sesame: <g><circle cx="8" cy="12" r="2" /><circle cx="16" cy="12" r="2" /><circle cx="12" cy="8" r="2" /><circle cx="12" cy="16" r="2" /></g>, // Seeds
+    sulphites: <path d="M8 22h8M7 10h10M12 15v7M12 2v13" />, // Wine Glass shape approx
+    lupin: <path d="M12 2l3 5-3 5-3-5zM12 12l3 5-3 5-3-5z" />, // Flower/Bean shape
+    mollusc: <path d="M10.5 5.5a5.5 5.5 0 1 1 5.4 8.5 3.5 3.5 0 1 0-5.3 2.5" />, // Snail shell
+  };
+
+  const createIcon = (key: string, icon: React.ReactNode, title: string) => (
+    <div key={key} className="flex flex-col items-center justify-center bg-white rounded-full w-6 h-6 border border-slate-200 shadow-sm text-slate-700" title={title}>
+      {/* If it's a standard Lucide component, render it. If it's a path, wrap in svg */}
+      {React.isValidElement(icon) && icon.type === 'path' || icon.type === 'g' ? (
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">{icon}</svg>
+      ) : (
+        icon
+      )}
     </div>
   );
+
+  const foundIcons: React.ReactNode[] = [];
+
+  // 1. Gluten (Cereals)
+  if (list.includes('gluten') || list.includes('weizen') || list.includes('wheat') || list.includes('rog'))
+    foundIcons.push(createIcon('gluten', <Wheat size={14} className="text-amber-600" />, 'Gluten'));
+
+  // 2. Crustaceans
+  if (list.includes('krebstier') || list.includes('crustacean') || list.includes('garnele') || list.includes('shrimp') || list.includes('crab'))
+    foundIcons.push(createIcon('crust', Svgs.crustacean, 'Crustaceans'));
+
+  // 3. Eggs
+  if (list.includes('ei') || list.includes('egg'))
+    foundIcons.push(createIcon('egg', <Egg size={14} className="text-yellow-500" />, 'Egg'));
+
+  // 4. Fish
+  if (list.includes('fisch') || list.includes('fish'))
+    foundIcons.push(createIcon('fish', <Fish size={14} className="text-blue-500" />, 'Fish'));
+
+  // 5. Peanuts
+  if (list.includes('erdnuss') || list.includes('erdnüsse') || list.includes('peanut'))
+    foundIcons.push(createIcon('peanut', <Nut size={14} className="text-amber-700" />, 'Peanuts'));
+
+  // 6. Soy
+  if (list.includes('soja') || list.includes('soy') || list.includes('bean'))
+    foundIcons.push(createIcon('soy', <Bean size={14} className="text-green-700" />, 'Soy'));
+
+  // 7. Milk (Lactose)
+  if (list.includes('milch') || list.includes('milk') || list.includes('lactose'))
+    foundIcons.push(createIcon('milk', <Milk size={14} className="text-blue-400" />, 'Milk'));
+
+  // 8. Nuts (Tree)
+  if (list.includes('nuss') || list.includes('nut') || list.includes('mandel') || list.includes('hazel') || list.includes('schalen'))
+    foundIcons.push(createIcon('nuts', <Nut size={14} className="text-amber-900 opacity-70" />, 'Tree Nuts'));
+
+  // 9. Celery
+  if (list.includes('sellerie') || list.includes('celery'))
+    foundIcons.push(createIcon('celery', Svgs.celery, 'Celery'));
+
+  // 10. Mustard
+  if (list.includes('senf') || list.includes('mustard'))
+    foundIcons.push(createIcon('mustard', Svgs.mustard, 'Mustard'));
+
+  // 11. Sesame
+  if (list.includes('sesam') || list.includes('sesame'))
+    foundIcons.push(createIcon('sesame', Svgs.sesame, 'Sesame'));
+
+  // 12. Sulphites
+  if (list.includes('schwefel') || list.includes('sulphite') || list.includes('sulfite') || list.includes('so2'))
+    foundIcons.push(createIcon('sulph', Svgs.sulphites, 'Sulphites'));
+
+  // 13. Lupin
+  if (list.includes('lupin'))
+    foundIcons.push(createIcon('lupin', Svgs.lupin, 'Lupin'));
+
+  // 14. Molluscs
+  if (list.includes('weichtier') || list.includes('mollusc') || list.includes('snail') || list.includes('muschel'))
+    foundIcons.push(createIcon('mollusc', Svgs.mollusc, 'Molluscs'));
+
+  return foundIcons.length > 0 ? <div className="flex gap-1 flex-wrap justify-end">{foundIcons}</div> : null;
 };
 
 // Helper for Diet Icons (Refined)

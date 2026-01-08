@@ -755,373 +755,381 @@ const App: React.FC = () => {
               <div className="flex flex-col gap-6 w-full">
                 {grouped[groupTitle].map((item, iIdx) => (
                   <div key={iIdx} className="flex flex-col w-full group">
-                    <div className="flex justify-between items-baseline w-full">
-                      <div className="flex-1">
-                        <span className="text-xl font-bold text-[#00543A] leading-tight tracking-wide">
-                          {item.item_name_de.toUpperCase()}
-                        </span>
-                      </div>
-                      Catering Service • Bella&Bona
+                    {/* English Desc */}
+                    <div className="mt-1 text-[#00543A]/60 font-medium italic text-sm">
+                      {item.item_name_en}
                     </div>
+                    {/* Dotted Leader */}
+                    <div className="border-b-2 border-dotted border-[#00543A]/20 w-full mt-3 opacity-0 group-hover:opacity-100 transition-opacity" />
                   </div>
+                ))}
+              </div>
+            </div>
+          ))}
+        </div>
+
+        {/* Footer */}
+        <div className="w-full text-center mt-auto pt-6 border-t border-[#00543A]/10 z-10">
+          <p className="text-[#00543A] font-bold text-sm tracking-widest uppercase opacity-70">Bella & Bona • Freshly Prepared for You</p>
+        </div>
       </div>
-              );
+    );
   };
 
-              return (
-              <>
-                <div className="print-only">
-                  {previewType === 'menu' && activeTab === 'catering' ? (
-                    <MenuPrint />
-                  ) : (
-                    // Label View (A6) Logic
-                    // If Catering, we Flatten Print Groups per Item
-                    activeTab === 'catering' && previewType === 'labels' ? (
-                      (() => {
-                        // Flatten all items from all selections
-                        const allItems = cateringSelections.flatMap(sel => {
-                          const b = bundles.find(x => x.id === sel.bundleId);
-                          if (!b) return [];
-                          return Array(sel.quantity).fill(b).flatMap(() => b.items);
-                        });
+  return (
+    <>
+      <div className="print-only">
+        {previewType === 'menu' && activeTab === 'catering' ? (
+          <MenuPrint />
+        ) : (
+          // Label View (A6) Logic
+          // If Catering, we Flatten Print Groups per Item
+          activeTab === 'catering' && previewType === 'labels' ? (
+            (() => {
+              // Flatten all items from all selections
+              const allItems = cateringSelections.flatMap(sel => {
+                const b = bundles.find(x => x.id === sel.bundleId);
+                if (!b) return [];
+                return Array(sel.quantity).fill(b).flatMap(() => b.items);
+              });
 
+              return (
+                <div className="label-card-container">
+                  {/* Just showing first one in preview or a list? The preview logic usually shows mapping. */}
+                  {/* We use a grid for preview */}
+                  <div className="grid grid-cols-2 gap-8">
+                    {allItems.map((item, idx) => (
+                      <div key={idx} className="scale-[0.6] origin-top-left">
+                        <CateringItemLabel item={item} lang={lang} forPrint />
+                      </div>
+                    ))}
+                  </div>
+                </div>
+              );
+            })()
+          ) : (
+            // Standard Bundle Labels Preview
+            printGroups.flatMap((group, groupIdx) => (
+              <div key={groupIdx} className="label-page-group mb-10">
+                {group.map((bundle, bIdx) => (
+                  <div key={bIdx} className="label-card-container">
+                    <Label bundle={bundle} lang={lang} packedOn={packedOn} forPrint variant="standard" />
+                  </div>
+                ))}
+              </div>
+            ))
+          )
+        )}
+      </div>
+
+      <div className="no-print min-h-screen flex flex-col bg-slate-950 text-slate-100">
+        <div className="flex flex-1">
+          <aside className="w-20 lg:w-64 bg-slate-900 border-r border-slate-800 flex flex-col">
+            <div className="p-6 border-b border-slate-800 flex items-center gap-3">
+              <div className="w-10 h-10 rounded-xl bg-[#FEACCF] flex items-center justify-center">
+                <Sprout size={24} color="#024930" />
+              </div>
+              <div className="hidden lg:block">
+                <h1 className="font-black text-sm text-white">BELLA&BONA</h1>
+                <p className="text-[9px] text-slate-500 uppercase">Label Factory</p>
+              </div>
+            </div>
+            <nav className="flex-1 p-4 space-y-2">
+              <button onClick={() => setActiveTab('generator')} className={`w-full flex items-center gap-4 px-4 py-3 rounded-xl ${activeTab === 'generator' ? 'bg-[#FEACCF] text-[#024930]' : 'text-slate-400 hover:bg-slate-800'}`}>
+                <Printer size={20} /><span className="hidden lg:block font-bold">Generator</span>
+              </button>
+              <button onClick={() => setActiveTab('catering')} className={`w-full flex items-center gap-4 px-4 py-3 rounded-xl ${activeTab === 'catering' ? 'bg-[#FEACCF] text-[#024930]' : 'text-slate-400 hover:bg-slate-800'}`}>
+                <ChefHat size={20} /><span className="hidden lg:block font-bold">Special Catering</span>
+              </button>
+              <button onClick={() => setActiveTab('database')} className={`w-full flex items-center gap-4 px-4 py-3 rounded-xl ${activeTab === 'database' ? 'bg-[#FEACCF] text-[#024930]' : 'text-slate-400 hover:bg-slate-800'}`}>
+                <Database size={20} /><span className="hidden lg:block font-bold">Database</span>
+              </button>
+            </nav>
+
+            <div className="p-4">
+              <button onClick={() => setActiveTab('trash')} className={`w-full flex items-center gap-4 px-4 py-3 rounded-xl ${activeTab === 'trash' ? 'bg-red-500/20 text-red-400' : 'text-slate-600 hover:text-red-400 hover:bg-slate-900'}`}>
+                <Trash2 size={20} /><span className="hidden lg:block font-bold">Trash</span>
+              </button>
+            </div>
+            <div className="p-4 border-t border-slate-800 space-y-4">
+              <div className="hidden lg:block px-2">
+                <label className="text-[10px] uppercase text-slate-500 font-bold">Packed On</label>
+                <input type="text" value={packedOn} onChange={e => setPackedOn(e.target.value)} className="w-full bg-slate-800 rounded px-2 py-1 text-white text-xs mt-1 border-none focus:ring-1 focus:ring-pink-400" />
+              </div>
+              <div className="flex bg-slate-800 rounded p-1">
+                <button onClick={() => setLang('de')} className={`flex-1 py-1 text-xs rounded transition-all ${lang === 'de' ? 'bg-slate-700 text-white shadow-sm' : 'text-slate-500'}`}>DE</button>
+                <button onClick={() => setLang('en')} className={`flex-1 py-1 text-xs rounded transition-all ${lang === 'en' ? 'bg-slate-700 text-white shadow-sm' : 'text-slate-500'}`}>EN</button>
+              </div>
+            </div>
+          </aside>
+
+          <main className="flex-1 overflow-y-auto p-8 lg:p-12">
+            {activeTab === 'generator' ? (
+              <div className="grid grid-cols-1 xl:grid-cols-12 gap-10">
+                <div className="xl:col-span-5 space-y-8">
+                  <div className="relative">
+                    <Search className="absolute left-5 top-1/2 -translate-y-1/2 text-slate-500" size={20} />
+                    <input type="text" placeholder={t.searchPlaceholder} value={searchTerm} onChange={e => setSearchTerm(e.target.value)} className="w-full bg-slate-900 rounded-2xl pl-14 pr-6 py-4 text-sm text-white focus:ring-2 focus:ring-emerald-500 shadow-xl" />
+                  </div>
+                  <div className="space-y-4 max-h-[60vh] overflow-y-auto pr-3">
+                    {filteredBundles.map(bundle => (
+                      <div key={bundle.id} onClick={() => addSelection(bundle.id)} className="bg-slate-900 border border-slate-800 rounded-2xl p-5 flex items-center justify-between cursor-pointer hover:border-emerald-500 hover:bg-slate-800/50 transition-all shadow-lg">
+                        <div className="flex items-center gap-4">
+                          <Soup size={22} className="text-emerald-400" />
+                          <div>
+                            <p className="font-black text-slate-200">{lang === 'de' ? bundle.name_de : bundle.name_en}</p>
+                            <p className="text-[10px] font-bold text-slate-500">{bundle.items.length} items</p>
+                          </div>
+                        </div>
+                        <Plus size={20} />
+                      </div>
+                    ))}
+                  </div>
+                </div>
+                <div className="xl:col-span-7">
+                  <section className="bg-slate-900 border border-slate-800 rounded-3xl p-8 flex flex-col min-h-[500px] shadow-2xl">
+                    <div className="flex justify-between mb-10">
+                      <h2 className="text-2xl font-black">Selected <span className="text-emerald-500">{selections.length}</span></h2>
+                      {selections.length > 0 && <button onClick={() => setSelections([])} className="text-red-400 font-bold uppercase text-xs hover:text-red-300">Clear All</button>}
+                    </div>
+                    <div className="flex-1 space-y-4">
+                      {selections.map(sel => {
+                        const b = bundles.find(x => x.id === sel.bundleId);
+                        if (!b) return null;
                         return (
-                          <div className="label-card-container">
-                            {/* Just showing first one in preview or a list? The preview logic usually shows mapping. */}
-                            {/* We use a grid for preview */}
-                            <div className="grid grid-cols-2 gap-8">
-                              {allItems.map((item, idx) => (
-                                <div key={idx} className="scale-[0.6] origin-top-left">
-                                  <CateringItemLabel item={item} lang={lang} forPrint />
-                                </div>
-                              ))}
-                            </div>
+                          <div key={sel.bundleId} className="flex items-center gap-4 bg-slate-800/50 rounded-xl p-4 border border-slate-700">
+                            <div className="flex-1"><p className="font-bold text-slate-100">{lang === 'de' ? b.name_de : b.name_en}</p></div>
+                            <input type="number" min="1" value={sel.quantity} onChange={e => setSelections(prev => prev.map(s => s.bundleId === sel.bundleId ? { ...s, quantity: parseInt(e.target.value) || 1 } : s))} className="w-16 bg-slate-950 rounded p-2 text-center text-emerald-400 font-bold border-none" />
+                            <button onClick={() => setSelections(prev => prev.filter(s => s.bundleId !== sel.bundleId))} className="text-slate-500 hover:text-red-400"><X size={20} /></button>
                           </div>
                         );
-                      })()
-                    ) : (
-                      // Standard Bundle Labels Preview
-                      printGroups.flatMap((group, groupIdx) => (
-                        <div key={groupIdx} className="label-page-group mb-10">
-                          {group.map((bundle, bIdx) => (
-                            <div key={bIdx} className="label-card-container">
-                              <Label bundle={bundle} lang={lang} packedOn={packedOn} forPrint variant="standard" />
-                            </div>
-                          ))}
-                        </div>
-                      ))
-                    )
-                  )}
-                </div>
-
-                <div className="no-print min-h-screen flex flex-col bg-slate-950 text-slate-100">
-                  <div className="flex flex-1">
-                    <aside className="w-20 lg:w-64 bg-slate-900 border-r border-slate-800 flex flex-col">
-                      <div className="p-6 border-b border-slate-800 flex items-center gap-3">
-                        <div className="w-10 h-10 rounded-xl bg-[#FEACCF] flex items-center justify-center">
-                          <Sprout size={24} color="#024930" />
-                        </div>
-                        <div className="hidden lg:block">
-                          <h1 className="font-black text-sm text-white">BELLA&BONA</h1>
-                          <p className="text-[9px] text-slate-500 uppercase">Label Factory</p>
-                        </div>
-                      </div>
-                      <nav className="flex-1 p-4 space-y-2">
-                        <button onClick={() => setActiveTab('generator')} className={`w-full flex items-center gap-4 px-4 py-3 rounded-xl ${activeTab === 'generator' ? 'bg-[#FEACCF] text-[#024930]' : 'text-slate-400 hover:bg-slate-800'}`}>
-                          <Printer size={20} /><span className="hidden lg:block font-bold">Generator</span>
-                        </button>
-                        <button onClick={() => setActiveTab('catering')} className={`w-full flex items-center gap-4 px-4 py-3 rounded-xl ${activeTab === 'catering' ? 'bg-[#FEACCF] text-[#024930]' : 'text-slate-400 hover:bg-slate-800'}`}>
-                          <ChefHat size={20} /><span className="hidden lg:block font-bold">Special Catering</span>
-                        </button>
-                        <button onClick={() => setActiveTab('database')} className={`w-full flex items-center gap-4 px-4 py-3 rounded-xl ${activeTab === 'database' ? 'bg-[#FEACCF] text-[#024930]' : 'text-slate-400 hover:bg-slate-800'}`}>
-                          <Database size={20} /><span className="hidden lg:block font-bold">Database</span>
-                        </button>
-                      </nav>
-
-                      <div className="p-4">
-                        <button onClick={() => setActiveTab('trash')} className={`w-full flex items-center gap-4 px-4 py-3 rounded-xl ${activeTab === 'trash' ? 'bg-red-500/20 text-red-400' : 'text-slate-600 hover:text-red-400 hover:bg-slate-900'}`}>
-                          <Trash2 size={20} /><span className="hidden lg:block font-bold">Trash</span>
-                        </button>
-                      </div>
-                      <div className="p-4 border-t border-slate-800 space-y-4">
-                        <div className="hidden lg:block px-2">
-                          <label className="text-[10px] uppercase text-slate-500 font-bold">Packed On</label>
-                          <input type="text" value={packedOn} onChange={e => setPackedOn(e.target.value)} className="w-full bg-slate-800 rounded px-2 py-1 text-white text-xs mt-1 border-none focus:ring-1 focus:ring-pink-400" />
-                        </div>
-                        <div className="flex bg-slate-800 rounded p-1">
-                          <button onClick={() => setLang('de')} className={`flex-1 py-1 text-xs rounded transition-all ${lang === 'de' ? 'bg-slate-700 text-white shadow-sm' : 'text-slate-500'}`}>DE</button>
-                          <button onClick={() => setLang('en')} className={`flex-1 py-1 text-xs rounded transition-all ${lang === 'en' ? 'bg-slate-700 text-white shadow-sm' : 'text-slate-500'}`}>EN</button>
-                        </div>
-                      </div>
-                    </aside>
-
-                    <main className="flex-1 overflow-y-auto p-8 lg:p-12">
-                      {activeTab === 'generator' ? (
-                        <div className="grid grid-cols-1 xl:grid-cols-12 gap-10">
-                          <div className="xl:col-span-5 space-y-8">
-                            <div className="relative">
-                              <Search className="absolute left-5 top-1/2 -translate-y-1/2 text-slate-500" size={20} />
-                              <input type="text" placeholder={t.searchPlaceholder} value={searchTerm} onChange={e => setSearchTerm(e.target.value)} className="w-full bg-slate-900 rounded-2xl pl-14 pr-6 py-4 text-sm text-white focus:ring-2 focus:ring-emerald-500 shadow-xl" />
-                            </div>
-                            <div className="space-y-4 max-h-[60vh] overflow-y-auto pr-3">
-                              {filteredBundles.map(bundle => (
-                                <div key={bundle.id} onClick={() => addSelection(bundle.id)} className="bg-slate-900 border border-slate-800 rounded-2xl p-5 flex items-center justify-between cursor-pointer hover:border-emerald-500 hover:bg-slate-800/50 transition-all shadow-lg">
-                                  <div className="flex items-center gap-4">
-                                    <Soup size={22} className="text-emerald-400" />
-                                    <div>
-                                      <p className="font-black text-slate-200">{lang === 'de' ? bundle.name_de : bundle.name_en}</p>
-                                      <p className="text-[10px] font-bold text-slate-500">{bundle.items.length} items</p>
-                                    </div>
-                                  </div>
-                                  <Plus size={20} />
-                                </div>
-                              ))}
-                            </div>
-                          </div>
-                          <div className="xl:col-span-7">
-                            <section className="bg-slate-900 border border-slate-800 rounded-3xl p-8 flex flex-col min-h-[500px] shadow-2xl">
-                              <div className="flex justify-between mb-10">
-                                <h2 className="text-2xl font-black">Selected <span className="text-emerald-500">{selections.length}</span></h2>
-                                {selections.length > 0 && <button onClick={() => setSelections([])} className="text-red-400 font-bold uppercase text-xs hover:text-red-300">Clear All</button>}
-                              </div>
-                              <div className="flex-1 space-y-4">
-                                {selections.map(sel => {
-                                  const b = bundles.find(x => x.id === sel.bundleId);
-                                  if (!b) return null;
-                                  return (
-                                    <div key={sel.bundleId} className="flex items-center gap-4 bg-slate-800/50 rounded-xl p-4 border border-slate-700">
-                                      <div className="flex-1"><p className="font-bold text-slate-100">{lang === 'de' ? b.name_de : b.name_en}</p></div>
-                                      <input type="number" min="1" value={sel.quantity} onChange={e => setSelections(prev => prev.map(s => s.bundleId === sel.bundleId ? { ...s, quantity: parseInt(e.target.value) || 1 } : s))} className="w-16 bg-slate-950 rounded p-2 text-center text-emerald-400 font-bold border-none" />
-                                      <button onClick={() => setSelections(prev => prev.filter(s => s.bundleId !== sel.bundleId))} className="text-slate-500 hover:text-red-400"><X size={20} /></button>
-                                    </div>
-                                  );
-                                })}
-                                {selections.length === 0 && (
-                                  <div className="h-full flex flex-col items-center justify-center opacity-30 text-slate-500 mt-20">
-                                    <Printer size={64} className="mb-4" />
-                                    <p className="font-bold">No bundles selected</p>
-                                  </div>
-                                )}
-                              </div>
-                              {selections.length > 0 && (
-                                <div className="mt-8 pt-8 border-t border-slate-800 flex justify-between items-center">
-                                  <button onClick={() => setIsPreviewing(true)} className="flex items-center gap-2 text-emerald-400 font-bold hover:text-emerald-300 transition-colors">
-                                    <Eye size={20} /> Preview
-                                  </button>
-                                  <button onClick={() => window.print()} className="bg-emerald-500 text-slate-950 font-black px-10 py-4 rounded-xl flex items-center gap-2 shadow-xl active:scale-95 transition-all">
-                                    <Printer size={24} /> Print A4 Grid
-                                  </button>
-                                </div>
-                              )}
-                            </section>
-                          </div>
-                        </div>
-                      ) : activeTab === 'catering' ? (
-                        <div className="grid grid-cols-1 xl:grid-cols-12 gap-10">
-                          <div className="xl:col-span-5 space-y-8">
-                            {/* Search & Selection for Catering - Reuse but with cateringSelections */}
-                            <div className="bg-slate-900 border border-slate-800 rounded-2xl p-6 shadow-xl space-y-4">
-                              <h3 className="text-xl font-bold flex items-center gap-2"><ChefHat className="text-[#FEACCF]" /> Event Details</h3>
-                              <div className="space-y-2">
-                                <label className="text-xs uppercase font-bold text-slate-500">Company Name</label>
-                                <input type="text" value={companyName} onChange={e => setCompanyName(e.target.value)} placeholder="Enter Company Name" className="w-full bg-slate-950 rounded-xl px-4 py-3 text-white border border-slate-800 focus:ring-2 focus:ring-[#FEACCF] outline-none" />
-                              </div>
-                              <div className="space-y-2">
-                                <label className="text-xs uppercase font-bold text-slate-500">Event Date</label>
-                                <input type="text" value={cateringDate} onChange={e => setCateringDate(e.target.value)} className="w-full bg-slate-950 rounded-xl px-4 py-3 text-white border border-slate-800 focus:ring-2 focus:ring-[#FEACCF] outline-none" />
-                              </div>
-                            </div>
-
-                            <div className="relative">
-                              <Search className="absolute left-5 top-1/2 -translate-y-1/2 text-slate-500" size={20} />
-                              <input type="text" placeholder="Search menu items..." value={searchTerm} onChange={e => setSearchTerm(e.target.value)} className="w-full bg-slate-900 rounded-2xl pl-14 pr-6 py-4 text-sm text-white focus:ring-2 focus:ring-[#FEACCF] shadow-xl" />
-                            </div>
-
-                            <div className="space-y-4 max-h-[50vh] overflow-y-auto pr-3">
-                              {filteredBundles.map(bundle => (
-                                <div key={bundle.id} onClick={() => addSelection(bundle.id, true)} className="bg-slate-900 border border-slate-800 rounded-2xl p-5 flex items-center justify-between cursor-pointer hover:border-[#FEACCF] hover:bg-slate-800/50 transition-all shadow-lg group">
-                                  <div className="flex items-center gap-4">
-                                    <Utensils size={22} className="text-[#FEACCF] group-hover:scale-110 transition-transform" />
-                                    <div>
-                                      <p className="font-black text-slate-200">{lang === 'de' ? bundle.name_de : bundle.name_en}</p>
-                                    </div>
-                                  </div>
-                                  <Plus size={20} className="text-slate-500 group-hover:text-white" />
-                                </div>
-                              ))}
-                            </div>
-                          </div>
-
-                          <div className="xl:col-span-7">
-                            <section className="bg-slate-900 border border-slate-800 rounded-3xl p-8 flex flex-col min-h-[600px] shadow-2xl relative overflow-hidden">
-                              <div className="absolute top-0 right-0 p-4 opacity-5 pointer-events-none">
-                                <ChefHat size={300} />
-                              </div>
-
-                              <div className="flex justify-between mb-10 relative z-10">
-                                <div>
-                                  <h2 className="text-2xl font-black">Catering Menu</h2>
-                                  <p className="text-slate-500 text-sm">{companyName || 'Untitled Event'} • {cateringDate}</p>
-                                </div>
-                                {cateringSelections.length > 0 && <button onClick={() => setCateringSelections([])} className="text-red-400 font-bold uppercase text-xs hover:text-red-300">Clear Menu</button>}
-                              </div>
-
-                              <div className="flex-1 space-y-4 relative z-10">
-                                {cateringSelections.map(sel => {
-                                  const b = bundles.find(x => x.id === sel.bundleId);
-                                  if (!b) return null;
-                                  return (
-                                    <div key={sel.bundleId} className="flex items-center gap-4 bg-slate-800/80 rounded-xl p-4 border border-slate-700 backdrop-blur-sm">
-                                      <div className="flex-1">
-                                        <p className="font-bold text-slate-100">{lang === 'de' ? b.name_de : b.name_en}</p>
-                                        <p className="text-xs text-slate-500">{b.items.length} items</p>
-                                      </div>
-                                      <input type="number" min="1" value={sel.quantity} onChange={e => setCateringSelections(prev => prev.map(s => s.bundleId === sel.bundleId ? { ...s, quantity: parseInt(e.target.value) || 1 } : s))} className="w-16 bg-slate-950 rounded p-2 text-center text-[#FEACCF] font-bold border-none" />
-                                      <button onClick={() => setCateringSelections(prev => prev.filter(s => s.bundleId !== sel.bundleId))} className="text-slate-500 hover:text-red-400"><X size={20} /></button>
-                                    </div>
-                                  );
-                                })}
-
-                                {cateringSelections.length === 0 && (
-                                  <div className="h-full flex flex-col items-center justify-center opacity-30 text-slate-500 mt-20">
-                                    <ChefHat size={64} className="mb-4" />
-                                    <p className="font-bold">Build your menu</p>
-                                  </div>
-                                )}
-                              </div>
-
-                              {cateringSelections.length > 0 && (
-                                <div className="mt-8 pt-8 border-t border-slate-800 grid grid-cols-2 gap-4 relative z-10">
-                                  <button onClick={() => { setPreviewType('menu'); setIsPreviewing(true); }} className="bg-slate-800 text-white font-bold py-4 rounded-xl flex items-center justify-center gap-2 hover:bg-slate-700 transition-all">
-                                    <FileSpreadsheet size={20} /> Preview Menu (A4)
-                                  </button>
-                                  <button onClick={() => { setPreviewType('labels'); setIsPreviewing(true); }} className="bg-[#FEACCF] text-[#024930] font-black py-4 rounded-xl flex items-center justify-center gap-2 hover:bg-[#ff9ec6] transition-all shadow-lg">
-                                    <Printer size={20} /> Print Labels (A6)
-                                  </button>
-                                </div>
-                              )}
-                            </section>
-                          </div>
-                        </div>
-                      ) : activeTab === 'trash' ? (
-                        <div className="max-w-4xl mx-auto space-y-8">
-                          <section className="bg-slate-900 p-10 rounded-3xl border border-slate-800 shadow-2xl">
-                            <h2 className="text-3xl font-black mb-8 text-red-400 flex items-center gap-4"><Trash2 size={32} /> Trash</h2>
-                            <div className="space-y-2">
-                              {deletedBundles.length === 0 && <p className="text-slate-500 text-center py-10 font-bold">Trash is empty</p>}
-                              {deletedBundles.map(b => (
-                                <div key={b.id} className="flex justify-between p-4 bg-slate-950 rounded-lg border border-slate-800 items-center opacity-75 hover:opacity-100 transition-all">
-                                  <span className="font-bold text-slate-400 line-through">{b.name_de}</span>
-                                  <div className="flex gap-2">
-                                    <button onClick={() => restoreFromTrash(b)} className="flex items-center gap-2 px-3 py-1.5 rounded-lg bg-emerald-900/30 text-emerald-400 hover:bg-emerald-900/50 text-xs font-bold uppercase"><RotateCcw size={14} /> Restore</button>
-                                    <button onClick={() => permanentDelete(b)} className="flex items-center gap-2 px-3 py-1.5 rounded-lg bg-red-900/30 text-red-400 hover:bg-red-900/50 text-xs font-bold uppercase"><Trash2 size={14} /> Delete Forever</button>
-                                  </div>
-                                </div>
-                              ))}
-                            </div>
-                          </section>
-                        </div>
-                      ) : (
-                        <div className="max-w-4xl mx-auto space-y-8">
-                          <section className="bg-slate-900 p-10 rounded-3xl border border-slate-800 shadow-2xl">
-                            <h2 className="text-3xl font-black mb-8 text-[#FEACCF]">Data Management</h2>
-                            <div className="grid md:grid-cols-2 gap-6 mb-10">
-                              <div onClick={() => {
-                                const template = [{ 'bundle_name_de': 'Brunch Set', 'bundle_name_en': 'Brunch Set', 'item_name_de': 'Croissant', 'item_name_en': 'Croissant', 'allergens_de': 'Gluten, Eier', 'diet_de': 'Vegetarisch' }];
-                                const ws = XLSX.utils.json_to_sheet(template);
-                                const wb = XLSX.utils.book_new();
-                                XLSX.utils.book_append_sheet(wb, ws, "Labels");
-                                XLSX.writeFile(wb, "BellaBona_Template.xlsx");
-                              }} className="bg-slate-800/30 p-8 rounded-2xl border-2 border-dashed border-slate-700 cursor-pointer hover:border-emerald-500 transition-all group">
-                                <FileSpreadsheet size={32} className="text-emerald-500 mb-4 group-hover:scale-100 transition-transform" />
-                                <p className="font-bold">Download Template</p>
-                              </div>
-                              <div onClick={() => fileInputRef.current?.click()} className="bg-slate-800/30 p-8 rounded-2xl border-2 border-dashed border-slate-700 cursor-pointer hover:border-pink-400 transition-all relative group">
-                                {isProcessingImport && <div className="absolute inset-0 bg-slate-900/80 flex items-center justify-center rounded-2xl z-20"><Loader2 className="animate-spin text-pink-400" size={32} /></div>}
-                                <Upload size={32} className="text-pink-400 mb-4 group-hover:scale-100 transition-transform" />
-                                <p className="font-bold">Upload Excel</p>
-                                <input type="file" ref={fileInputRef} className="hidden" accept=".xlsx" onChange={handleFileUpload} />
-                              </div>
-                            </div>
-                            <div className="space-y-2 max-h-[400px] overflow-y-auto pr-2">
-                              {bundles.map(b => (
-                                <div key={b.id} className="flex justify-between p-4 bg-slate-950 rounded-lg border border-slate-800 items-center hover:bg-slate-900 transition-colors">
-                                  <span className="font-bold text-slate-300">{b.name_de}</span>
-                                  <button onClick={() => moveBundleToTrash(b)} className="text-slate-600 hover:text-red-500 transition-colors"><Trash2 size={18} /></button>
-                                </div>
-                              ))}
-                            </div>
-                          </section>
+                      })}
+                      {selections.length === 0 && (
+                        <div className="h-full flex flex-col items-center justify-center opacity-30 text-slate-500 mt-20">
+                          <Printer size={64} className="mb-4" />
+                          <p className="font-bold">No bundles selected</p>
                         </div>
                       )}
-                    </main>
+                    </div>
+                    {selections.length > 0 && (
+                      <div className="mt-8 pt-8 border-t border-slate-800 flex justify-between items-center">
+                        <button onClick={() => setIsPreviewing(true)} className="flex items-center gap-2 text-emerald-400 font-bold hover:text-emerald-300 transition-colors">
+                          <Eye size={20} /> Preview
+                        </button>
+                        <button onClick={() => window.print()} className="bg-emerald-500 text-slate-950 font-black px-10 py-4 rounded-xl flex items-center gap-2 shadow-xl active:scale-95 transition-all">
+                          <Printer size={24} /> Print A4 Grid
+                        </button>
+                      </div>
+                    )}
+                  </section>
+                </div>
+              </div>
+            ) : activeTab === 'catering' ? (
+              <div className="grid grid-cols-1 xl:grid-cols-12 gap-10">
+                <div className="xl:col-span-5 space-y-8">
+                  {/* Search & Selection for Catering - Reuse but with cateringSelections */}
+                  <div className="bg-slate-900 border border-slate-800 rounded-2xl p-6 shadow-xl space-y-4">
+                    <h3 className="text-xl font-bold flex items-center gap-2"><ChefHat className="text-[#FEACCF]" /> Event Details</h3>
+                    <div className="space-y-2">
+                      <label className="text-xs uppercase font-bold text-slate-500">Company Name</label>
+                      <input type="text" value={companyName} onChange={e => setCompanyName(e.target.value)} placeholder="Enter Company Name" className="w-full bg-slate-950 rounded-xl px-4 py-3 text-white border border-slate-800 focus:ring-2 focus:ring-[#FEACCF] outline-none" />
+                    </div>
+                    <div className="space-y-2">
+                      <label className="text-xs uppercase font-bold text-slate-500">Event Date</label>
+                      <input type="text" value={cateringDate} onChange={e => setCateringDate(e.target.value)} className="w-full bg-slate-950 rounded-xl px-4 py-3 text-white border border-slate-800 focus:ring-2 focus:ring-[#FEACCF] outline-none" />
+                    </div>
+                  </div>
+
+                  <div className="relative">
+                    <Search className="absolute left-5 top-1/2 -translate-y-1/2 text-slate-500" size={20} />
+                    <input type="text" placeholder="Search menu items..." value={searchTerm} onChange={e => setSearchTerm(e.target.value)} className="w-full bg-slate-900 rounded-2xl pl-14 pr-6 py-4 text-sm text-white focus:ring-2 focus:ring-[#FEACCF] shadow-xl" />
+                  </div>
+
+                  <div className="space-y-4 max-h-[50vh] overflow-y-auto pr-3">
+                    {filteredBundles.map(bundle => (
+                      <div key={bundle.id} onClick={() => addSelection(bundle.id, true)} className="bg-slate-900 border border-slate-800 rounded-2xl p-5 flex items-center justify-between cursor-pointer hover:border-[#FEACCF] hover:bg-slate-800/50 transition-all shadow-lg group">
+                        <div className="flex items-center gap-4">
+                          <Utensils size={22} className="text-[#FEACCF] group-hover:scale-110 transition-transform" />
+                          <div>
+                            <p className="font-black text-slate-200">{lang === 'de' ? bundle.name_de : bundle.name_en}</p>
+                          </div>
+                        </div>
+                        <Plus size={20} className="text-slate-500 group-hover:text-white" />
+                      </div>
+                    ))}
                   </div>
                 </div>
 
-                {isPreviewing && (
-                  <div className="no-print fixed inset-0 z-[200] bg-slate-950/95 backdrop-blur-xl flex items-center justify-center p-8 overflow-y-auto">
-                    <div className="bg-slate-900 w-full max-w-6xl h-[90vh] rounded-3xl flex flex-col border border-slate-800 shadow-2xl">
-                      <div className="p-8 border-b border-slate-800 flex justify-between items-center">
-                        <h2 className="text-2xl font-black text-white">Print Preview</h2>
-                        <button onClick={() => setIsPreviewing(false)} className="text-white bg-slate-800 p-2 rounded-xl hover:bg-slate-700"><X size={24} /></button>
+                <div className="xl:col-span-7">
+                  <section className="bg-slate-900 border border-slate-800 rounded-3xl p-8 flex flex-col min-h-[600px] shadow-2xl relative overflow-hidden">
+                    <div className="absolute top-0 right-0 p-4 opacity-5 pointer-events-none">
+                      <ChefHat size={300} />
+                    </div>
+
+                    <div className="flex justify-between mb-10 relative z-10">
+                      <div>
+                        <h2 className="text-2xl font-black">Catering Menu</h2>
+                        <p className="text-slate-500 text-sm">{companyName || 'Untitled Event'} • {cateringDate}</p>
                       </div>
-                      <div className="flex-1 overflow-y-auto p-12 bg-slate-950 flex flex-col items-center gap-16">
-                        {/* Content Area */}
-                        {previewType === 'menu' && activeTab === 'catering' ? (
-                          <div className="bg-white shadow-2xl scale-[0.6] origin-top" style={{ width: '210mm', height: '297mm' }}>
-                            <MenuPrint />
-                          </div>
-                        ) : activeTab === 'catering' ? (
-                          // Catering Items Grid (4 per page)
-                          (() => {
-                            const allItems = cateringSelections.flatMap(sel => {
-                              const b = bundles.find(x => x.id === sel.bundleId);
-                              if (!b) return [];
-                              return Array(sel.quantity).fill(b).flatMap(() => b.items);
-                            });
+                      {cateringSelections.length > 0 && <button onClick={() => setCateringSelections([])} className="text-red-400 font-bold uppercase text-xs hover:text-red-300">Clear Menu</button>}
+                    </div>
 
-                            const pages = [];
-                            for (let i = 0; i < allItems.length; i += 4) {
-                              pages.push(allItems.slice(i, i + 4));
-                            }
-
-                            return pages.map((pageItems, pIdx) => (
-                              <div key={pIdx} className="bg-white shadow-2xl origin-top scale-[0.6] mb-12" style={{ width: '210mm', height: '297mm', display: 'grid', gridTemplateColumns: '105mm 105mm', gridTemplateRows: '148.5mm 148.5mm' }}>
-                                {pageItems.map((item, iIdx) => (
-                                  <div key={iIdx} style={{ width: '105mm', height: '148.5mm' }}>
-                                    <CateringItemLabel item={item} lang={lang} forPrint />
-                                  </div>
-                                ))}
-                              </div>
-                            ));
-                          })()
-                        ) : (
-                          // Standard Bundles
-                          printGroups.map((group, idx) => (
-                            <div key={idx} className="bg-white shadow-2xl mb-12 scale-[0.6] origin-top" style={{ width: '210mm', height: '297mm' }}>
-                              <div className="label-page-group">
-                                {group.map((b, bi) => (
-                                  <div key={bi} className="label-card-container">
-                                    <Label bundle={b} lang={lang} packedOn={packedOn} forPrint variant="standard" />
-                                  </div>
-                                ))}
-                              </div>
+                    <div className="flex-1 space-y-4 relative z-10">
+                      {cateringSelections.map(sel => {
+                        const b = bundles.find(x => x.id === sel.bundleId);
+                        if (!b) return null;
+                        return (
+                          <div key={sel.bundleId} className="flex items-center gap-4 bg-slate-800/80 rounded-xl p-4 border border-slate-700 backdrop-blur-sm">
+                            <div className="flex-1">
+                              <p className="font-bold text-slate-100">{lang === 'de' ? b.name_de : b.name_en}</p>
+                              <p className="text-xs text-slate-500">{b.items.length} items</p>
                             </div>
-                          ))
-                        )}
-                      </div>
-                      <div className="p-8 border-t border-slate-800">
-                        <button onClick={() => window.print()} className="w-full bg-emerald-500 text-slate-950 font-black py-5 rounded-2xl flex items-center justify-center gap-4 text-xl">
-                          <Printer size={28} /> Confirm and Print
+                            <input type="number" min="1" value={sel.quantity} onChange={e => setCateringSelections(prev => prev.map(s => s.bundleId === sel.bundleId ? { ...s, quantity: parseInt(e.target.value) || 1 } : s))} className="w-16 bg-slate-950 rounded p-2 text-center text-[#FEACCF] font-bold border-none" />
+                            <button onClick={() => setCateringSelections(prev => prev.filter(s => s.bundleId !== sel.bundleId))} className="text-slate-500 hover:text-red-400"><X size={20} /></button>
+                          </div>
+                        );
+                      })}
+
+                      {cateringSelections.length === 0 && (
+                        <div className="h-full flex flex-col items-center justify-center opacity-30 text-slate-500 mt-20">
+                          <ChefHat size={64} className="mb-4" />
+                          <p className="font-bold">Build your menu</p>
+                        </div>
+                      )}
+                    </div>
+
+                    {cateringSelections.length > 0 && (
+                      <div className="mt-8 pt-8 border-t border-slate-800 grid grid-cols-2 gap-4 relative z-10">
+                        <button onClick={() => { setPreviewType('menu'); setIsPreviewing(true); }} className="bg-slate-800 text-white font-bold py-4 rounded-xl flex items-center justify-center gap-2 hover:bg-slate-700 transition-all">
+                          <FileSpreadsheet size={20} /> Preview Menu (A4)
+                        </button>
+                        <button onClick={() => { setPreviewType('labels'); setIsPreviewing(true); }} className="bg-[#FEACCF] text-[#024930] font-black py-4 rounded-xl flex items-center justify-center gap-2 hover:bg-[#ff9ec6] transition-all shadow-lg">
+                          <Printer size={20} /> Print Labels (A6)
                         </button>
                       </div>
+                    )}
+                  </section>
+                </div>
+              </div>
+            ) : activeTab === 'trash' ? (
+              <div className="max-w-4xl mx-auto space-y-8">
+                <section className="bg-slate-900 p-10 rounded-3xl border border-slate-800 shadow-2xl">
+                  <h2 className="text-3xl font-black mb-8 text-red-400 flex items-center gap-4"><Trash2 size={32} /> Trash</h2>
+                  <div className="space-y-2">
+                    {deletedBundles.length === 0 && <p className="text-slate-500 text-center py-10 font-bold">Trash is empty</p>}
+                    {deletedBundles.map(b => (
+                      <div key={b.id} className="flex justify-between p-4 bg-slate-950 rounded-lg border border-slate-800 items-center opacity-75 hover:opacity-100 transition-all">
+                        <span className="font-bold text-slate-400 line-through">{b.name_de}</span>
+                        <div className="flex gap-2">
+                          <button onClick={() => restoreFromTrash(b)} className="flex items-center gap-2 px-3 py-1.5 rounded-lg bg-emerald-900/30 text-emerald-400 hover:bg-emerald-900/50 text-xs font-bold uppercase"><RotateCcw size={14} /> Restore</button>
+                          <button onClick={() => permanentDelete(b)} className="flex items-center gap-2 px-3 py-1.5 rounded-lg bg-red-900/30 text-red-400 hover:bg-red-900/50 text-xs font-bold uppercase"><Trash2 size={14} /> Delete Forever</button>
+                        </div>
+                      </div>
+                    ))}
+                  </div>
+                </section>
+              </div>
+            ) : (
+              <div className="max-w-4xl mx-auto space-y-8">
+                <section className="bg-slate-900 p-10 rounded-3xl border border-slate-800 shadow-2xl">
+                  <h2 className="text-3xl font-black mb-8 text-[#FEACCF]">Data Management</h2>
+                  <div className="grid md:grid-cols-2 gap-6 mb-10">
+                    <div onClick={() => {
+                      const template = [{ 'bundle_name_de': 'Brunch Set', 'bundle_name_en': 'Brunch Set', 'item_name_de': 'Croissant', 'item_name_en': 'Croissant', 'allergens_de': 'Gluten, Eier', 'diet_de': 'Vegetarisch' }];
+                      const ws = XLSX.utils.json_to_sheet(template);
+                      const wb = XLSX.utils.book_new();
+                      XLSX.utils.book_append_sheet(wb, ws, "Labels");
+                      XLSX.writeFile(wb, "BellaBona_Template.xlsx");
+                    }} className="bg-slate-800/30 p-8 rounded-2xl border-2 border-dashed border-slate-700 cursor-pointer hover:border-emerald-500 transition-all group">
+                      <FileSpreadsheet size={32} className="text-emerald-500 mb-4 group-hover:scale-100 transition-transform" />
+                      <p className="font-bold">Download Template</p>
+                    </div>
+                    <div onClick={() => fileInputRef.current?.click()} className="bg-slate-800/30 p-8 rounded-2xl border-2 border-dashed border-slate-700 cursor-pointer hover:border-pink-400 transition-all relative group">
+                      {isProcessingImport && <div className="absolute inset-0 bg-slate-900/80 flex items-center justify-center rounded-2xl z-20"><Loader2 className="animate-spin text-pink-400" size={32} /></div>}
+                      <Upload size={32} className="text-pink-400 mb-4 group-hover:scale-100 transition-transform" />
+                      <p className="font-bold">Upload Excel</p>
+                      <input type="file" ref={fileInputRef} className="hidden" accept=".xlsx" onChange={handleFileUpload} />
                     </div>
                   </div>
-                )}
-              </>
-              );
+                  <div className="space-y-2 max-h-[400px] overflow-y-auto pr-2">
+                    {bundles.map(b => (
+                      <div key={b.id} className="flex justify-between p-4 bg-slate-950 rounded-lg border border-slate-800 items-center hover:bg-slate-900 transition-colors">
+                        <span className="font-bold text-slate-300">{b.name_de}</span>
+                        <button onClick={() => moveBundleToTrash(b)} className="text-slate-600 hover:text-red-500 transition-colors"><Trash2 size={18} /></button>
+                      </div>
+                    ))}
+                  </div>
+                </section>
+              </div>
+            )}
+          </main>
+        </div>
+      </div>
+
+      {isPreviewing && (
+        <div className="no-print fixed inset-0 z-[200] bg-slate-950/95 backdrop-blur-xl flex items-center justify-center p-8 overflow-y-auto">
+          <div className="bg-slate-900 w-full max-w-6xl h-[90vh] rounded-3xl flex flex-col border border-slate-800 shadow-2xl">
+            <div className="p-8 border-b border-slate-800 flex justify-between items-center">
+              <h2 className="text-2xl font-black text-white">Print Preview</h2>
+              <button onClick={() => setIsPreviewing(false)} className="text-white bg-slate-800 p-2 rounded-xl hover:bg-slate-700"><X size={24} /></button>
+            </div>
+            <div className="flex-1 overflow-y-auto p-12 bg-slate-950 flex flex-col items-center gap-16">
+              {/* Content Area */}
+              {previewType === 'menu' && activeTab === 'catering' ? (
+                <div className="bg-white shadow-2xl scale-[0.6] origin-top" style={{ width: '210mm', height: '297mm' }}>
+                  <MenuPrint />
+                </div>
+              ) : activeTab === 'catering' ? (
+                // Catering Items Grid (4 per page)
+                (() => {
+                  const allItems = cateringSelections.flatMap(sel => {
+                    const b = bundles.find(x => x.id === sel.bundleId);
+                    if (!b) return [];
+                    return Array(sel.quantity).fill(b).flatMap(() => b.items);
+                  });
+
+                  const pages = [];
+                  for (let i = 0; i < allItems.length; i += 4) {
+                    pages.push(allItems.slice(i, i + 4));
+                  }
+
+                  return pages.map((pageItems, pIdx) => (
+                    <div key={pIdx} className="bg-white shadow-2xl origin-top scale-[0.6] mb-12" style={{ width: '210mm', height: '297mm', display: 'grid', gridTemplateColumns: '105mm 105mm', gridTemplateRows: '148.5mm 148.5mm' }}>
+                      {pageItems.map((item, iIdx) => (
+                        <div key={iIdx} style={{ width: '105mm', height: '148.5mm' }}>
+                          <CateringItemLabel item={item} lang={lang} forPrint />
+                        </div>
+                      ))}
+                    </div>
+                  ));
+                })()
+              ) : (
+                // Standard Bundles
+                printGroups.map((group, idx) => (
+                  <div key={idx} className="bg-white shadow-2xl mb-12 scale-[0.6] origin-top" style={{ width: '210mm', height: '297mm' }}>
+                    <div className="label-page-group">
+                      {group.map((b, bi) => (
+                        <div key={bi} className="label-card-container">
+                          <Label bundle={b} lang={lang} packedOn={packedOn} forPrint variant="standard" />
+                        </div>
+                      ))}
+                    </div>
+                  </div>
+                ))
+              )}
+            </div>
+            <div className="p-8 border-t border-slate-800">
+              <button onClick={() => window.print()} className="w-full bg-emerald-500 text-slate-950 font-black py-5 rounded-2xl flex items-center justify-center gap-4 text-xl">
+                <Printer size={28} /> Confirm and Print
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+    </>
+  );
 };
 
 
-              const root = document.getElementById('root');
-              if (root) createRoot(root).render(<App />);
+const root = document.getElementById('root');
+if (root) createRoot(root).render(<App />);

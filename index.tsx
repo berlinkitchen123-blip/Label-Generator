@@ -109,60 +109,83 @@ interface Selection {
   bundleId: string;
   quantity: number;
 }
-// Helper for Allergen Icons
+// --- BRANDING ---
+const BRAND_COLOR_PRIMARY = '#00543A'; // Deep Green from Bella&Bona
+const BRAND_COLOR_SECONDARY = '#F5E6D3'; // Warm Beige/Cream
+const BRAND_COLOR_ACCENT = '#F4B7D5'; // Soft Pink
+
+// Logo Component (SVG approximation)
+const BrandLogo = ({ size = 40, color = BRAND_COLOR_PRIMARY }: { size?: number, color?: string }) => (
+  <div className="flex items-center gap-2" style={{ color }}>
+    <ChefHat size={size} strokeWidth={1.5} />
+    <span className="font-serif font-black tracking-tighter leading-none" style={{ fontSize: size * 0.8 }}>
+      BELLA<span className="italic font-light">&</span>BONA
+    </span>
+  </div>
+);
+
+// Helper for Allergen Icons (Refined)
 const getAllergenIcons = (allergens: string, size: number = 18) => {
+  if (!allergens) return null;
   const list = allergens.toLowerCase();
   const icons: React.ReactNode[] = [];
 
-  if (list.includes('gluten') || list.includes('weizen')) icons.push(<div key="gluten" className="flex flex-col items-center" title="Gluten"><Wheat size={size} /><span className="text-[8px] uppercase">Gluten</span></div>);
-  if (list.includes('egg') || list.includes('ei')) icons.push(<div key="egg" className="flex flex-col items-center" title="Egg"><Egg size={size} /><span className="text-[8px] uppercase">Egg</span></div>);
-  if (list.includes('lactose') || list.includes('milch') || list.includes('milk')) icons.push(<div key="milk" className="flex flex-col items-center" title="Lactose"><Milk size={size} /><span className="text-[8px] uppercase">Dairy</span></div>);
-  if (list.includes('soja') || list.includes('soy') || list.includes('bean')) icons.push(<div key="soy" className="flex flex-col items-center" title="Soy"><Bean size={size} /><span className="text-[8px] uppercase">Soy</span></div>);
-  if (list.includes('nuss') || list.includes('nut') || list.includes('mandel') || list.includes('hazel')) icons.push(<div key="nut" className="flex flex-col items-center" title="Nuts"><Nut size={size} /><span className="text-[8px] uppercase">Nut</span></div>);
+  const iconStyle = "flex flex-col items-center justify-center bg-gray-50 rounded-full w-8 h-8 border border-gray-100";
+  const labelStyle = "text-[6px] uppercase font-bold tracking-wider mt-0.5 text-slate-500 scale-75";
 
-  return icons;
+  if (list.includes('gluten') || list.includes('weizen')) icons.push(<div key="gluten" className="flex flex-col items-center"><div className={iconStyle} title="Gluten"><Wheat size={size} className="text-amber-600" /></div><span className={labelStyle}>Gluten</span></div>);
+  if (list.includes('egg') || list.includes('ei')) icons.push(<div key="egg" className="flex flex-col items-center"><div className={iconStyle} title="Egg"><Egg size={size} className="text-yellow-500" /></div><span className={labelStyle}>Egg</span></div>);
+  if (list.includes('lactose') || list.includes('milch') || list.includes('milk')) icons.push(<div key="milk" className="flex flex-col items-center"><div className={iconStyle} title="Lactose"><Milk size={size} className="text-blue-400" /></div><span className={labelStyle}>Dairy</span></div>);
+  if (list.includes('soja') || list.includes('soy') || list.includes('bean')) icons.push(<div key="soy" className="flex flex-col items-center"><div className={iconStyle} title="Soy"><Bean size={size} className="text-green-600" /></div><span className={labelStyle}>Soy</span></div>);
+  if (list.includes('nuss') || list.includes('nut') || list.includes('mandel')) icons.push(<div key="nut" className="flex flex-col items-center"><div className={iconStyle} title="Nuts"><Nut size={size} className="text-amber-800" /></div><span className={labelStyle}>Nut</span></div>);
+
+  return icons.length > 0 ? icons : null;
 };
 
-// Helper for Diet Icons
-const getDietIcons = (diet: string, size: number = 20) => {
+// Helper for Diet Icons (Refined)
+const getDietIcons = (diet: string, showLabel = true) => {
   const d = diet.toLowerCase();
-  if (d.includes('vegan')) return <div className="flex items-center gap-1 text-[#024930] font-bold uppercase text-[10px]"><Leaf size={size} /> Vegan</div>;
-  if (d.includes('vegetarisch')) return <div className="flex items-center gap-1 text-[#024930] font-bold uppercase text-[10px]"><Sprout size={size} /> Veggie</div>;
-  if (d.includes('fish') || d.includes('fisch')) return <div className="flex items-center gap-1 text-blue-600 font-bold uppercase text-[10px]"><Fish size={size} /> Fish</div>;
-  if (d.includes('meat') || d.includes('fleisch') || d.includes('beef')) return <div className="flex items-center gap-1 text-slate-600 font-bold uppercase text-[10px]"><span className="text-xl">🥩</span> Meat</div>;
+  const style = "flex items-center gap-1.5 px-3 py-1 rounded-full border border-current shadow-sm";
+
+  if (d.includes('vegan')) return <div className={`${style} text-green-700 bg-green-50`}><Leaf size={16} /><span className="text-[10px] font-bold uppercase tracking-wider">{showLabel && 'Vegan'}</span></div>;
+  if (d.includes('vegetarisch')) return <div className={`${style} text-green-600 bg-green-50`}><Sprout size={16} /><span className="text-[10px] font-bold uppercase tracking-wider">{showLabel && 'Veggie'}</span></div>;
+  if (d.includes('fish') || d.includes('fisch')) return <div className={`${style} text-blue-600 bg-blue-50`}><Fish size={16} /><span className="text-[10px] font-bold uppercase tracking-wider">{showLabel && 'Fish'}</span></div>;
+  if (d.includes('meat') || d.includes('fleisch') || d.includes('beef')) return <div className={`${style} text-red-800 bg-red-50`}><span className="text-lg leading-none">🥩</span><span className="text-[10px] font-bold uppercase tracking-wider">{showLabel && 'Meat'}</span></div>;
   return null;
 };
 
 const CateringItemLabel: React.FC<{ item: BundleItem, lang: 'de' | 'en', forPrint?: boolean }> = ({ item, lang, forPrint }) => {
   return (
     <div
-      className={`relative bg-white flex flex-col items-center justify-between p-6 text-center border-[1px] border-gray-100 overflow-hidden ${!forPrint ? 'shadow-xl w-[105mm] h-[148.5mm]' : 'w-full h-full'}`}
-      style={{ width: forPrint ? '105mm' : undefined, height: forPrint ? '148.5mm' : undefined, fontFamily: 'serif' }}
+      className={`relative bg-white flex flex-col justify-between p-0 overflow-hidden ${!forPrint ? 'shadow-xl w-[105mm] h-[148.5mm]' : 'w-full h-full'}`}
+      style={{ width: forPrint ? '105mm' : undefined, height: forPrint ? '148.5mm' : undefined }}
     >
-      {/* Elegant Frame */}
-      <div className="absolute inset-2 border-[2px] border-[#024930] opacity-80 pointer-events-none" />
-
-      {/* Header */}
-      <div className="mt-14 z-10 w-full flex flex-col items-center">
-        <span className="text-[10px] uppercase font-sans tracking-[0.3em] text-[#024930] mb-3">Buffet Selection</span>
-        <div className="flex justify-center">{getDietIcons(item.diet_de, 24)}</div>
+      {/* Top: Brand Header */}
+      <div className="bg-[#00543A] h-16 w-full flex items-center justify-center text-[#F5E6D3]">
+        <BrandLogo size={24} color="#F5E6D3" />
       </div>
 
-      {/* Main Dish Name */}
-      <div className="flex-1 flex flex-col justify-center items-center w-full px-4 z-10">
-        <h2 className="text-3xl leading-snug font-black text-[#024930] uppercase font-serif mb-2">
+      {/* Middle: Content */}
+      <div className="flex-1 flex flex-col items-center justify-center px-8 py-4 text-center">
+        {/* Diet Badge */}
+        <div className="mb-6 opacity-90 scale-125">
+          {getDietIcons(item.diet_de)}
+        </div>
+
+        {/* Dish Name - Maximized */}
+        <h2 className="text-4xl leading-tight font-serif font-black text-slate-900 uppercase">
           {lang === 'de' ? item.item_name_de : item.item_name_en}
         </h2>
+
+        {/* Decorative Line */}
+        <div className="w-20 h-1 bg-[#F4B7D5] mt-6 mb-2" />
       </div>
 
-      {/* Allergens Footer - Fixed at bottom */}
-      <div className="mb-10 z-10 w-full px-8">
-        <div className="border-t border-[#024930]/30 pt-4 flex flex-col items-center gap-2">
-          <span className="text-[8px] uppercase font-sans tracking-widest text-slate-400">Allergens</span>
-          <div className="flex gap-4 text-[#024930] justify-center flex-wrap">
-            {getAllergenIcons(item.allergens_de, 20)}
-            {!item.allergens_de && <span className="text-[10px] text-slate-400 italic">No Common Allergens</span>}
-          </div>
+      {/* Bottom: Allergens Section */}
+      <div className="bg-[#F5F5F5] min-h-[100px] border-t-4 border-[#F4B7D5] p-6 flex flex-col items-center justify-center">
+        <span className="text-[10px] uppercase font-black text-slate-400 tracking-[0.2em] mb-3">Allergen Information</span>
+        <div className="flex gap-4 justify-center items-end min-h-[30px]">
+          {getAllergenIcons(item.allergens_de, 20) || <span className="text-slate-400 italic text-sm">No common allergens declared</span>}
         </div>
       </div>
     </div>
@@ -521,52 +544,53 @@ const App: React.FC = () => {
     return groups;
   }, [selections, cateringSelections, bundles, activeTab, isPreviewing, previewType]);
 
-  // Menu Print Logic (A4)
+  // Menu Print Logic (A4) - Optimized for 100% Space & Readability
   const MenuPrint = () => {
     const selectedBundles = cateringSelections.map(s => bundles.find(b => b.id === s.bundleId)).filter(Boolean) as Bundle[];
 
     return (
-      <div className="w-[210mm] h-[297mm] bg-white p-[20mm] flex flex-col">
-        {/* Minimal Header */}
-        <div className="w-full text-center pb-8 border-b-2 border-[#024930]">
-          <div className="flex justify-center mb-4 text-[#024930]"><ChefHat size={40} /></div>
-          <h1 className="text-5xl font-serif font-black text-[#024930] uppercase tracking-wide">Menu</h1>
-          <div className="text-slate-500 font-sans uppercase tracking-[0.2em] mt-2 text-sm">{companyName || 'Special Event'} • {cateringDate}</div>
+      <div className="w-[210mm] h-[297mm] bg-white relative flex flex-col">
+        {/* Top Branding Strip */}
+        <div className="bg-[#00543A] text-white p-8 flex justify-between items-center h-[35mm]">
+          <BrandLogo size={40} color="#F5E6D3" />
+          <div className="text-right">
+            <div className="text-[#F4B7D5] uppercase tracking-[0.2em] text-xs font-bold mb-1">Event Menu</div>
+            <div className="text-xl font-serif italic">{cateringDate}</div>
+          </div>
         </div>
 
-        {/* Items List - Fully Detailed per Item */}
-        <div className="flex-1 flex flex-col gap-8 py-8 px-12">
+        {/* Main Content Area */}
+        <div className="flex-1 p-[15mm] flex flex-col gap-10">
           {selectedBundles.map((b, idx) => (
-            <div key={idx} className="flex flex-col gap-4 mb-4">
-              {/* Bundle / Course Header */}
-              <div className="text-center mb-2">
-                <h2 className="text-2xl font-serif font-black text-[#024930] uppercase tracking-wider border-b border-[#024930]/20 inline-block pb-1">
+            <div key={idx} className="flex flex-col gap-6">
+              {/* Course Title */}
+              <div className="flex items-center gap-4">
+                <h2 className="text-3xl font-black text-[#00543A] uppercase font-serif tracking-wide shrink-0">
                   {lang === 'de' ? b.name_de : b.name_en}
                 </h2>
+                <div className="h-[2px] bg-[#F4B7D5] flex-1 mt-1 opacity-50" />
               </div>
 
-              {/* Detailed Item Rows */}
-              <div className="flex flex-col gap-4">
+              {/* Items Grid */}
+              <div className="grid grid-cols-1 gap-6">
                 {b.items.map((item, iIdx) => (
-                  <div key={iIdx} className="flex flex-col border-b border-dotted border-gray-200 pb-3 last:border-none">
-                    <div className="flex justify-between items-baseline">
-                      <span className="text-xl font-serif font-bold text-slate-800">
-                        {lang === 'de' ? item.item_name_de : item.item_name_en}
-                      </span>
-                      <div className="flex items-center gap-3">
-                        {/* Diet Icon */}
-                        {getDietIcons(item.diet_de, 18)}
+                  <div key={iIdx} className="flex items-start justify-between gap-6 group">
+                    {/* Left: Name & Diet */}
+                    <div className="flex-1">
+                      <div className="flex items-center gap-3 mb-1">
+                        <span className="text-xl font-bold text-slate-800 leading-snug">
+                          {lang === 'de' ? item.item_name_de : item.item_name_en}
+                        </span>
+                        <div className="scale-90 origin-left">{getDietIcons(item.diet_de, false)}</div>
                       </div>
                     </div>
 
-                    <div className="flex justify-between items-center mt-1 pl-1">
-                      <div className="flex items-center gap-2 text-[#024930]">
-                        <span className="text-[9px] uppercase font-sans tracking-widest text-slate-400">Contains:</span>
-                        {item.allergens_de ? getAllergenIcons(item.allergens_de, 14) : <span className="text-[10px] text-slate-400 italic">No Allergens</span>}
+                    {/* Right: Allergens */}
+                    <div className="flex items-center gap-2 pt-1.5 shrink-0 opacity-80 group-hover:opacity-100 transition-opacity">
+                      <div className="flex gap-2">
+                        {getAllergenIcons(item.allergens_de, 14)}
                       </div>
-                      <span className="text-[10px] text-slate-500 uppercase font-sans tracking-wider">
-                        {item.allergens_de}
-                      </span>
+                      {!item.allergens_de && <span className="text-xs text-slate-300 italic">No Allergens</span>}
                     </div>
                   </div>
                 ))}
@@ -575,9 +599,9 @@ const App: React.FC = () => {
           ))}
         </div>
 
-        {/* Footer */}
-        <div className="w-full text-center pt-8 border-t-2 border-[#024930] text-[#024930]">
-          <span className="font-serif italic text-xl">Bon Appétit</span>
+        {/* Bottom Strip */}
+        <div className="h-[15mm] bg-[#F5E6D3] flex items-center justify-center text-[#00543A] border-t border-[#00543A]/10">
+          <span className="font-serif italic font-semibold">Freshly prepared by Bella&Bona</span>
         </div>
       </div>
     );

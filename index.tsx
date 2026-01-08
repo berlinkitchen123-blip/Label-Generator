@@ -818,31 +818,37 @@ const App: React.FC = () => {
               });
 
               return (
-                <div className="label-card-container">
-                  {/* Just showing first one in preview or a list? The preview logic usually shows mapping. */}
-                  {/* We use a grid for preview */}
-                  <div className="grid grid-cols-2 gap-8">
-                    {allItems.map((item, idx) => (
-                      <div key={idx} className="scale-[0.6] origin-top-left">
-                        <CateringItemLabel item={item} lang={lang} forPrint />
-                      </div>
-                    ))}
-                  </div>
+              // 1. Group items into pages of 4
+              const pages = [];
+              for (let i = 0; i < allItems.length; i += 4) {
+                pages.push(allItems.slice(i, i + 4));
+              }
+
+              // 2. Render each A4 page
+              return pages.map((pageItems, pIdx) => (
+                <div key={pIdx} className="w-[210mm] h-[297mm] bg-white grid grid-cols-2 grid-rows-2" style={{ pageBreakAfter: 'always', margin: 0, padding: 0 }}>
+                  {pageItems.map((item, iIdx) => (
+                    <div key={iIdx} className="w-[105mm] h-[148.5mm] overflow-hidden flex items-center justify-center">
+                      <CateringItemLabel item={item} lang={lang} forPrint />
+                    </div>
+                  ))}
                 </div>
-              );
+              ));
             })()
-          ) : (
+          );
+            })()
+        ) : (
             // Standard Bundle Labels Preview
             printGroups.flatMap((group, groupIdx) => (
-              <div key={groupIdx} className="label-page-group mb-10">
-                {group.map((bundle, bIdx) => (
-                  <div key={bIdx} className="label-card-container">
-                    <Label bundle={bundle} lang={lang} packedOn={packedOn} forPrint variant="standard" />
-                  </div>
-                ))}
-              </div>
-            ))
-          )
+        <div key={groupIdx} className="label-page-group mb-10">
+          {group.map((bundle, bIdx) => (
+            <div key={bIdx} className="label-card-container">
+              <Label bundle={bundle} lang={lang} packedOn={packedOn} forPrint variant="standard" />
+            </div>
+          ))}
+        </div>
+        ))
+        )
         )}
       </div>
 

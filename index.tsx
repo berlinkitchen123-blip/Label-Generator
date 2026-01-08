@@ -534,32 +534,45 @@ const App: React.FC = () => {
           <div className="text-slate-500 font-sans uppercase tracking-[0.2em] mt-2 text-sm">{companyName || 'Special Event'} • {cateringDate}</div>
         </div>
 
-        {/* Items List - High End Restaurant Style */}
-        <div className="flex-1 flex flex-col gap-10 py-10 px-4">
-          {selectedBundles.map((b, idx) => {
-            // Aggregate diet/allergens from components for the main dish line
-            const diets = Array.from(new Set(b.items.map(i => i.diet_de))).map(d => getDietIcons(d, 16));
-            const allAllergens = Array.from(new Set(b.items.flatMap(i => i.allergens_de.split(/[,/]+/).map(a => a.trim()).filter(Boolean)))).join(', ');
-
-            return (
-              <div key={idx} className="flex flex-col gap-2">
-                <div className="flex justify-between items-baseline border-b border-dotted border-gray-300 pb-2">
-                  <h2 className="text-2xl font-serif font-bold text-[#024930] uppercase">{lang === 'de' ? b.name_de : b.name_en}</h2>
-                  <div className="flex gap-4 items-center">
-                    {diets}
-                  </div>
-                </div>
-                <div className="flex justify-between items-start pl-2">
-                  <div className="text-slate-600 font-serif italic text-lg w-[70%]">
-                    {b.items.map(i => lang === 'de' ? i.item_name_de : i.item_name_en).join(' • ')}
-                  </div>
-                  <div className="flex gap-3 pt-1">
-                    {getAllergenIcons(allAllergens, 16)}
-                  </div>
-                </div>
+        {/* Items List - Fully Detailed per Item */}
+        <div className="flex-1 flex flex-col gap-8 py-8 px-12">
+          {selectedBundles.map((b, idx) => (
+            <div key={idx} className="flex flex-col gap-4 mb-4">
+              {/* Bundle / Course Header */}
+              <div className="text-center mb-2">
+                <h2 className="text-2xl font-serif font-black text-[#024930] uppercase tracking-wider border-b border-[#024930]/20 inline-block pb-1">
+                  {lang === 'de' ? b.name_de : b.name_en}
+                </h2>
               </div>
-            );
-          })}
+
+              {/* Detailed Item Rows */}
+              <div className="flex flex-col gap-4">
+                {b.items.map((item, iIdx) => (
+                  <div key={iIdx} className="flex flex-col border-b border-dotted border-gray-200 pb-3 last:border-none">
+                    <div className="flex justify-between items-baseline">
+                      <span className="text-xl font-serif font-bold text-slate-800">
+                        {lang === 'de' ? item.item_name_de : item.item_name_en}
+                      </span>
+                      <div className="flex items-center gap-3">
+                        {/* Diet Icon */}
+                        {getDietIcons(item.diet_de, 18)}
+                      </div>
+                    </div>
+
+                    <div className="flex justify-between items-center mt-1 pl-1">
+                      <div className="flex items-center gap-2 text-[#024930]">
+                        <span className="text-[9px] uppercase font-sans tracking-widest text-slate-400">Contains:</span>
+                        {item.allergens_de ? getAllergenIcons(item.allergens_de, 14) : <span className="text-[10px] text-slate-400 italic">No Allergens</span>}
+                      </div>
+                      <span className="text-[10px] text-slate-500 uppercase font-sans tracking-wider">
+                        {item.allergens_de}
+                      </span>
+                    </div>
+                  </div>
+                ))}
+              </div>
+            </div>
+          ))}
         </div>
 
         {/* Footer */}

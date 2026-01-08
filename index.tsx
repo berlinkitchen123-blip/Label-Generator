@@ -1106,11 +1106,14 @@ const App: React.FC = () => {
                       pages.push(allItems.slice(i, i + 4));
                     }
 
-                    return pages.map((pageItems, pIdx) => (
-                      // Catering uses Item Level Labels
-                      activeTab === 'catering' ? (
-                        // We need to paginate the flattened items
-                        // Calculate pages for items (4 per page)
+                    {/* Content Area */ }
+                    {
+                      previewType === 'menu' && activeTab === 'catering' ? (
+                        <div className="bg-white shadow-2xl scale-[0.6] origin-top" style={{ width: '210mm', height: '297mm' }}>
+                          <MenuPrint />
+                        </div>
+                      ) : activeTab === 'catering' ? (
+                        // Catering Items Grid (4 per page)
                         (() => {
                           const allItems = cateringSelections.flatMap(sel => {
                             const b = bundles.find(x => x.id === sel.bundleId);
@@ -1124,7 +1127,7 @@ const App: React.FC = () => {
                           }
 
                           return pages.map((pageItems, pIdx) => (
-                            <div key={pIdx} className="bg-white shadow-2xl origin-top scale-[0.5]" style={{ width: '210mm', height: '297mm', padding: 0, margin: 0, display: 'grid', gridTemplateColumns: '105mm 105mm', gridTemplateRows: '148.5mm 148.5mm' }}>
+                            <div key={pIdx} className="bg-white shadow-2xl origin-top scale-[0.6] mb-12" style={{ width: '210mm', height: '297mm', display: 'grid', gridTemplateColumns: '105mm 105mm', gridTemplateRows: '148.5mm 148.5mm' }}>
                               {pageItems.map((item, iIdx) => (
                                 <div key={iIdx} style={{ width: '105mm', height: '148.5mm' }}>
                                   <CateringItemLabel item={item} lang={lang} forPrint />
@@ -1132,23 +1135,22 @@ const App: React.FC = () => {
                               ))}
                             </div>
                           ));
-
                         })()
                       ) : (
-                        // Standard Generator Prints (Bundle Level)
-                        printGroups.map((group, idx) => (
-                          <div key={idx} className="bg-white shadow-2xl" style={{ width: '210mm', height: '297mm', minHeight: '297mm', minWidth: '210mm' }}>
-                            <div className="label-page-group">
-                              {group.map((b, bi) => (
-                                <div key={bi} className="label-card-container">
-                                  <Label bundle={b} lang={lang} packedOn={packedOn} forPrint variant="standard" />
-                                </div>
-                              ))}
-                            </div>
+                      // Standard Bundles
+                      printGroups.map((group, idx) => (
+                        <div key={idx} className="bg-white shadow-2xl mb-12 scale-[0.6] origin-top" style={{ width: '210mm', height: '297mm' }}>
+                          <div className="label-page-group">
+                            {group.map((b, bi) => (
+                              <div key={bi} className="label-card-container">
+                                <Label bundle={b} lang={lang} packedOn={packedOn} forPrint variant="standard" />
+                              </div>
+                            ))}
                           </div>
-                        ))
-                      )
-                    )}
+                        </div>
+                      ))
+                    )
+                    }
             </div>
             <div className="p-8 border-t border-slate-800">
               <button onClick={() => window.print()} className="w-full bg-emerald-500 text-slate-950 font-black py-5 rounded-2xl flex items-center justify-center gap-4 text-xl">

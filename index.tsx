@@ -123,91 +123,188 @@ const BrandLogo = ({ className = "h-12" }: { className?: string }) => (
 
 // Helper for Allergen Icons (Refined)
 // Helper for Allergen Icons (Professional SVG Set - EU 14)
+// Helper for Allergen Icons (Premium "Sticker Style" SVG Set - EU 14)
 const getAllergenIcons = (allergens: string) => {
   if (!allergens) return null;
   const list = allergens.toLowerCase();
 
-  // Custom SVG Paths for specialized allergens to ensure professional look without missing icon libs
-  const Svgs = {
-    crustacean: <path d="M12 12c-2-2-2-5 0-7l1.5 1.5M12 12c2-2 2-5 0-7l-1.5 1.5m0 16.5c2 0 4-2 4-5v-2c0-2.5-4-3-4-3s-4 .5-4 3v2c0 3 2 5 4 5zM15 15l3 3m-6-3l-3 3" />, // Abstract Crab/Shell
-    celery: <path d="M12 2v20M5 7c0-1.5 1-3 3-3s3 2 3 3v13h2V7c0-1 2-3 4-3s2 1.5 2 3" />, // Celery Stalk
-    mustard: <path d="M8 17h8a2 2 0 0 0 2-2V9a2 2 0 0 0-2-2h-1V5a2 2 0 0 0-2-2h-2a2 2 0 0 0-2 2v2H8a2 2 0 0 0-2 2v6a2 2 0 0 0 2 2zM12 2v3" />, // Jar
-    sesame: <g><circle cx="8" cy="12" r="2" /><circle cx="16" cy="12" r="2" /><circle cx="12" cy="8" r="2" /><circle cx="12" cy="16" r="2" /></g>, // Seeds
-    sulphites: <path d="M8 22h8M7 10h10M12 15v7M12 2v13" />, // Wine Glass shape approx
-    lupin: <path d="M12 2l3 5-3 5-3-5zM12 12l3 5-3 5-3-5z" />, // Flower/Bean shape
-    mollusc: <path d="M10.5 5.5a5.5 5.5 0 1 1 5.4 8.5 3.5 3.5 0 1 0-5.3 2.5" />, // Snail shell
+  // Common props for the illustrative look
+  const strokeColor = "#333";
+  const strokeWidth = 1.5;
+
+  const Icons = {
+    gluten: (
+      <svg viewBox="0 0 24 24" className="w-full h-full overflow-visible">
+        <path d="M12 3v18" stroke={strokeColor} strokeWidth={strokeWidth} strokeLinecap="round" />
+        <path d="M12 5c2 2 4 0 4 3s-2 3-4 1c-2 2-4 0-4-3s2-3 4-1z" fill="#FCD34D" stroke={strokeColor} strokeWidth={strokeWidth} />
+        <path d="M12 9c2 2 4 0 4 3s-2 3-4 1c-2 2-4 0-4-3s2-3 4-1z" fill="#FCD34D" stroke={strokeColor} strokeWidth={strokeWidth} />
+        <path d="M12 13c2 2 4 0 4 3s-2 3-4 1c-2 2-4 0-4-3s2-3 4-1z" fill="#FCD34D" stroke={strokeColor} strokeWidth={strokeWidth} />
+        <path d="M8 18l4 3 4-3" fill="none" stroke={strokeColor} strokeWidth={strokeWidth} strokeLinecap="round" />
+      </svg>
+    ),
+    crustacean: (
+      <svg viewBox="0 0 24 24" className="w-full h-full overflow-visible">
+        <path d="M17 18c0-2-3-4-5-4s-5 2-5 4" fill="#FDA4AF" stroke={strokeColor} strokeWidth={strokeWidth} />
+        <path d="M12 14c2-3 2-6 0-8-2 2-2 5 0 8z" fill="#FB7185" stroke={strokeColor} strokeWidth={strokeWidth} />
+        <path d="M7 18l-2 2M17 18l2 2" stroke={strokeColor} strokeWidth={strokeWidth} strokeLinecap="round" />
+        <circle cx="10" cy="8" r="0.5" fill="#000" />
+        <circle cx="14" cy="8" r="0.5" fill="#000" />
+      </svg>
+    ),
+    egg: (
+      <svg viewBox="0 0 24 24" className="w-full h-full overflow-visible">
+        <path d="M12 21c4.4 0 8-3.6 8-8 0-4.4-3.6-8-8-8s-8 3.6-8 8c0 4.4 3.6 8 8 8z" fill="#FFF" stroke={strokeColor} strokeWidth={strokeWidth} />
+        <circle cx="12" cy="14" r="3.5" fill="#FBBF24" stroke={strokeColor} strokeWidth={strokeWidth} />
+        <path d="M12 5v4" stroke={strokeColor} strokeWidth={strokeWidth} strokeLinecap="round" opacity="0.2" />
+      </svg>
+    ),
+    fish: (
+      <svg viewBox="0 0 24 24" className="w-full h-full overflow-visible">
+        <path d="M20 12c-2-2-5.5-3-9-3C6 9 2 12 2 12s4 3 9 3c3.5 0 7-1 9-3z" fill="#93C5FD" stroke={strokeColor} strokeWidth={strokeWidth} />
+        <path d="M20 12l2-2v4l-2-2z" fill="#60A5FA" stroke={strokeColor} strokeWidth={strokeWidth} strokeLinejoin="round" />
+        <circle cx="16" cy="11" r="1" fill="#FFF" stroke={strokeColor} strokeWidth={1} />
+        <path d="M12 10c0 1-1 2-1 4" stroke={strokeColor} strokeWidth={1} opacity="0.5" />
+      </svg>
+    ),
+    peanut: (
+      <svg viewBox="0 0 24 24" className="w-full h-full overflow-visible">
+        <path d="M12 4c-3 0-5 2-5 5 0 2 1.5 3.5 3 4-1.5 0.5-3 2-3 4 0 3 2 5 5 5s5-2 5-5c0-2-1.5-3.5-3-4 1.5-0.5 3-2 3-4 0-3-2-5-5-5z" fill="#D4A373" stroke={strokeColor} strokeWidth={strokeWidth} />
+        <path d="M10 7c1 1 3 1 4 0M10 16c1 1 3 1 4 0" stroke={strokeColor} strokeWidth={1} opacity="0.6" />
+      </svg>
+    ),
+    soy: (
+      <svg viewBox="0 0 24 24" className="w-full h-full overflow-visible">
+        <path d="M17 4c-5 0-10 6-12 14 3-1 11-6 13-10 1-2 0-4-1-4z" fill="#86EFAC" stroke={strokeColor} strokeWidth={strokeWidth} />
+        <circle cx="10" cy="13" r="1.5" fill="#22C55E" stroke="none" />
+        <circle cx="13" cy="10" r="1.5" fill="#22C55E" stroke="none" />
+        <circle cx="15" cy="7" r="1.5" fill="#22C55E" stroke="none" />
+      </svg>
+    ),
+    milk: (
+      <svg viewBox="0 0 24 24" className="w-full h-full overflow-visible">
+        <path d="M7 8h10v12H7z" fill="#EFF6FF" stroke={strokeColor} strokeWidth={strokeWidth} />
+        <path d="M7 8l5-5 5 5" fill="#DBEAFE" stroke={strokeColor} strokeWidth={strokeWidth} strokeLinejoin="round" />
+        <rect x="9" y="12" width="6" height="4" rx="1" fill="#60A5FA" stroke={strokeColor} strokeWidth={1} />
+      </svg>
+    ),
+    nuts: (
+      <svg viewBox="0 0 24 24" className="w-full h-full overflow-visible">
+        <path d="M12 21c-4 0-7-4-7-9 0-5 3-9 7-9s7 4 7 9c0 5-3 9-7 9z" fill="#B45309" stroke={strokeColor} strokeWidth={strokeWidth} />
+        <path d="M12 3c0.5 3 2 8 2 18" stroke={strokeColor} strokeWidth={1} opacity="0.4" />
+      </svg>
+    ),
+    celery: (
+      <svg viewBox="0 0 24 24" className="w-full h-full overflow-visible">
+        <path d="M12 21V5" stroke="#4ADE80" strokeWidth="4" strokeLinecap="round" />
+        <path d="M12 21V5" stroke={strokeColor} strokeWidth={strokeWidth} strokeLinecap="round" fill="none" />
+        <path d="M12 5l-3-2M12 5l3-2" stroke={strokeColor} strokeWidth={strokeWidth} strokeLinecap="round" />
+        <path d="M12 10l-2-1M12 15l2-1" stroke={strokeColor} strokeWidth={strokeWidth} strokeLinecap="round" />
+      </svg>
+    ),
+    mustard: (
+      <svg viewBox="0 0 24 24" className="w-full h-full overflow-visible">
+        <path d="M8 21h8v-6c0-4-2-7-4-7s-4 3-4 7v6z" fill="#FDE047" stroke={strokeColor} strokeWidth={strokeWidth} />
+        <rect x="10" y="3" width="4" height="4" rx="1" fill="#9CA3AF" stroke={strokeColor} strokeWidth={strokeWidth} />
+        <path d="M8 15h8" stroke={strokeColor} strokeWidth={1} />
+      </svg>
+    ),
+    sesame: (
+      <svg viewBox="0 0 24 24" className="w-full h-full overflow-visible">
+        <path d="M12 4c-5 0-9 4-9 9 0 2 1 3 2 4l7 3 7-3c1-1 2-2 2-4 0-5-4-9-9-9z" fill="#FEF3C7" stroke={strokeColor} strokeWidth={strokeWidth} />
+        <circle cx="10" cy="10" r="0.8" fill="#555" />
+        <circle cx="14" cy="10" r="0.8" fill="#555" />
+        <circle cx="12" cy="13" r="0.8" fill="#555" />
+        <circle cx="15" cy="14" r="0.8" fill="#555" />
+        <circle cx="9" cy="14" r="0.8" fill="#555" />
+      </svg>
+    ),
+    sulphites: (
+      <svg viewBox="0 0 24 24" className="w-full h-full overflow-visible">
+        <path d="M7 8c0 5 2 9 5 9s5-4 5-9" fill="#F472B6" stroke={strokeColor} strokeWidth={strokeWidth} />
+        <path d="M7 8h10" stroke={strokeColor} strokeWidth={strokeWidth} />
+        <path d="M12 17v5M8 22h8" stroke={strokeColor} strokeWidth={strokeWidth} strokeLinecap="round" />
+      </svg>
+    ),
+    lupin: (
+      <svg viewBox="0 0 24 24" className="w-full h-full overflow-visible">
+        <circle cx="12" cy="12" r="6" fill="#FEF08A" stroke={strokeColor} strokeWidth={strokeWidth} />
+        <path d="M12 6v12M6 12h12" stroke={strokeColor} strokeWidth={1} opacity="0.3" />
+      </svg>
+    ),
+    mollusc: (
+      <svg viewBox="0 0 24 24" className="w-full h-full overflow-visible">
+        <path d="M5 14c0 4 3 7 7 7s7-3 7-7" fill="#FDBA74" stroke={strokeColor} strokeWidth={strokeWidth} />
+        <path d="M5 14c0-4 3-8 7-8s7 4 7 8" fill="#FED7AA" stroke={strokeColor} strokeWidth={strokeWidth} />
+        <path d="M12 14l-4 4M12 14l4 4M12 14v-5" stroke={strokeColor} strokeWidth={1} opacity="0.5" />
+      </svg>
+    )
   };
 
   const createIcon = (key: string, icon: React.ReactNode, title: string) => (
-    <div key={key} className="flex flex-col items-center justify-center bg-white rounded-full w-6 h-6 border border-slate-200 shadow-sm text-slate-700" title={title}>
-      {/* If it's a standard Lucide component, render it. If it's a path, wrap in svg */}
-      {React.isValidElement(icon) && icon.type === 'path' || icon.type === 'g' ? (
-        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">{icon}</svg>
-      ) : (
-        icon
-      )}
+    <div key={key} className="flex flex-col items-center justify-center bg-white rounded-lg w-7 h-7 p-0.5 shadow-sm border border-slate-100" title={title}>
+      {icon}
     </div>
   );
 
   const foundIcons: React.ReactNode[] = [];
 
-  // 1. Gluten (Cereals)
+  // 1. Gluten
   if (list.includes('gluten') || list.includes('weizen') || list.includes('wheat') || list.includes('rog'))
-    foundIcons.push(createIcon('gluten', <Wheat size={14} className="text-amber-600" />, 'Gluten'));
+    foundIcons.push(createIcon('gluten', Icons.gluten, 'Gluten'));
 
   // 2. Crustaceans
   if (list.includes('krebstier') || list.includes('crustacean') || list.includes('garnele') || list.includes('shrimp') || list.includes('crab'))
-    foundIcons.push(createIcon('crust', Svgs.crustacean, 'Crustaceans'));
+    foundIcons.push(createIcon('crust', Icons.crustacean, 'Crustaceans'));
 
   // 3. Eggs
   if (list.includes('ei') || list.includes('egg'))
-    foundIcons.push(createIcon('egg', <Egg size={14} className="text-yellow-500" />, 'Egg'));
+    foundIcons.push(createIcon('egg', Icons.egg, 'Egg'));
 
   // 4. Fish
   if (list.includes('fisch') || list.includes('fish'))
-    foundIcons.push(createIcon('fish', <Fish size={14} className="text-blue-500" />, 'Fish'));
+    foundIcons.push(createIcon('fish', Icons.fish, 'Fish'));
 
   // 5. Peanuts
   if (list.includes('erdnuss') || list.includes('erdnüsse') || list.includes('peanut'))
-    foundIcons.push(createIcon('peanut', <Nut size={14} className="text-amber-700" />, 'Peanuts'));
+    foundIcons.push(createIcon('peanut', Icons.peanut, 'Peanuts'));
 
   // 6. Soy
   if (list.includes('soja') || list.includes('soy') || list.includes('bean'))
-    foundIcons.push(createIcon('soy', <Bean size={14} className="text-green-700" />, 'Soy'));
+    foundIcons.push(createIcon('soy', Icons.soy, 'Soy'));
 
-  // 7. Milk (Lactose)
+  // 7. Milk
   if (list.includes('milch') || list.includes('milk') || list.includes('lactose'))
-    foundIcons.push(createIcon('milk', <Milk size={14} className="text-blue-400" />, 'Milk'));
+    foundIcons.push(createIcon('milk', Icons.milk, 'Milk'));
 
-  // 8. Nuts (Tree)
+  // 8. Nuts
   if (list.includes('nuss') || list.includes('nut') || list.includes('mandel') || list.includes('hazel') || list.includes('schalen'))
-    foundIcons.push(createIcon('nuts', <Nut size={14} className="text-amber-900 opacity-70" />, 'Tree Nuts'));
+    foundIcons.push(createIcon('nuts', Icons.nuts, 'Tree Nuts'));
 
   // 9. Celery
   if (list.includes('sellerie') || list.includes('celery'))
-    foundIcons.push(createIcon('celery', Svgs.celery, 'Celery'));
+    foundIcons.push(createIcon('celery', Icons.celery, 'Celery'));
 
   // 10. Mustard
   if (list.includes('senf') || list.includes('mustard'))
-    foundIcons.push(createIcon('mustard', Svgs.mustard, 'Mustard'));
+    foundIcons.push(createIcon('mustard', Icons.mustard, 'Mustard'));
 
   // 11. Sesame
   if (list.includes('sesam') || list.includes('sesame'))
-    foundIcons.push(createIcon('sesame', Svgs.sesame, 'Sesame'));
+    foundIcons.push(createIcon('sesame', Icons.sesame, 'Sesame'));
 
   // 12. Sulphites
   if (list.includes('schwefel') || list.includes('sulphite') || list.includes('sulfite') || list.includes('so2'))
-    foundIcons.push(createIcon('sulph', Svgs.sulphites, 'Sulphites'));
+    foundIcons.push(createIcon('sulph', Icons.sulphites, 'Sulphites'));
 
   // 13. Lupin
   if (list.includes('lupin'))
-    foundIcons.push(createIcon('lupin', Svgs.lupin, 'Lupin'));
+    foundIcons.push(createIcon('lupin', Icons.lupin, 'Lupin'));
 
   // 14. Molluscs
   if (list.includes('weichtier') || list.includes('mollusc') || list.includes('snail') || list.includes('muschel'))
-    foundIcons.push(createIcon('mollusc', Svgs.mollusc, 'Molluscs'));
+    foundIcons.push(createIcon('mollusc', Icons.mollusc, 'Molluscs'));
 
-  return foundIcons.length > 0 ? <div className="flex gap-1 flex-wrap justify-end">{foundIcons}</div> : null;
+  return foundIcons.length > 0 ? <div className="flex gap-1.5 flex-wrap justify-end">{foundIcons}</div> : null;
 };
 
 // Helper for Diet Icons (Refined)

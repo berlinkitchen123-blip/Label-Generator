@@ -659,20 +659,27 @@ const App: React.FC = () => {
     });
 
     return (
-      <div className="w-[210mm] h-[297mm] bg-white relative flex flex-col items-center py-[15mm] px-[20mm]">
-        {/* Minimal Header: Logo Only */}
-        <div className="flex flex-col items-center w-full mb-12">
-          <BrandLogo className="h-16" />
+      <div
+        className="w-[210mm] h-[297mm] relative flex flex-col items-center py-[15mm] px-[15mm] overflow-hidden"
+        style={{ backgroundColor: '#FDFBF7' }} // Warm white/cream paper
+      >
+        {/* Main Border Frame */}
+        <div className="absolute inset-4 border border-[#00543A] opacity-20 pointer-events-none" />
+        <div className="absolute inset-5 border border-[#00543A] opacity-10 pointer-events-none" />
+
+        {/* Header */}
+        <div className="flex flex-col items-center w-full mb-12 mt-4 z-10">
+          <BrandLogo className="h-20" />
         </div>
 
         {/* Menu Content - Grouped by Type */}
-        <div className="flex-1 w-full pl-4 pr-4 flex flex-col gap-10">
+        <div className="flex-1 w-full pl-8 pr-8 flex flex-col z-10">
           {sortedGroups.map((groupTitle, idx) => (
-            <div key={idx} className="flex flex-col w-full">
+            <div key={idx} className="flex flex-col w-full mb-10 last:mb-0 grow">
               {/* Item Type Header with Lines */}
-              <div className="flex items-center gap-4 mb-6">
+              <div className="flex items-center gap-6 mb-6">
                 <div className="h-[1px] bg-[#00543A] flex-1 opacity-20"></div>
-                <h2 className="text-xl font-black text-[#00543A] uppercase font-serif tracking-[0.2em] px-2">
+                <h2 className="text-2xl font-black text-[#00543A] uppercase font-serif tracking-[0.25em] px-4">
                   {groupTitle}
                 </h2>
                 <div className="h-[1px] bg-[#00543A] flex-1 opacity-20"></div>
@@ -681,25 +688,25 @@ const App: React.FC = () => {
               {/* Items List */}
               <div className="flex flex-col gap-6 w-full">
                 {grouped[groupTitle].map((item, iIdx) => (
-                  <div key={iIdx} className="flex items-start justify-between w-full min-h-[3rem]">
+                  <div key={iIdx} className="flex items-start justify-between w-full relative group">
                     {/* Left: Item Name */}
-                    <div className="flex-1 pr-8 pt-1">
-                      <span className="text-lg font-bold text-slate-800 font-serif leading-tight block">
+                    <div className="flex-1 pr-6 relative">
+                      <span className="text-xl font-bold text-[#00543A] font-serif leading-tight block">
                         {lang === 'de' ? item.item_name_de : item.item_name_en}
                       </span>
+                      {/* Dotted Leader Line (Visual connector) */}
+                      <div className="absolute bottom-1 left-0 w-full border-b border-[#00543A] opacity-10 border-dotted" style={{ transform: 'translateY(8px)' }} />
                     </div>
 
                     {/* Right: Allergens (Icons + Text) */}
                     {item.allergens_de && (
-                      <div className="flex flex-col items-end gap-1 max-w-[30%] shrink-0">
+                      <div className="flex flex-col items-end gap-1 shrink-0 bg-[#FDFBF7] pl-2 z-10">
                         {/* Icons */}
                         {getAllergenIcons(item.allergens_de)}
                         {/* Text below icons */}
-                        {item.allergens_de && (
-                          <span className="text-[9px] text-slate-400 uppercase tracking-wide text-right leading-tight">
-                            {item.allergens_de}
-                          </span>
-                        )}
+                        <span className="text-[9px] text-[#00543A] opacity-60 uppercase tracking-widest text-right leading-none mt-1">
+                          {item.allergens_de}
+                        </span>
                       </div>
                     )}
                   </div>
@@ -709,9 +716,12 @@ const App: React.FC = () => {
           ))}
         </div>
 
-        {/* Minimal Footer (No Legend) */}
-        <div className="w-full text-center mt-auto pt-8 border-t border-slate-50">
-          <span className="font-serif italic text-[#00543A] opacity-60 text-sm">Bon Appétit</span>
+        {/* Premium Footer */}
+        <div className="w-full text-center mt-auto pt-8 border-t border-[#00543A]/10 z-10 flex flex-col items-center gap-2">
+          <span className="font-serif italic text-[#00543A] text-lg">Bon Appétit</span>
+          <div className="text-[9px] text-[#00543A] opacity-50 uppercase tracking-[0.2em] mt-2">
+            Catering Service • Bella&Bona
+          </div>
         </div>
       </div>
     );

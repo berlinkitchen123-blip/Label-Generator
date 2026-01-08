@@ -573,43 +573,45 @@ const App: React.FC = () => {
       <div className="print-only">
         {previewType === 'menu' && activeTab === 'catering' ? (
           <MenuPrint />
-        ) :                // Label View (A6) Logic
-                // If Catering, we Flatten Print Groups per Item
-                if (activeTab === 'catering' && previewType === 'labels') {
-                   // Flatten all items from all selections
-                   const allItems = cateringSelections.flatMap(sel => {
-                      const b = bundles.find(x => x.id === sel.bundleId);
-        if (!b) return [];
-                      return Array(sel.quantity).fill(b).flatMap(() => b.items);
-                   });
+        ) : (
+          // Label View (A6) Logic
+          // If Catering, we Flatten Print Groups per Item
+          activeTab === 'catering' && previewType === 'labels' ? (
+            (() => {
+              // Flatten all items from all selections
+              const allItems = cateringSelections.flatMap(sel => {
+                const b = bundles.find(x => x.id === sel.bundleId);
+                if (!b) return [];
+                return Array(sel.quantity).fill(b).flatMap(() => b.items);
+              });
 
-        return (
-        <div className="label-card-container">
-          {/* Just showing first one in preview or a list? The preview logic usually shows mapping. */}
-          {/* We use a grid for preview */}
-          <div className="grid grid-cols-2 gap-8">
-            {allItems.map((item, idx) => (
-              <div key={idx} className="scale-[0.6] origin-top-left">
-                <CateringItemLabel item={item} lang={lang} forPrint />
+              return (
+                <div className="label-card-container">
+                  {/* Just showing first one in preview or a list? The preview logic usually shows mapping. */}
+                  {/* We use a grid for preview */}
+                  <div className="grid grid-cols-2 gap-8">
+                    {allItems.map((item, idx) => (
+                      <div key={idx} className="scale-[0.6] origin-top-left">
+                        <CateringItemLabel item={item} lang={lang} forPrint />
+                      </div>
+                    ))}
+                  </div>
+                </div>
+              );
+            })()
+          ) : (
+            // Standard Bundle Labels Preview
+            printGroups.flatMap((group, groupIdx) => (
+              <div key={groupIdx} className="label-page-group mb-10">
+                {group.map((bundle, bIdx) => (
+                  <div key={bIdx} className="label-card-container">
+                    <Label bundle={bundle} lang={lang} packedOn={packedOn} forPrint variant="standard" />
+                  </div>
+                ))}
               </div>
-            ))}
-          </div>
-        </div>
-        );
-                } else {
-                   // Standard Bundle Labels Preview
-                   return printGroups.flatMap((group, groupIdx) => (
-        <div key={groupIdx} className="label-page-group mb-10">
-          {group.map((bundle, bIdx) => (
-            <div key={bIdx} className="label-card-container">
-              <Label bundle={bundle} lang={lang} packedOn={packedOn} forPrint variant="standard" />
-            </div>
-          ))}
-        </div>
-        ));
-                }
-              })()
-            )}
+            ))
+          )
+        )}
       </div>
 
       <div className="no-print min-h-screen flex flex-col bg-slate-950 text-slate-100">

@@ -755,6 +755,16 @@ const App: React.FC = () => {
               <div className="flex flex-col gap-6 w-full">
                 {grouped[groupTitle].map((item, iIdx) => (
                   <div key={iIdx} className="flex flex-col w-full group">
+                    <div className="flex justify-between items-baseline w-full">
+                      <div className="flex-1">
+                        <span className="text-xl font-bold text-[#00543A] leading-tight tracking-wide">
+                          {item.item_name_de.toUpperCase()}
+                        </span>
+                      </div>
+                      <div className="flex items-center gap-2 ml-4">
+                        {getAllergenIcons(item.allergens_de)}
+                      </div>
+                    </div>
                     {/* English Desc */}
                     <div className="mt-1 text-[#00543A]/60 font-medium italic text-sm">
                       {item.item_name_en}
@@ -772,6 +782,20 @@ const App: React.FC = () => {
         <div className="w-full text-center mt-auto pt-6 border-t border-[#00543A]/10 z-10">
           <p className="text-[#00543A] font-bold text-sm tracking-widest uppercase opacity-70">Bella & Bona • Freshly Prepared for You</p>
         </div>
+
+        {/* Force Print Styles */}
+        <style>{`
+          @media print {
+            @page {
+              size: A4;
+              margin: 0;
+            }
+            body {
+              print-color-adjust: exact;
+              -webkit-print-color-adjust: exact;
+            }
+          }
+        `}</style>
       </div>
     );
   };

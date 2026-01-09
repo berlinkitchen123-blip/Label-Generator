@@ -638,7 +638,7 @@ const App: React.FC = () => {
         {/* Header */}
         <div className="flex flex-col items-center w-full mb-12 mt-4 z-10">
           <div className="w-full flex justify-center py-4 border-b-2 border-[#FEACCF]/20">
-            <BrandLogo className="h-16 brightness-0" style={{ filter: 'invert(16%) sepia(34%) saturate(7181%) hue-rotate(149deg) brightness(95%) contrast(100%)' }} /> {/* Match #00543A */}
+            <BrandLogo className="h-16" />
           </div>
         </div>
 

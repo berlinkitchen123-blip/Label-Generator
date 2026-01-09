@@ -112,8 +112,8 @@ interface Selection {
 // --- BRANDING ---
 const BRAND_COLOR_PRIMARY = '#024930'; // Bella&Bona Dark Green
 const BRAND_COLOR_SECONDARY = '#F8F7F6'; // Cream Background
-const BRAND_COLOR_ACCENT = '#E0EA68'; // Lime Green Accent
-const BRAND_COLOR_PINK = '#F895BD'; // Brand Pink Accent
+const BRAND_COLOR_ACCENT = '#FEACCF'; // Baby Pink Accent
+const BRAND_COLOR_PINK = '#f895bd'; // Darker Brand Pink
 
 // Logo Component (Base64 Image)
 const BRAND_LOGO_B64 = "data:image/png;base64,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";
@@ -217,7 +217,7 @@ const CateringItemLabel: React.FC<{ item: BundleItem, lang: 'de' | 'en', forPrin
 
       {/* Bottom: Allergens Section (Only if exists) */}
       {hasAllergens && (
-        <div className="bg-[#F9F9EC] min-h-[90px] border-t border-[#E0EA68] p-6 flex flex-col items-center justify-center">
+        <div className="bg-[#FFF1F6] min-h-[90px] border-t border-[#FEACCF] p-6 flex flex-col items-center justify-center">
           <span className="text-[9px] uppercase font-bold text-[#024930] tracking-[0.2em] mb-2 opacity-70">Allergens</span>
           <div className="flex flex-col items-center gap-1">
             {getAllergenIcons(item.allergens_de)}
@@ -322,7 +322,7 @@ const Label: React.FC<{ bundle: Bundle, lang: 'de' | 'en', packedOn: string, for
           <h2 className="text-3xl font-bold text-[#024930] leading-tight uppercase font-serif px-4">
             {lang === 'de' ? bundle.name_de : bundle.name_en}
           </h2>
-          <div className="w-16 h-[2px] bg-[#E0EA68] mt-4 mb-2" />
+          <div className="w-16 h-[2px] bg-[#FEACCF] mt-4 mb-2" />
         </div>
 
         {/* Body: Items List */}
@@ -395,7 +395,7 @@ const Label: React.FC<{ bundle: Bundle, lang: 'de' | 'en', packedOn: string, for
         height: forPrint ? '148.5mm' : undefined
       }}
     >
-      <div className={`bg-[#024930] ${headerPadding} px-6 flex items-center justify-center ${headerMinHeight} shrink-0 border-b-2 border-[#E0EA68]`}>
+      <div className={`bg-[#024930] ${headerPadding} px-6 flex items-center justify-center ${headerMinHeight} shrink-0 border-b-2 border-[#FEACCF]`}>
         <h2 className={`text-white text-center font-black ${headerTitleSize} uppercase tracking-wider leading-tight`}>
           {lang === 'de' ? bundle.name_de : bundle.name_en}
         </h2>
@@ -414,7 +414,7 @@ const Label: React.FC<{ bundle: Bundle, lang: 'de' | 'en', packedOn: string, for
                     const trimmed = alg.trim();
                     if (!trimmed) return null;
                     return (
-                      <span key={aIdx} className={`bg-[#E0EA68] ${allergenFontSize} font-black px-1 py-0.5 rounded-[1px] uppercase text-[#024930] tracking-tighter`}>
+                      <span key={aIdx} className={`bg-[#FEACCF] ${allergenFontSize} font-black px-1 py-0.5 rounded-[1px] uppercase text-[#024930] tracking-tighter`}>
                         {trimmed}
                       </span>
                     );
@@ -633,12 +633,12 @@ const App: React.FC = () => {
         </div>
 
         {/* Main Border Frame */}
-        <div className="absolute inset-4 border border-[#E0EA68] opacity-50 pointer-events-none rounded-3xl" />
-        <div className="absolute inset-6 border border-[#E0EA68] opacity-30 pointer-events-none rounded-2xl" />
+        <div className="absolute inset-4 border border-[#FEACCF] opacity-50 pointer-events-none rounded-3xl" />
+        <div className="absolute inset-6 border border-[#FEACCF] opacity-30 pointer-events-none rounded-2xl" />
 
         {/* Header */}
         <div className="flex flex-col items-center w-full mb-12 mt-4 z-10">
-          <div className="w-full flex justify-center py-4 border-b-2 border-[#E0EA68]/20">
+          <div className="w-full flex justify-center py-4 border-b-2 border-[#FEACCF]/20">
             <BrandLogo className="h-16" />
           </div>
         </div>
@@ -649,7 +649,7 @@ const App: React.FC = () => {
             <div key={idx} className="flex flex-col w-full mb-10 last:mb-0">
               {/* Item Type Header with Lines */}
               <div className="flex items-center gap-6 mb-6">
-                <div className="h-[2px] bg-[#E0EA68] flex-1"></div>
+                <div className="h-[2px] bg-[#FEACCF] flex-1"></div>
                 <h2 className="text-2xl font-black text-[#024930] uppercase font-serif tracking-[0.25em] px-4 bg-[#F8F7F6]">
                   {lang === 'de' ? (
                     groupTitle === 'Vegetarian' ? 'VEGETARISCH' :
@@ -658,7 +658,7 @@ const App: React.FC = () => {
                           groupTitle
                   ) : groupTitle}
                 </h2>
-                <div className="h-[2px] bg-[#E0EA68] flex-1"></div>
+                <div className="h-[2px] bg-[#FEACCF] flex-1"></div>
               </div>
 
               {/* Items List */}
@@ -762,7 +762,7 @@ const App: React.FC = () => {
         <div className="flex flex-1">
           <aside className="w-20 lg:w-64 bg-slate-900 border-r border-slate-800 flex flex-col">
             <div className="p-6 border-b border-slate-800 flex items-center gap-3">
-              <div className="w-10 h-10 rounded-xl bg-[#E0EA68] flex items-center justify-center">
+              <div className="w-10 h-10 rounded-xl bg-[#FEACCF] flex items-center justify-center">
                 <Sprout size={24} color="#024930" />
               </div>
               <div className="hidden lg:block">
@@ -771,13 +771,13 @@ const App: React.FC = () => {
               </div>
             </div>
             <nav className="flex-1 p-4 space-y-2">
-              <button onClick={() => setActiveTab('generator')} className={`w-full flex items-center gap-4 px-4 py-3 rounded-xl ${activeTab === 'generator' ? 'bg-[#E0EA68] text-[#024930]' : 'text-slate-400 hover:bg-slate-800'}`}>
+              <button onClick={() => setActiveTab('generator')} className={`w-full flex items-center gap-4 px-4 py-3 rounded-xl ${activeTab === 'generator' ? 'bg-[#FEACCF] text-[#024930]' : 'text-slate-400 hover:bg-slate-800'}`}>
                 <Printer size={20} /><span className="hidden lg:block font-bold">Generator</span>
               </button>
-              <button onClick={() => setActiveTab('catering')} className={`w-full flex items-center gap-4 px-4 py-3 rounded-xl ${activeTab === 'catering' ? 'bg-[#E0EA68] text-[#024930]' : 'text-slate-400 hover:bg-slate-800'}`}>
+              <button onClick={() => setActiveTab('catering')} className={`w-full flex items-center gap-4 px-4 py-3 rounded-xl ${activeTab === 'catering' ? 'bg-[#FEACCF] text-[#024930]' : 'text-slate-400 hover:bg-slate-800'}`}>
                 <ChefHat size={20} /><span className="hidden lg:block font-bold">Special Catering</span>
               </button>
-              <button onClick={() => setActiveTab('database')} className={`w-full flex items-center gap-4 px-4 py-3 rounded-xl ${activeTab === 'database' ? 'bg-[#E0EA68] text-[#024930]' : 'text-slate-400 hover:bg-slate-800'}`}>
+              <button onClick={() => setActiveTab('database')} className={`w-full flex items-center gap-4 px-4 py-3 rounded-xl ${activeTab === 'database' ? 'bg-[#FEACCF] text-[#024930]' : 'text-slate-400 hover:bg-slate-800'}`}>
                 <Database size={20} /><span className="hidden lg:block font-bold">Database</span>
               </button>
             </nav>
@@ -865,7 +865,7 @@ const App: React.FC = () => {
                 <div className="xl:col-span-5 space-y-8">
                   {/* Search & Selection for Catering - Reuse but with cateringSelections */}
                   <div className="bg-slate-900 border border-slate-800 rounded-2xl p-6 shadow-xl space-y-4">
-                    <h3 className="text-xl font-bold flex items-center gap-2"><ChefHat className="text-[#E0EA68]" /> Event Details</h3>
+                    <h3 className="text-xl font-bold flex items-center gap-2"><ChefHat className="text-[#FEACCF]" /> Event Details</h3>
                     <div className="space-y-2">
                       <label className="text-xs uppercase font-bold text-slate-500">Company Name</label>
                       <input type="text" value={companyName} onChange={e => setCompanyName(e.target.value)} placeholder="Enter Company Name" className="w-full bg-slate-950 rounded-xl px-4 py-3 text-white border border-slate-800 focus:ring-2 focus:ring-[#FEACCF] outline-none" />
@@ -883,9 +883,9 @@ const App: React.FC = () => {
 
                   <div className="space-y-4 max-h-[50vh] overflow-y-auto pr-3">
                     {filteredBundles.map(bundle => (
-                      <div key={bundle.id} onClick={() => addSelection(bundle.id, true)} className="bg-slate-900 border border-slate-800 rounded-2xl p-5 flex items-center justify-between cursor-pointer hover:border-[#E0EA68] hover:bg-slate-800/50 transition-all shadow-lg group">
+                      <div key={bundle.id} onClick={() => addSelection(bundle.id, true)} className="bg-slate-900 border border-slate-800 rounded-2xl p-5 flex items-center justify-between cursor-pointer hover:border-[#FEACCF] hover:bg-slate-800/50 transition-all shadow-lg group">
                         <div className="flex items-center gap-4">
-                          <Utensils size={22} className="text-[#E0EA68] group-hover:scale-110 transition-transform" />
+                          <Utensils size={22} className="text-[#FEACCF] group-hover:scale-110 transition-transform" />
                           <div>
                             <p className="font-black text-slate-200">{lang === 'de' ? bundle.name_de : bundle.name_en}</p>
                           </div>
@@ -920,7 +920,7 @@ const App: React.FC = () => {
                               <p className="font-bold text-slate-100">{lang === 'de' ? b.name_de : b.name_en}</p>
                               <p className="text-xs text-slate-500">{b.items.length} items</p>
                             </div>
-                            <input type="number" min="1" value={sel.quantity} onChange={e => setCateringSelections(prev => prev.map(s => s.bundleId === sel.bundleId ? { ...s, quantity: parseInt(e.target.value) || 1 } : s))} className="w-16 bg-slate-950 rounded p-2 text-center text-[#E0EA68] font-bold border-none" />
+                            <input type="number" min="1" value={sel.quantity} onChange={e => setCateringSelections(prev => prev.map(s => s.bundleId === sel.bundleId ? { ...s, quantity: parseInt(e.target.value) || 1 } : s))} className="w-16 bg-slate-950 rounded p-2 text-center text-[#FEACCF] font-bold border-none" />
                             <button onClick={() => setCateringSelections(prev => prev.filter(s => s.bundleId !== sel.bundleId))} className="text-slate-500 hover:text-red-400"><X size={20} /></button>
                           </div>
                         );
@@ -939,7 +939,7 @@ const App: React.FC = () => {
                         <button onClick={() => { setPreviewType('menu'); setIsPreviewing(true); }} className="bg-slate-800 text-white font-bold py-4 rounded-xl flex items-center justify-center gap-2 hover:bg-slate-700 transition-all">
                           <FileSpreadsheet size={20} /> Preview Menu (A4)
                         </button>
-                        <button onClick={() => { setPreviewType('labels'); setIsPreviewing(true); }} className="bg-[#E0EA68] text-[#024930] font-black py-4 rounded-xl flex items-center justify-center gap-2 hover:bg-[#ff9ec6] transition-all shadow-lg">
+                        <button onClick={() => { setPreviewType('labels'); setIsPreviewing(true); }} className="bg-[#FEACCF] text-[#024930] font-black py-4 rounded-xl flex items-center justify-center gap-2 hover:bg-[#ff9ec6] transition-all shadow-lg">
                           <Printer size={20} /> Print Labels (A6)
                         </button>
                       </div>
@@ -968,7 +968,7 @@ const App: React.FC = () => {
             ) : (
               <div className="max-w-4xl mx-auto space-y-8">
                 <section className="bg-slate-900 p-10 rounded-3xl border border-slate-800 shadow-2xl">
-                  <h2 className="text-3xl font-black mb-8 text-[#E0EA68]">Data Management</h2>
+                  <h2 className="text-3xl font-black mb-8 text-[#FEACCF]">Data Management</h2>
                   <div className="grid md:grid-cols-2 gap-6 mb-10">
                     <div onClick={() => {
                       const template = [{ 'bundle_name_de': 'Brunch Set', 'bundle_name_en': 'Brunch Set', 'item_name_de': 'Croissant', 'item_name_en': 'Croissant', 'allergens_de': 'Gluten, Eier', 'diet_de': 'Vegetarisch' }];

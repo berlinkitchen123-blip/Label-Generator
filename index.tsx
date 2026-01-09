@@ -150,8 +150,11 @@ const getAllergenIcons = (allergens: string) => {
   };
 
   const createIcon = (key: string, url: string, label: string) => (
-    <div key={key} className="flex flex-col items-center justify-center w-8 h-8 rounded-full bg-white shadow-sm border border-slate-100 p-0.5" title={label}>
-      <img src={url} alt={label} className="w-full h-full object-contain" />
+    <div key={key} className="flex flex-col items-center gap-0.5" title={label}>
+      <div className="flex flex-col items-center justify-center w-8 h-8 rounded-full bg-white shadow-sm border border-slate-100 p-0.5">
+        <img src={url} alt={label} className="w-full h-full object-contain" />
+      </div>
+      <span className="text-[7px] font-bold text-[#024930] uppercase tracking-wide leading-none">{label}</span>
     </div>
   );
 

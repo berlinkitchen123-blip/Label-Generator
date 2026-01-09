@@ -129,145 +129,31 @@ const getAllergenIcons = (allergens: string) => {
   if (!allergens) return null;
   const list = allergens.toLowerCase();
 
-  // Clean, consistent stroke style. 
-  // Using a dark slate color for standard, can be styled via className 'text-current'
-  const strokeWidth = 1.5;
-
-  const Icons = {
-    gluten: (
-      <svg viewBox="0 0 24 24" className="w-full h-full overflow-visible" fill="none" stroke="currentColor" strokeWidth={strokeWidth} strokeLinecap="round" strokeLinejoin="round">
-        <path d="M6 8V6a2 2 0 0 1 2-2h1a2 2 0 0 1 2 2v2" />
-        <path d="M6 12v-2a2 2 0 0 1 2-2h1a2 2 0 0 1 2 2v2" />
-        <path d="M6 21v-7a2 2 0 0 1 2-2h1a2 2 0 0 1 2 2v7" />
-        <path d="M5 21h14" />
-        <path d="M18 13V6a2 2 0 0 0-2-2h-1a2 2 0 0 0-2 2v7" />
-        <path d="M14 13v7" />
-        <path d="M18 13v7" />
-      </svg>
-    ),
-    crustacean: (
-      <svg viewBox="0 0 24 24" className="w-full h-full overflow-visible" fill="none" stroke="currentColor" strokeWidth={strokeWidth} strokeLinecap="round" strokeLinejoin="round">
-        <path d="M12 12c-2-2-2-5 0-7l1.5 1.5M12 12c2-2 2-5 0-7l-1.5 1.5M12 12v9" />
-        <path d="M5 21c0-4 3-6 7-6s7 2 7 6" />
-        <path d="M12 21h0" />
-      </svg>
-    ),
-    egg: (
-      <svg viewBox="0 0 24 24" className="w-full h-full overflow-visible" fill="none" stroke="currentColor" strokeWidth={strokeWidth} strokeLinecap="round" strokeLinejoin="round">
-        <path d="M12 22c4.4 0 8-3.6 8-8 0-4.4-3.6-8-8-8S4 9.6 4 14c0 4.4 3.6 8 8 8z" />
-        <path d="M12 13a3 3 0 1 0 0-6 3 3 0 0 0 0 6z" />
-      </svg>
-    ),
-    fish: (
-      <svg viewBox="0 0 24 24" className="w-full h-full overflow-visible" fill="none" stroke="currentColor" strokeWidth={strokeWidth} strokeLinecap="round" strokeLinejoin="round">
-        <path d="M18 13c1.5 0 3-.5 4-1.5-1.5-1-4-1.5-5.5-1.5" />
-        <path d="M17.5 16c2.5 0 4.5-1 4.5-3s-2-3-4.5-3" />
-        <path d="M2 13a4 4 0 0 1 4-4c3 0 6 2 9 4-3 2-6 4-9 4a4 4 0 0 1-4-4z" />
-        <circle cx="7" cy="12" r="1" fill="currentColor" />
-      </svg>
-    ),
-    peanut: (
-      <svg viewBox="0 0 24 24" className="w-full h-full overflow-visible" fill="none" stroke="currentColor" strokeWidth={strokeWidth} strokeLinecap="round" strokeLinejoin="round">
-        <path d="M12 5c-2.5 0-4 1.5-4 4s1.5 3 2 4c.5 1 .5 2 0 3-.5 1-2 1.5-2 4s1.5 4 4 4 4-1.5 4-4-1.5-3-2-4-.5-2 0-3c.5-1 2-1.5 2-4s-1.5-4-4-4z" />
-        <path d="M12 5v18" opacity="0.5" />
-      </svg>
-    ),
-    soy: (
-      <svg viewBox="0 0 24 24" className="w-full h-full overflow-visible" fill="none" stroke="currentColor" strokeWidth={strokeWidth} strokeLinecap="round" strokeLinejoin="round">
-        <path d="M7 6c0-2.2 1.8-4 4-4s4 1.8 4 4-1.8 4-4 4-4-1.8-4-4z" />
-        <path d="M13 14c0-2.2 1.8-4 4-4s4 1.8 4 4-1.8 4-4 4-4-1.8-4-4z" />
-        <path d="M7 18c0-2.2 1.8-4 4-4s4 1.8 4 4-1.8 4-4 4-4-1.8-4-4z" />
-        <path d="M11 6l3 5" />
-        <path d="M15 14l-1 4" />
-      </svg>
-    ),
-    milk: (
-      <svg viewBox="0 0 24 24" className="w-full h-full overflow-visible" fill="none" stroke="currentColor" strokeWidth={strokeWidth} strokeLinecap="round" strokeLinejoin="round">
-        <path d="M8 2h8l1 5H7l1-5z" />
-        <path d="M4 8h16v13a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2V8z" />
-        <circle cx="12" cy="15" r="2" />
-      </svg>
-    ),
-    nuts: (
-      <svg viewBox="0 0 24 24" className="w-full h-full overflow-visible" fill="none" stroke="currentColor" strokeWidth={strokeWidth} strokeLinecap="round" strokeLinejoin="round">
-        <path d="M12 2C7 2 3 7 3 13c0 5 4 9 9 9s9-4 9-9c0-6-4-11-9-11z" />
-        <path d="M12 2v20" opacity="0.3" />
-        <path d="M3 13h18" opacity="0.3" />
-      </svg>
-    ),
-    celery: (
-      <svg viewBox="0 0 24 24" className="w-full h-full overflow-visible" fill="none" stroke="currentColor" strokeWidth={strokeWidth} strokeLinecap="round" strokeLinejoin="round">
-        <path d="M12 22V2" strokeWidth="2" />
-        <path d="M12 7l-4-3" />
-        <path d="M12 7l4-3" />
-        <path d="M12 12l-3-2" />
-        <path d="M12 12l3-2" />
-        <path d="M12 17l-3-2" />
-        <path d="M12 17l3-2" />
-      </svg>
-    ),
-    mustard: (
-      <svg viewBox="0 0 24 24" className="w-full h-full overflow-visible" fill="none" stroke="currentColor" strokeWidth={strokeWidth} strokeLinecap="round" strokeLinejoin="round">
-        <path d="M7 21h10a2 2 0 0 0 2-2V8a2 2 0 0 0-2-2H7a2 2 0 0 0-2 2v11a2 2 0 0 0 2 2z" />
-        <path d="M9 6V3h6v3" />
-        <path d="M7 13h10" />
-      </svg>
-    ),
-    sesame: (
-      <svg viewBox="0 0 24 24" className="w-full h-full overflow-visible" fill="none" stroke="currentColor" strokeWidth={strokeWidth} strokeLinecap="round" strokeLinejoin="round">
-        <ellipse cx="12" cy="12" rx="4" ry="6" />
-        <path d="M12 2v2" />
-        <path d="M12 20v2" />
-        <path d="M12 9v1" />
-      </svg>
-    ),
-    sulphites: (
-      <svg viewBox="0 0 24 24" className="w-full h-full overflow-visible" fill="none" stroke="currentColor" strokeWidth={strokeWidth} strokeLinecap="round" strokeLinejoin="round">
-        <path d="M7 10h10l-1 6a4 4 0 0 1-4 4h-2a4 4 0 0 1-4-4l-1-6z" />
-        <path d="M11 2h2v8h-2z" />
-        <path d="M8 22h8" />
-      </svg>
-    ),
-    lupin: (
-      <svg viewBox="0 0 24 24" className="w-full h-full overflow-visible" fill="none" stroke="currentColor" strokeWidth={strokeWidth} strokeLinecap="round" strokeLinejoin="round">
-        <path d="M12 2L9 8h6l-3-6z" />
-        <path d="M12 12L9 18h6l-3-6z" />
-        <circle cx="12" cy="10" r="1" />
-      </svg>
-    ),
-    mollusc: (
-      <svg viewBox="0 0 24 24" className="w-full h-full overflow-visible" fill="none" stroke="currentColor" strokeWidth={strokeWidth} strokeLinecap="round" strokeLinejoin="round">
-        <path d="M6 12a6 6 0 1 1 6 6" />
-        <path d="M12 18a6 6 0 1 0 6-6" />
-        <path d="M10 10a2 2 0 1 1 2 2" />
-      </svg>
-    )
-  };
-
-  const createIcon = (key: string, icon: React.ReactNode, title: string) => (
-    <div key={key} className="flex flex-col items-center justify-center bg-transparent w-8 h-8 rounded-full border border-current text-current p-1.5 scale-90" title={title}>
-      {icon}
+  // Modern Minimalist Circular Style
+  const createIcon = (label: string, char: string) => (
+    <div key={label} className="flex items-center justify-center w-6 h-6 rounded-full bg-white border border-[#00543A] text-[#00543A] text-[10px] font-bold shadow-sm" title={label}>
+      {char}
     </div>
   );
 
   const foundIcons: React.ReactNode[] = [];
 
-  if (list.includes('gluten') || list.includes('weizen')) foundIcons.push(createIcon('gluten', Icons.gluten, 'Gluten'));
-  if (list.includes('krebstier') || list.includes('crustacean') || list.includes('crab')) foundIcons.push(createIcon('crust', Icons.crustacean, 'Crustaceans'));
-  if (list.includes('ei') || list.includes('egg')) foundIcons.push(createIcon('egg', Icons.egg, 'Egg'));
-  if (list.includes('fisch') || list.includes('fish')) foundIcons.push(createIcon('fish', Icons.fish, 'Fish'));
-  if (list.includes('erdnuss') || list.includes('peanut')) foundIcons.push(createIcon('peanut', Icons.peanut, 'Peanuts'));
-  if (list.includes('soja') || list.includes('soy') || list.includes('bean')) foundIcons.push(createIcon('soy', Icons.soy, 'Soy'));
-  if (list.includes('milch') || list.includes('milk') || list.includes('lactose')) foundIcons.push(createIcon('milk', Icons.milk, 'Milk'));
-  if (list.includes('nuss') || list.includes('nut') || list.includes('mandel')) foundIcons.push(createIcon('nuts', Icons.nuts, 'Tree Nuts'));
-  if (list.includes('sellerie') || list.includes('celery')) foundIcons.push(createIcon('celery', Icons.celery, 'Celery'));
-  if (list.includes('senf') || list.includes('mustard')) foundIcons.push(createIcon('mustard', Icons.mustard, 'Mustard'));
-  if (list.includes('sesam') || list.includes('sesame')) foundIcons.push(createIcon('sesame', Icons.sesame, 'Sesame'));
-  if (list.includes('schwefel') || list.includes('sulphite')) foundIcons.push(createIcon('sulph', Icons.sulphites, 'Sulphites'));
-  if (list.includes('lupin')) foundIcons.push(createIcon('lupin', Icons.lupin, 'Lupin'));
-  if (list.includes('weichtier') || list.includes('mollusc')) foundIcons.push(createIcon('mollusc', Icons.mollusc, 'Molluscs'));
+  if (list.includes('gluten') || list.includes('weizen')) foundIcons.push(createIcon('Gluten', 'G'));
+  if (list.includes('krebstier') || list.includes('crustacean')) foundIcons.push(createIcon('Crustaceans', 'C'));
+  if (list.includes('ei') || list.includes('egg')) foundIcons.push(createIcon('Egg', 'E'));
+  if (list.includes('fisch') || list.includes('fish')) foundIcons.push(createIcon('Fish', 'F'));
+  if (list.includes('erdnuss') || list.includes('peanut')) foundIcons.push(createIcon('Peanuts', 'P'));
+  if (list.includes('soja') || list.includes('soy')) foundIcons.push(createIcon('Soy', 'S'));
+  if (list.includes('milch') || list.includes('milk') || list.includes('lactose')) foundIcons.push(createIcon('Milk', 'M'));
+  if (list.includes('nuss') || list.includes('nut') || list.includes('mandel')) foundIcons.push(createIcon('Nuts', 'N'));
+  if (list.includes('sellerie') || list.includes('celery')) foundIcons.push(createIcon('Celery', 'Ce'));
+  if (list.includes('senf') || list.includes('mustard')) foundIcons.push(createIcon('Mustard', 'Mu'));
+  if (list.includes('sesam') || list.includes('sesame')) foundIcons.push(createIcon('Sesame', 'Se'));
+  if (list.includes('schwefel') || list.includes('sulphite')) foundIcons.push(createIcon('Sulphites', 'Su'));
+  if (list.includes('lupin')) foundIcons.push(createIcon('Lupin', 'L'));
+  if (list.includes('weichtier') || list.includes('mollusc')) foundIcons.push(createIcon('Molluscs', 'Mo'));
 
-  return foundIcons.length > 0 ? <div className="flex gap-2 flex-wrap justify-end text-[#00543A]">{foundIcons}</div> : null;
+  return foundIcons.length > 0 ? <div className="flex gap-1 flex-wrap justify-center">{foundIcons}</div> : null;
 };
 
 // Helper for Diet Icons (Refined)
@@ -312,11 +198,11 @@ const CateringItemLabel: React.FC<{ item: BundleItem, lang: 'de' | 'en', forPrin
 
       {/* Bottom: Allergens Section (Only if exists) */}
       {hasAllergens && (
-        <div className="bg-slate-50 min-h-[90px] border-t border-slate-200 p-6 flex flex-col items-center justify-center">
-          <span className="text-[9px] uppercase font-bold text-slate-400 tracking-[0.2em] mb-2">Allergens</span>
+        <div className="bg-[#e6f4ea] min-h-[90px] border-t border-[#ccebd6] p-6 flex flex-col items-center justify-center">
+          <span className="text-[9px] uppercase font-bold text-[#00543A] tracking-[0.2em] mb-2 opacity-70">Allergens</span>
           <div className="flex flex-col items-center gap-1">
             {getAllergenIcons(item.allergens_de)}
-            <span className="text-[10px] text-slate-500 font-sans tracking-wide uppercase mt-1">{item.allergens_de}</span>
+            <span className="text-[10px] text-[#00543A] font-sans tracking-wide uppercase mt-1 opacity-80">{item.allergens_de}</span>
           </div>
         </div>
       )}

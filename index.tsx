@@ -125,32 +125,49 @@ const BrandLogo = ({ className = "h-12" }: { className?: string }) => (
 // Helper for Allergen Icons (Professional SVG Set - EU 14)
 // Helper for Allergen Icons (Premium "Sticker Style" SVG Set - EU 14)
 // Helper for Allergen Icons (Professional Line Art - Single Color)
-// Helper for Allergen Icons (Realistic Symbols)
+// Helper for Allergen Icons (Realistic/Solid Symbols)
 const getAllergenIcons = (allergens: string) => {
   if (!allergens) return null;
   const list = allergens.toLowerCase();
 
-  // "Realistic Symbol" Set - High Fidelity SVG Paths
+  // Solid/Filled Symbol Paths for better realism and readability
   const SymbolPaths = {
-    gluten: "M12 2C12 2 16 6 16 12C16 18 12 22 12 22C12 22 8 18 8 12C8 6 12 2 12 2ZM12 2V22M8 12H16M5 9L19 15M5 15L19 9", // Wheat
-    crustacean: "M3 13C3 13 5 10 8 10H16C19 10 21 13 21 13M3 13V15C3 17 5 18 7 18H17C19 18 21 17 21 15V13M7 18L5 22M17 18L19 22M8 10L6 6M16 10L18 6", // Crab/Lobster-like
-    egg: "M12 2C7 2 4 6 4 11C4 16 7 21 12 21C17 21 20 16 20 11C20 6 17 2 12 2ZM12 21V11", // Eggish
-    fish: "M20 12C20 12 17 8 12 8C7 8 4 10 2 12C4 14 7 16 12 16C17 16 20 12 20 12ZM20 12H22M15 12C15 13.65 13.65 15 12 15C10.35 15 9 13.65 9 12C9 10.35 10.35 9 12 9C13.65 9 15 10.35 15 12Z", // Simple Fish
-    peanut: "M12 4C9 4 7 6 7 9C7 11 9 12 12 12C15 12 17 11 17 9C17 6 15 4 12 4ZM12 12C9 12 7 13 7 16C7 19 9 21 12 21C15 21 17 19 17 16C17 13 15 12 12 12Z", // Peanut shell
-    soy: "M12 2C12 2 7 6 7 14C7 19 10 22 12 22C14 22 17 19 17 14C17 6 12 2 12 2ZM12 2V22", // Edamame pod
-    milk: "M8 2H16L17 6H7L8 2ZM7 6V20C7 21 8 22 9 22H15C16 22 17 21 17 20V6H7Z", // Bottle
-    nuts: "M12 2C8 2 5 6 5 12C5 17 8 21 12 21C16 21 19 17 19 12C19 6 16 2 12 2ZM5 12H19", // Walnut-ish
-    celery: "M12 22V4M12 4L9 8M12 4L15 8M12 10H8M12 14H16", // Stalk
-    mustard: "M8 6H16V20C16 21 15 22 14 22H10C9 22 8 21 8 20V6ZM12 2V6", // Jar
-    sesame: "M12 2C10 4 9 7 9 10C9 13 10 16 12 18C14 16 15 13 15 10C15 7 14 4 12 2Z", // Seed
-    sulphites: "M6 8H18V16H6V8ZM8 10H16V14H8V10Z", // Box/Chemical (Simple)
-    lupin: "M12 2V22M12 6L9 9M12 6L15 9M12 12L9 15M12 12L15 15", // Flower spike
-    mollusc: "M12 18C8 18 4 15 4 11C4 7 8 4 12 4C16 4 20 7 20 11C20 15 16 18 12 18ZM8 18L12 22L16 18" // Shell
+    gluten: "M17 3H7c-1.1 0-2 .9-2 2v16h2V5h10v16h2V5c0-1.1-.9-2-2-2zm-5 16h-4v-2h4v2zm0-4h-4v-2h4v2zm0-4h-4V9h4v2zm-2-6h-2v2h2V5z", // Wheat/Ear (Abstracted) -> Replaced with generic grain shape if possible, but used simplified "Grain/Bread" representation or generic "Wheat". Let's use a clear Wheat Ear shape.
+    // Better Wheat:
+    gluten_v2: "M10.5 2c-1.3 0-2.5 1.2-2.5 3 0 1.2.8 2.3 2 2.8v10.4c-1.2.5-2 1.6-2 2.8 0 1.8 1.2 3 2.5 3s2.5-1.2 2.5-3c0-1.2-.8-2.3-2-2.8V7.8c1.2-.5 2-1.6 2-2.8 0-1.8-1.2-3-2.5-3z",
+
+    crustacean: "M12 2C6.5 2 2 6.5 2 12s4.5 10 10 10 10-4.5 10-10S17.5 2 12 2zm6 11h-2v3h-2v-3h-4v3H8v-3H6v-2h2V8h2v2h4V8h2v2h2v2z", // Simplified "Crab" body
+    // Better Crab:
+    crustacean_v2: "M19 10c0-1.8-1.2-3-3-3-1.2 0-2.3.8-2.8 2-1.5-.7-3.2-.7-4.4 0C8.3 7.8 7.2 7 6 7c-1.8 0-3 1.2-3 3 0 1.5 1 2.7 2.3 3-.3.6-.3 1.3-.3 2v4c0 1.1.9 2 2 2h10c1.1 0 2-.9 2-2v-4c0-.7 0-1.4-.3-2 1.3-.3 2.3-1.5 2.3-3z",
+
+    egg: "M12 2C8.5 2 5.5 6 5.5 11C5.5 16.5 8.5 22 12 22C15.5 22 18.5 16.5 18.5 11C18.5 6 15.5 2 12 2Z", // Solid Egg
+
+    fish: "M21.5 11.5c-1.5 0-3-.5-4-1.5-1.5-1.5-2.5-4-5.5-4S7.5 8.5 6 10c-1.5 1.5-3.5 1.5-5 1.5v1c1.5 0 3.5 0 5 1.5 1.5 1.5 2.5 4 5.5 4s4.5-2.5 5.5-4c1-1 2.5-1.5 4-1.5v-1z", // Solid Fish Shape
+
+    peanut: "M7 8c0-2.2 1.8-4 4-4s3.5 1.3 4.5 3c1-1.7 2.5-3 4.5-3 2.2 0 4 1.8 4 4 0 2-1.5 3.5-3.5 4 2 0.5 3.5 2 3.5 4 0 2.2-1.8 4-4 4-2 0-3.5-1.3-4.5-3-1 1.7-2.5 3-4.5 3-2.2 0-4-1.8-4-4 0-2 1.5-3.5 3.5-4-2-.5-3.5-2-3.5-4z", // Peanut Shape (Complex)
+
+    soy: "M4 14c0 4.4 3.6 8 8 8s8-3.6 8-8-3.6-8-8-8-8 3.6-8 8zm4 0c0-2.2 1.8-4 4-4s4 1.8 4 4-1.8 4-4 4-4-1.8-4-4z", // Bean Pod Style (Simple)
+
+    milk: "M7 4v16c0 1.1.9 2 2 2h6c1.1 0 2-.9 2-2V4H7zm3-2h4v2h-4V2z", // Solid Milk Bottle
+
+    nuts: "M12 2C7 2 4 6 4 11s3 9 8 9 9-4 9-9-4-9-9-9zm0 16c-2.3 0-4.6-1-6.1-2.9C5.3 14 5 12.5 5 11c0-3.9 3.1-7 7-7s7 3.1 7 7c0 1.5-.3 3-.9 4.1-1.5 1.9-3.8 2.9-6.1 2.9z", // Walnut-like
+
+    celery: "M6 20c0 1.1.9 2 2 2h8c1.1 0 2-.9 2-2V4h-2v16H8V4H6v16zM12 2v5l3-3M12 2v5l-3-3", // Stalk
+
+    mustard: "M9 4v16c0 1.1.9 2 2 2h2c1.1 0 2-.9 2-2V4H9zm1-2h4v2h-4V2z", // Jar/Bottle
+
+    sesame: "M12 4c-1.1 0-2 .9-2 2s.9 2 2 2 2-.9 2-2-.9-2-2-2zm-6 6c-1.1 0-2 .9-2 2s.9 2 2 2 2-.9 2-2-.9-2-2-2zm12 0c-1.1 0-2 .9-2 2s.9 2 2 2 2-.9 2-2-.9-2-2-2zm-6 6c-1.1 0-2 .9-2 2s.9 2 2 2 2-.9 2-2-.9-2-2-2z", // Seeds
+
+    sulphites: "M12 2C8 2 8 6 8 6h8s0-4-4-4zm-2 5v9h8V7h-8zm1 14c-1.1 0-2 .9-2 2h6c0-1.1-.9-2-2-2h-2z", // Wine Glass / Bottle
+
+    lupin: "M12 2C9 2 7 6 7 6l5 14 5-14s-2-4-5-4z", // Flower Bud
+
+    mollusc: "M12 22s5-3 5-10c0-5-3-10-5-10S7 7 7 12c0 7 5 10 5 10z" // Shell
   };
 
   const createSymbol = (key: string, path: string, label: string) => (
-    <div key={key} className="flex flex-col items-center justify-center w-8 h-8 rounded-full border border-[#00543A] bg-white text-[#00543A] shadow-sm p-1" title={label}>
-      <svg viewBox="0 0 24 24" className="w-full h-full" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round">
+    <div key={key} className="flex flex-col items-center justify-center w-8 h-8 rounded-full border border-[#00543A] bg-white text-[#00543A] shadow-sm p-1.5" title={label}>
+      <svg viewBox="0 0 24 24" className="w-full h-full" fill="currentColor">
         <path d={path} />
       </svg>
     </div>
@@ -158,8 +175,8 @@ const getAllergenIcons = (allergens: string) => {
 
   const foundIcons: React.ReactNode[] = [];
 
-  if (list.includes('gluten') || list.includes('weizen')) foundIcons.push(createSymbol('gluten', SymbolPaths.gluten, 'Gluten'));
-  if (list.includes('krebstier') || list.includes('crustacean')) foundIcons.push(createSymbol('crustacean', SymbolPaths.crustacean, 'Crustaceans'));
+  if (list.includes('gluten') || list.includes('weizen')) foundIcons.push(createSymbol('gluten', SymbolPaths.gluten_v2, 'Gluten'));
+  if (list.includes('krebstier') || list.includes('crustacean')) foundIcons.push(createSymbol('crustacean', SymbolPaths.crustacean_v2, 'Crustaceans'));
   if (list.includes('ei') || list.includes('egg')) foundIcons.push(createSymbol('egg', SymbolPaths.egg, 'Egg'));
   if (list.includes('fisch') || list.includes('fish')) foundIcons.push(createSymbol('fish', SymbolPaths.fish, 'Fish'));
   if (list.includes('erdnuss') || list.includes('peanut')) foundIcons.push(createSymbol('peanut', SymbolPaths.peanut, 'Peanuts'));

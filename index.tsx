@@ -125,49 +125,50 @@ const BrandLogo = ({ className = "h-12" }: { className?: string }) => (
 // Helper for Allergen Icons (Professional SVG Set - EU 14)
 // Helper for Allergen Icons (Premium "Sticker Style" SVG Set - EU 14)
 // Helper for Allergen Icons (Professional Line Art - Single Color)
-// Helper for Allergen Icons (Realistic/Solid Symbols)
+// Helper for Allergen Icons (Realistic Colored Symbols)
 const getAllergenIcons = (allergens: string) => {
   if (!allergens) return null;
   const list = allergens.toLowerCase();
 
-  // Solid/Filled Symbol Paths for better realism and readability
-  const SymbolPaths = {
-    gluten: "M17 3H7c-1.1 0-2 .9-2 2v16h2V5h10v16h2V5c0-1.1-.9-2-2-2zm-5 16h-4v-2h4v2zm0-4h-4v-2h4v2zm0-4h-4V9h4v2zm-2-6h-2v2h2V5z", // Wheat/Ear (Abstracted) -> Replaced with generic grain shape if possible, but used simplified "Grain/Bread" representation or generic "Wheat". Let's use a clear Wheat Ear shape.
-    // Better Wheat:
-    gluten_v2: "M10.5 2c-1.3 0-2.5 1.2-2.5 3 0 1.2.8 2.3 2 2.8v10.4c-1.2.5-2 1.6-2 2.8 0 1.8 1.2 3 2.5 3s2.5-1.2 2.5-3c0-1.2-.8-2.3-2-2.8V7.8c1.2-.5 2-1.6 2-2.8 0-1.8-1.2-3-2.5-3z",
-
-    crustacean: "M12 2C6.5 2 2 6.5 2 12s4.5 10 10 10 10-4.5 10-10S17.5 2 12 2zm6 11h-2v3h-2v-3h-4v3H8v-3H6v-2h2V8h2v2h4V8h2v2h2v2z", // Simplified "Crab" body
-    // Better Crab:
-    crustacean_v2: "M19 10c0-1.8-1.2-3-3-3-1.2 0-2.3.8-2.8 2-1.5-.7-3.2-.7-4.4 0C8.3 7.8 7.2 7 6 7c-1.8 0-3 1.2-3 3 0 1.5 1 2.7 2.3 3-.3.6-.3 1.3-.3 2v4c0 1.1.9 2 2 2h10c1.1 0 2-.9 2-2v-4c0-.7 0-1.4-.3-2 1.3-.3 2.3-1.5 2.3-3z",
-
-    egg: "M12 2C8.5 2 5.5 6 5.5 11C5.5 16.5 8.5 22 12 22C15.5 22 18.5 16.5 18.5 11C18.5 6 15.5 2 12 2Z", // Solid Egg
-
-    fish: "M21.5 11.5c-1.5 0-3-.5-4-1.5-1.5-1.5-2.5-4-5.5-4S7.5 8.5 6 10c-1.5 1.5-3.5 1.5-5 1.5v1c1.5 0 3.5 0 5 1.5 1.5 1.5 2.5 4 5.5 4s4.5-2.5 5.5-4c1-1 2.5-1.5 4-1.5v-1z", // Solid Fish Shape
-
-    peanut: "M7 8c0-2.2 1.8-4 4-4s3.5 1.3 4.5 3c1-1.7 2.5-3 4.5-3 2.2 0 4 1.8 4 4 0 2-1.5 3.5-3.5 4 2 0.5 3.5 2 3.5 4 0 2.2-1.8 4-4 4-2 0-3.5-1.3-4.5-3-1 1.7-2.5 3-4.5 3-2.2 0-4-1.8-4-4 0-2 1.5-3.5 3.5-4-2-.5-3.5-2-3.5-4z", // Peanut Shape (Complex)
-
-    soy: "M4 14c0 4.4 3.6 8 8 8s8-3.6 8-8-3.6-8-8-8-8 3.6-8 8zm4 0c0-2.2 1.8-4 4-4s4 1.8 4 4-1.8 4-4 4-4-1.8-4-4z", // Bean Pod Style (Simple)
-
-    milk: "M7 4v16c0 1.1.9 2 2 2h6c1.1 0 2-.9 2-2V4H7zm3-2h4v2h-4V2z", // Solid Milk Bottle
-
-    nuts: "M12 2C7 2 4 6 4 11s3 9 8 9 9-4 9-9-4-9-9-9zm0 16c-2.3 0-4.6-1-6.1-2.9C5.3 14 5 12.5 5 11c0-3.9 3.1-7 7-7s7 3.1 7 7c0 1.5-.3 3-.9 4.1-1.5 1.9-3.8 2.9-6.1 2.9z", // Walnut-like
-
-    celery: "M6 20c0 1.1.9 2 2 2h8c1.1 0 2-.9 2-2V4h-2v16H8V4H6v16zM12 2v5l3-3M12 2v5l-3-3", // Stalk
-
-    mustard: "M9 4v16c0 1.1.9 2 2 2h2c1.1 0 2-.9 2-2V4H9zm1-2h4v2h-4V2z", // Jar/Bottle
-
-    sesame: "M12 4c-1.1 0-2 .9-2 2s.9 2 2 2 2-.9 2-2-.9-2-2-2zm-6 6c-1.1 0-2 .9-2 2s.9 2 2 2 2-.9 2-2-.9-2-2-2zm12 0c-1.1 0-2 .9-2 2s.9 2 2 2 2-.9 2-2-.9-2-2-2zm-6 6c-1.1 0-2 .9-2 2s.9 2 2 2 2-.9 2-2-.9-2-2-2z", // Seeds
-
-    sulphites: "M12 2C8 2 8 6 8 6h8s0-4-4-4zm-2 5v9h8V7h-8zm1 14c-1.1 0-2 .9-2 2h6c0-1.1-.9-2-2-2h-2z", // Wine Glass / Bottle
-
-    lupin: "M12 2C9 2 7 6 7 6l5 14 5-14s-2-4-5-4z", // Flower Bud
-
-    mollusc: "M12 22s5-3 5-10c0-5-3-10-5-10S7 7 7 12c0 7 5 10 5 10z" // Shell
+  // Color Mapping for Realism
+  const Colors: Record<string, string> = {
+    gluten: "#E4C06E",    // Wheat Gold
+    crustacean: "#FF6F61", // Coral/Red
+    egg: "#F4C430",        // Yolk Yellow
+    fish: "#5DADE2",       // Ocean Blue
+    peanut: "#D2691E",     // Peanut Brown
+    soy: "#82E0AA",        // Soy Green
+    milk: "#85C1E9",       // Milk Blue/White hint
+    nuts: "#A0522D",       // Sienna Brown
+    celery: "#2ECC71",     // Celery Green
+    mustard: "#F1C40F",    // Mustard Yellow
+    sesame: "#E59866",     // Sesame Tan
+    sulphites: "#922B21",  // Wine Red
+    lupin: "#FF69B4",      // Pink Flower
+    mollusc: "#E74C3C"     // Shellfish Red
   };
 
-  const createSymbol = (key: string, path: string, label: string) => (
-    <div key={key} className="flex flex-col items-center justify-center w-8 h-8 rounded-full border border-[#00543A] bg-white text-[#00543A] shadow-sm p-1.5" title={label}>
-      <svg viewBox="0 0 24 24" className="w-full h-full" fill="currentColor">
+  // Detailed Symbol Paths (Filled)
+  const SymbolPaths = {
+    gluten: "M10.8 2c-1.3 0-2.5 1.2-2.5 3 0 1.2.8 2.3 2 2.8v10.4c-1.2.5-2 1.6-2 2.8 0 1.8 1.2 3 2.5 3s2.5-1.2 2.5-3c0-1.2-.8-2.3-2-2.8V7.8c1.2-.5 2-1.6 2-2.8 0-1.8-1.2-3-2.5-3z", // Wheat
+    crustacean: "M19 10c0-1.8-1.2-3-3-3-1.2 0-2.3.8-2.8 2-1.5-.7-3.2-.7-4.4 0C8.3 7.8 7.2 7 6 7c-1.8 0-3 1.2-3 3 0 1.5 1 2.7 2.3 3-.3.6-.3 1.3-.3 2v4c0 1.1.9 2 2 2h10c1.1 0 2-.9 2-2v-4c0-.7 0-1.4-.3-2 1.3-.3 2.3-1.5 2.3-3z", // Crab
+    egg: "M12 2C8.5 2 5.5 6 5.5 11C5.5 16.5 8.5 22 12 22C15.5 22 18.5 16.5 18.5 11C18.5 6 15.5 2 12 2Z", // Egg
+    fish: "M21.5 11.5c-1.5 0-3-.5-4-1.5-1.5-1.5-2.5-4-5.5-4S7.5 8.5 6 10c-1.5 1.5-3.5 1.5-5 1.5v1c1.5 0 3.5 0 5 1.5 1.5 1.5 2.5 4 5.5 4s4.5-2.5 5.5-4c1-1 2.5-1.5 4-1.5v-1z", // Fish
+    peanut: "M7 8c0-2.2 1.8-4 4-4s3.5 1.3 4.5 3c1-1.7 2.5-3 4.5-3 2.2 0 4 1.8 4 4 0 2-1.5 3.5-3.5 4 2 0.5 3.5 2 3.5 4 0 2.2-1.8 4-4 4-2 0-3.5-1.3-4.5-3-1 1.7-2.5 3-4.5 3-2.2 0-4-1.8-4-4 0-2 1.5-3.5 3.5-4-2-.5-3.5-2-3.5-4z", // Peanut
+    soy: "M4 14c0 4.4 3.6 8 8 8s8-3.6 8-8-3.6-8-8-8-8 3.6-8 8zm4 0c0-2.2 1.8-4 4-4s4 1.8 4 4-1.8 4-4 4-4-1.8-4-4z", // Bean Pod
+    milk: "M7 4v16c0 1.1.9 2 2 2h6c1.1 0 2-.9 2-2V4H7zm3-2h4v2h-4V2z", // Milk Bottle
+    nuts: "M12 2C7 2 4 6 4 11s3 9 8 9 9-4 9-9-4-9-9-9zm0 16c-2.3 0-4.6-1-6.1-2.9C5.3 14 5 12.5 5 11c0-3.9 3.1-7 7-7s7 3.1 7 7c0 1.5-.3 3-.9 4.1-1.5 1.9-3.8 2.9-6.1 2.9z", // Walnut
+    celery: "M6 20c0 1.1.9 2 2 2h8c1.1 0 2-.9 2-2V4h-2v16H8V4H6v16zM12 2v5l3-3M12 2v5l-3-3", // Celery Stalk
+    mustard: "M9 4v16c0 1.1.9 2 2 2h2c1.1 0 2-.9 2-2V4H9zm1-2h4v2h-4V2z", // Mustard Jar
+    sesame: "M12 4c-1.1 0-2 .9-2 2s.9 2 2 2 2-.9 2-2-.9-2-2-2zm-6 6c-1.1 0-2 .9-2 2s.9 2 2 2 2-.9 2-2-.9-2-2-2zm12 0c-1.1 0-2 .9-2 2s.9 2 2 2 2-.9 2-2-.9-2-2-2zm-6 6c-1.1 0-2 .9-2 2s.9 2 2 2 2-.9 2-2-.9-2-2-2z", // Sesame Seeds
+    sulphites: "M12 2C8 2 8 6 8 6h8s0-4-4-4zm-2 5v9h8V7h-8zm1 14c-1.1 0-2 .9-2 2h6c0-1.1-.9-2-2-2h-2z", // Wine Bottle
+    lupin: "M12 2C9 2 7 6 7 6l5 14 5-14s-2-4-5-4z", // Lupin Flower
+    mollusc: "M12 22s5-3 5-10c0-5-3-10-5-10S7 7 7 12c0 7 5 10 5 10z" // Mollusc Shell
+  };
+
+  const createSymbol = (key: string, path: string, color: string, label: string) => (
+    <div key={key} className="flex flex-col items-center justify-center w-8 h-8 rounded-full bg-white shadow-sm p-1.5 border border-slate-100" title={label}>
+      <svg viewBox="0 0 24 24" className="w-full h-full" fill={color}>
         <path d={path} />
       </svg>
     </div>
@@ -175,20 +176,20 @@ const getAllergenIcons = (allergens: string) => {
 
   const foundIcons: React.ReactNode[] = [];
 
-  if (list.includes('gluten') || list.includes('weizen')) foundIcons.push(createSymbol('gluten', SymbolPaths.gluten_v2, 'Gluten'));
-  if (list.includes('krebstier') || list.includes('crustacean')) foundIcons.push(createSymbol('crustacean', SymbolPaths.crustacean_v2, 'Crustaceans'));
-  if (list.includes('ei') || list.includes('egg')) foundIcons.push(createSymbol('egg', SymbolPaths.egg, 'Egg'));
-  if (list.includes('fisch') || list.includes('fish')) foundIcons.push(createSymbol('fish', SymbolPaths.fish, 'Fish'));
-  if (list.includes('erdnuss') || list.includes('peanut')) foundIcons.push(createSymbol('peanut', SymbolPaths.peanut, 'Peanuts'));
-  if (list.includes('soja') || list.includes('soy')) foundIcons.push(createSymbol('soy', SymbolPaths.soy, 'Soy'));
-  if (list.includes('milch') || list.includes('milk') || list.includes('lactose')) foundIcons.push(createSymbol('milk', SymbolPaths.milk, 'Milk'));
-  if (list.includes('nuss') || list.includes('nut') || list.includes('mandel')) foundIcons.push(createSymbol('nuts', SymbolPaths.nuts, 'Nuts'));
-  if (list.includes('sellerie') || list.includes('celery')) foundIcons.push(createSymbol('celery', SymbolPaths.celery, 'Celery'));
-  if (list.includes('senf') || list.includes('mustard')) foundIcons.push(createSymbol('mustard', SymbolPaths.mustard, 'Mustard'));
-  if (list.includes('sesam') || list.includes('sesame')) foundIcons.push(createSymbol('sesame', SymbolPaths.sesame, 'Sesame'));
-  if (list.includes('schwefel') || list.includes('sulphite')) foundIcons.push(createSymbol('sulphites', SymbolPaths.sulphites, 'Sulphites'));
-  if (list.includes('lupin')) foundIcons.push(createSymbol('lupin', SymbolPaths.lupin, 'Lupin'));
-  if (list.includes('weichtier') || list.includes('mollusc')) foundIcons.push(createSymbol('mollusc', SymbolPaths.mollusc, 'Molluscs'));
+  if (list.includes('gluten') || list.includes('weizen')) foundIcons.push(createSymbol('gluten', SymbolPaths.gluten, Colors.gluten, 'Gluten'));
+  if (list.includes('krebstier') || list.includes('crustacean')) foundIcons.push(createSymbol('crustacean', SymbolPaths.crustacean, Colors.crustacean, 'Crustaceans'));
+  if (list.includes('ei') || list.includes('egg')) foundIcons.push(createSymbol('egg', SymbolPaths.egg, Colors.egg, 'Egg'));
+  if (list.includes('fisch') || list.includes('fish')) foundIcons.push(createSymbol('fish', SymbolPaths.fish, Colors.fish, 'Fish'));
+  if (list.includes('erdnuss') || list.includes('peanut')) foundIcons.push(createSymbol('peanut', SymbolPaths.peanut, Colors.peanut, 'Peanuts'));
+  if (list.includes('soja') || list.includes('soy')) foundIcons.push(createSymbol('soy', SymbolPaths.soy, Colors.soy, 'Soy'));
+  if (list.includes('milch') || list.includes('milk') || list.includes('lactose')) foundIcons.push(createSymbol('milk', SymbolPaths.milk, Colors.milk, 'Milk'));
+  if (list.includes('nuss') || list.includes('nut') || list.includes('mandel')) foundIcons.push(createSymbol('nuts', SymbolPaths.nuts, Colors.nuts, 'Nuts'));
+  if (list.includes('sellerie') || list.includes('celery')) foundIcons.push(createSymbol('celery', SymbolPaths.celery, Colors.celery, 'Celery'));
+  if (list.includes('senf') || list.includes('mustard')) foundIcons.push(createSymbol('mustard', SymbolPaths.mustard, Colors.mustard, 'Mustard'));
+  if (list.includes('sesam') || list.includes('sesame')) foundIcons.push(createSymbol('sesame', SymbolPaths.sesame, Colors.sesame, 'Sesame'));
+  if (list.includes('schwefel') || list.includes('sulphite')) foundIcons.push(createSymbol('sulphites', SymbolPaths.sulphites, Colors.sulphites, 'Sulphites'));
+  if (list.includes('lupin')) foundIcons.push(createSymbol('lupin', SymbolPaths.lupin, Colors.lupin, 'Lupin'));
+  if (list.includes('weichtier') || list.includes('mollusc')) foundIcons.push(createSymbol('mollusc', SymbolPaths.mollusc, Colors.mollusc, 'Molluscs'));
 
   return foundIcons.length > 0 ? <div className="flex gap-2 flex-wrap justify-center">{foundIcons}</div> : null;
 };

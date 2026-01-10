@@ -104,6 +104,8 @@ interface Bundle {
   items: BundleItem[];
   deleted?: boolean;
   type?: 'standard' | 'catering';
+  company_name?: string; // Metadata from Excel
+  date?: string;         // Metadata from Excel
 }
 
 interface Selection {
@@ -466,7 +468,7 @@ const App: React.FC = () => {
   const [activeTab, setActiveTab] = useState<'generator' | 'database' | 'catering' | 'trash'>('generator');
   const [isProcessingImport, setIsProcessingImport] = useState(false);
   const [isPreviewing, setIsPreviewing] = useState(false);
-  const [previewType, setPreviewType] = useState<'labels' | 'menu'>('labels'); // New state for preview type
+  const [previewType, setPreviewType] = useState<'labels' | 'menu' | 'review-a4' | 'review-a6'>('labels'); // New state for preview type
   const fileInputRef = useRef<HTMLInputElement>(null);
 
   const init = async () => {
@@ -550,10 +552,15 @@ const App: React.FC = () => {
           if (!bundleMap[nameDe].type) {
             bundleMap[nameDe].type = String(row.type || 'standard').toLowerCase().includes('catering') ? 'catering' : 'standard';
           }
-          // Update type if specified in any row for this bundle (simple heuristic)
           if (!bundleMap[nameDe].type) {
             bundleMap[nameDe].type = String(row.type || 'standard').toLowerCase().includes('catering') ? 'catering' : 'standard';
           }
+
+          // CAPTURE METADATA (Company & Date) from the first row that has them
+          const rowCompany = String(row.company_name || '').trim();
+          const rowDate = String(row.date || '').trim();
+          if (rowCompany) setCompanyName(rowCompany);
+          if (rowDate) setCateringDate(rowDate);
         });
         const updated = [...bundles, ...Object.values(bundleMap)];
         setBundles(updated);
@@ -759,6 +766,10 @@ const App: React.FC = () => {
                 </>
               );
             })()
+          ) : previewType === 'review-a4' ? (
+            <ReviewPrint size="A4" />
+          ) : previewType === 'review-a6' ? (
+            <ReviewPrint size="A6" />
           ) : (
             // Standard Bundle Labels Preview
             printGroups.map((group, groupIdx) => (
@@ -947,6 +958,12 @@ const App: React.FC = () => {
                         </button>
                       </div>
                     )}
+                    {cateringSelections.length > 0 && (
+                      <div className="grid grid-cols-2 gap-4 mt-4">
+                        <button onClick={() => { setPreviewType('review-a4'); setIsPreviewing(true); }} className="bg-slate-800 text-emerald-400 font-bold py-3 rounded-xl hover:bg-slate-700 border border-slate-700">Review A4</button>
+                        <button onClick={() => { setPreviewType('review-a6'); setIsPreviewing(true); }} className="bg-slate-800 text-emerald-400 font-bold py-3 rounded-xl hover:bg-slate-700 border border-slate-700">Review A6</button>
+                      </div>
+                    )}
                   </section>
                 </div>
               </div>
@@ -974,7 +991,7 @@ const App: React.FC = () => {
                   <h2 className="text-3xl font-black mb-8 text-[#FEACCF]">Data Management</h2>
                   <div className="grid md:grid-cols-2 gap-6 mb-10">
                     <div onClick={() => {
-                      const template = [{ 'type': 'Standard', 'bundle_name_de': 'Brunch Set', 'bundle_name_en': 'Brunch Set', 'item_name_de': 'Croissant', 'item_name_en': 'Croissant', 'allergens_de': 'Gluten, Eier', 'diet_de': 'Vegetarisch' }];
+                      const template = [{ 'type': 'Standard', 'company_name': 'Acme Corp', 'date': '12.12.2025', 'bundle_name_de': 'Brunch Set', 'bundle_name_en': 'Brunch Set', 'item_name_de': 'Croissant', 'item_name_en': 'Croissant', 'allergens_de': 'Gluten, Eier', 'diet_de': 'Vegetarisch' }];
                       const ws = XLSX.utils.json_to_sheet(template);
                       const wb = XLSX.utils.book_new();
                       XLSX.utils.book_append_sheet(wb, ws, "Labels");
@@ -1019,7 +1036,7 @@ const App: React.FC = () => {
                   <div className="bg-white shadow-2xl scale-[0.6] origin-top" style={{ width: '210mm', height: '297mm' }}>
                     <MenuPrint />
                   </div>
-                ) : activeTab === 'catering' ? (
+                ) : activeTab === 'catering' && previewType === 'labels' ? (
                   // Catering Items Grid (4 per page)
                   (() => {
                     const allItems = cateringSelections.flatMap(sel => {

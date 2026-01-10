@@ -103,6 +103,7 @@ interface Bundle {
   name_en: string;
   items: BundleItem[];
   deleted?: boolean;
+  type?: 'standard' | 'catering';
 }
 
 interface Selection {
@@ -398,7 +399,8 @@ const Label: React.FC<{ bundle: Bundle, lang: 'de' | 'en', packedOn: string, for
         height: forPrint ? '148.5mm' : undefined
       }}
     >
-      <div className={`bg-[#024930] ${headerPadding} px-6 flex items-center justify-center ${headerMinHeight} shrink-0 border-b-2 border-[#FEACCF]`}>
+      <div className={`bg-[#024930] ${headerPadding} px-6 flex flex-col items-center justify-center ${headerMinHeight} shrink-0 border-b-2 border-[#FEACCF] gap-1`}>
+        <BrandLogo className="h-6 brightness-0 invert" />
         <h2 className={`text-white text-center font-black ${headerTitleSize} uppercase tracking-wider leading-tight`}>
           {lang === 'de' ? bundle.name_de : bundle.name_en}
         </h2>
@@ -479,10 +481,14 @@ const App: React.FC = () => {
   useEffect(() => { init(); }, []);
 
   const filteredBundles = useMemo(() =>
-    bundles.filter(b =>
-      b.name_de.toLowerCase().includes(searchTerm.toLowerCase()) ||
-      b.name_en.toLowerCase().includes(searchTerm.toLowerCase())
-    ), [bundles, searchTerm]);
+    bundles.filter(b => {
+      const matchesSearch = b.name_de.toLowerCase().includes(searchTerm.toLowerCase()) ||
+        b.name_en.toLowerCase().includes(searchTerm.toLowerCase());
+      const isCatering = b.type === 'catering';
+      if (activeTab === 'catering') return matchesSearch && isCatering;
+      if (activeTab === 'generator') return matchesSearch && !isCatering;
+      return matchesSearch;
+    }), [bundles, searchTerm, activeTab]);
 
   const addSelection = (bundleId: string, isCatering = false) => {
     const param = isCatering ? setCateringSelections : setSelections;
@@ -542,6 +548,13 @@ const App: React.FC = () => {
             allergens_de: String(row.allergens_de || '').trim(),
             diet_de: String(row.diet_de || '').trim()
           });
+          if (!bundleMap[nameDe].type) {
+            bundleMap[nameDe].type = String(row.type || 'standard').toLowerCase().includes('catering') ? 'catering' : 'standard';
+          }
+          // Update type if specified in any row for this bundle (simple heuristic)
+          if (!bundleMap[nameDe].type) {
+            bundleMap[nameDe].type = String(row.type || 'standard').toLowerCase().includes('catering') ? 'catering' : 'standard';
+          }
         });
         const updated = [...bundles, ...Object.values(bundleMap)];
         setBundles(updated);
@@ -867,18 +880,6 @@ const App: React.FC = () => {
               <div className="grid grid-cols-1 xl:grid-cols-12 gap-10">
                 <div className="xl:col-span-5 space-y-8">
                   {/* Search & Selection for Catering - Reuse but with cateringSelections */}
-                  <div className="bg-slate-900 border border-slate-800 rounded-2xl p-6 shadow-xl space-y-4">
-                    <h3 className="text-xl font-bold flex items-center gap-2"><ChefHat className="text-[#FEACCF]" /> Event Details</h3>
-                    <div className="space-y-2">
-                      <label className="text-xs uppercase font-bold text-slate-500">Company Name</label>
-                      <input type="text" value={companyName} onChange={e => setCompanyName(e.target.value)} placeholder="Enter Company Name" className="w-full bg-slate-950 rounded-xl px-4 py-3 text-white border border-slate-800 focus:ring-2 focus:ring-[#FEACCF] outline-none" />
-                    </div>
-                    <div className="space-y-2">
-                      <label className="text-xs uppercase font-bold text-slate-500">Event Date</label>
-                      <input type="text" value={cateringDate} onChange={e => setCateringDate(e.target.value)} className="w-full bg-slate-950 rounded-xl px-4 py-3 text-white border border-slate-800 focus:ring-2 focus:ring-[#FEACCF] outline-none" />
-                    </div>
-                  </div>
-
                   <div className="relative">
                     <Search className="absolute left-5 top-1/2 -translate-y-1/2 text-slate-500" size={20} />
                     <input type="text" placeholder="Search menu items..." value={searchTerm} onChange={e => setSearchTerm(e.target.value)} className="w-full bg-slate-900 rounded-2xl pl-14 pr-6 py-4 text-sm text-white focus:ring-2 focus:ring-[#FEACCF] shadow-xl" />
@@ -974,7 +975,7 @@ const App: React.FC = () => {
                   <h2 className="text-3xl font-black mb-8 text-[#FEACCF]">Data Management</h2>
                   <div className="grid md:grid-cols-2 gap-6 mb-10">
                     <div onClick={() => {
-                      const template = [{ 'bundle_name_de': 'Brunch Set', 'bundle_name_en': 'Brunch Set', 'item_name_de': 'Croissant', 'item_name_en': 'Croissant', 'allergens_de': 'Gluten, Eier', 'diet_de': 'Vegetarisch' }];
+                      const template = [{ 'type': 'Standard', 'bundle_name_de': 'Brunch Set', 'bundle_name_en': 'Brunch Set', 'item_name_de': 'Croissant', 'item_name_en': 'Croissant', 'allergens_de': 'Gluten, Eier', 'diet_de': 'Vegetarisch' }];
                       const ws = XLSX.utils.json_to_sheet(template);
                       const wb = XLSX.utils.book_new();
                       XLSX.utils.book_append_sheet(wb, ws, "Labels");

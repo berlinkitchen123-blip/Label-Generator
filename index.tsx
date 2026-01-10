@@ -728,6 +728,49 @@ const App: React.FC = () => {
     );
   };
 
+  // Review Print Component
+  const ReviewPrint: React.FC<{ size: 'A4' | 'A6' }> = ({ size }) => {
+    // A4: 210mm x 297mm
+    // A6: 105mm x 148.5mm
+    const dim = size === 'A4' ? { w: '210mm', h: '297mm' } : { w: '105mm', h: '148.5mm' };
+    const titleSize = size === 'A4' ? 'text-7xl mb-24' : 'text-3xl mb-12'; // Scaled down for A6
+    const subSize = size === 'A4' ? 'text-5xl leading-tight mb-20' : 'text-xl leading-tight mb-8';
+    const qrSize = size === 'A4' ? 'w-[400px] h-[400px]' : 'w-[150px] h-[150px]';
+    const logoSize = size === 'A4' ? 'text-5xl' : 'text-2xl';
+
+    return (
+      <div
+        className="flex flex-col items-center text-center bg-[#FEACCF] relative font-sans p-10 overflow-hidden"
+        style={{ width: dim.w, height: dim.h, pageBreakAfter: 'always' }}
+      >
+        {/* Company Name Header */}
+        <h1 className={`${titleSize} font-black text-[#024930] uppercase mt-10 tracking-wide`}>
+          {companyName || 'COMPANY NAME'}
+        </h1>
+
+        {/* Call to Action */}
+        <h2 className={`${subSize} font-bold text-[#024930] uppercase tracking-wide`}>
+          RATE YOUR LUNCH<br />WITH US
+        </h2>
+
+        {/* QR Code Container */}
+        <div className="bg-white p-4">
+          {/* Placeholder QR Code - user can replace standard QR URL here */}
+          <img
+            src={`https://api.qrserver.com/v1/create-qr-code/?size=400x400&color=000000&bgcolor=ffffff&data=https://bellabona.com/review`}
+            className={qrSize}
+            alt="Review QR"
+          />
+        </div>
+
+        {/* Footer Brand */}
+        <div className={`mt-auto font-black ${logoSize} text-[#024930] uppercase tracking-tighter mb-4`}>
+          BELLABONA
+        </div>
+      </div>
+    );
+  };
+
   return (
     <>
       <div className="print-only">

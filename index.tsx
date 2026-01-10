@@ -741,7 +741,7 @@ const App: React.FC = () => {
     return (
       <div
         className="flex flex-col items-center text-center bg-[#FEACCF] relative font-sans p-10 overflow-hidden"
-        style={{ width: dim.w, height: dim.h, pageBreakAfter: 'always' }}
+        style={{ width: dim.w, height: dim.h }}
       >
         {/* Company Name Header */}
         <h1 className={`${titleSize} font-black text-[#024930] uppercase mt-10 tracking-wide`}>
@@ -775,18 +775,28 @@ const App: React.FC = () => {
     <>
       <div className="print-only">
         {previewType === 'menu' && activeTab === 'catering' ? (
-          <MenuPrint />
+          <>
+            <div style={{ width: '210mm', height: '297mm', pageBreakAfter: 'always' }}>
+              <MenuPrint />
+            </div>
+            <div style={{ width: '210mm', height: '297mm', pageBreakAfter: 'always' }}>
+              <ReviewPrint size="A4" />
+            </div>
+          </>
         ) : (
           // Label View (A6) Logic
           // If Catering, we Flatten Print Groups per Item
           activeTab === 'catering' && previewType === 'labels' ? (
             (() => {
               // Flatten all items from all selections
-              const allItems = cateringSelections.flatMap(sel => {
+              const allItems: any[] = cateringSelections.flatMap(sel => {
                 const b = bundles.find(x => x.id === sel.bundleId);
                 if (!b) return [];
                 return Array(sel.quantity).fill(b).flatMap(() => b.items);
               });
+
+              // Add Review Card at the end
+              allItems.push({ isReviewCard: true });
 
               // 1. Group items into pages of 4
               const pages = [];
@@ -801,7 +811,7 @@ const App: React.FC = () => {
                     <div key={pIdx} className="w-[210mm] h-[297mm] bg-white grid grid-cols-2 grid-rows-2" style={{ pageBreakAfter: 'always', margin: 0, padding: 0 }}>
                       {pageItems.map((item, iIdx) => (
                         <div key={iIdx} className="w-[105mm] h-[148.5mm] overflow-hidden flex items-center justify-center">
-                          <CateringItemLabel item={item} lang={lang} forPrint />
+                          {item.isReviewCard ? <ReviewPrint size="A6" /> : <CateringItemLabel item={item} lang={lang} forPrint />}
                         </div>
                       ))}
                     </div>
@@ -995,16 +1005,11 @@ const App: React.FC = () => {
                       <div className="mt-8 pt-8 border-t border-slate-800 grid grid-cols-2 gap-4 relative z-10">
                         <button onClick={() => { setPreviewType('menu'); setIsPreviewing(true); }} className="bg-slate-800 text-white font-bold py-4 rounded-xl flex items-center justify-center gap-2 hover:bg-slate-700 transition-all">
                           <FileSpreadsheet size={20} /> Preview Menu (A4)
+                          ```
                         </button>
                         <button onClick={() => { setPreviewType('labels'); setIsPreviewing(true); }} className="bg-[#FEACCF] text-[#024930] font-black py-4 rounded-xl flex items-center justify-center gap-2 hover:bg-[#ff9ec6] transition-all shadow-lg">
                           <Printer size={20} /> Print Labels (A6)
                         </button>
-                      </div>
-                    )}
-                    {cateringSelections.length > 0 && (
-                      <div className="grid grid-cols-2 gap-4 mt-4">
-                        <button onClick={() => { setPreviewType('review-a4'); setIsPreviewing(true); }} className="bg-slate-800 text-emerald-400 font-bold py-3 rounded-xl hover:bg-slate-700 border border-slate-700">Review A4</button>
-                        <button onClick={() => { setPreviewType('review-a6'); setIsPreviewing(true); }} className="bg-slate-800 text-emerald-400 font-bold py-3 rounded-xl hover:bg-slate-700 border border-slate-700">Review A6</button>
                       </div>
                     )}
                   </section>
@@ -1076,17 +1081,63 @@ const App: React.FC = () => {
               <div className="flex-1 overflow-y-auto p-12 bg-slate-950 flex flex-col items-center gap-16">
                 {/* Content Area */}
                 {previewType === 'menu' && activeTab === 'catering' ? (
-                  <div className="bg-white shadow-2xl scale-[0.6] origin-top" style={{ width: '210mm', height: '297mm' }}>
-                    <MenuPrint />
-                  </div>
+      <div className="print-only">
+        {previewType === 'menu' && activeTab === 'catering' ? (
+          <>
+            <div style={{ width: '210mm', height: '297mm', pageBreakAfter: 'always' }}>
+              <MenuPrint />
+            </div>
+            <div style={{ width: '210mm', height: '297mm', pageBreakAfter: 'always' }}>
+              <ReviewPrint size="A4" />
+            </div>
+          </>
+        ) : (
+          // Label View (A6) Logic
+          // If Catering, we Flatten Print Groups per Item
+          activeTab === 'catering' && previewType === 'labels' ? (
+            (() => {
+              // Flatten all items from all selections
+              const allItems: any[] = cateringSelections.flatMap(sel => {
+                const b = bundles.find(x => x.id === sel.bundleId);
+                if (!b) return [];
+                return Array(sel.quantity).fill(b).flatMap(() => b.items);
+              });
+              
+              // Add Review Card at the end
+              allItems.push({ isReviewCard: true });
+
+              // 1. Group items into pages of 4
+              const pages = [];
+              for (let i = 0; i < allItems.length; i += 4) {
+                pages.push(allItems.slice(i, i + 4));
+              }
+
+              // 2. Render each A4 page
+              return (
+                <>
+                  {pages.map((pageItems, pIdx) => (
+                    <div key={pIdx} className="w-[210mm] h-[297mm] bg-white grid grid-cols-2 grid-rows-2" style={{ pageBreakAfter: 'always', margin: 0, padding: 0 }}>
+                      {pageItems.map((item, iIdx) => (
+                        <div key={iIdx} className="w-[105mm] h-[148.5mm] overflow-hidden flex items-center justify-center">
+                          {item.isReviewCard ? <ReviewPrint size="A6" /> : <CateringItemLabel item={item} lang={lang} forPrint />}
+                        </div>
+                      ))}
+                    </div>
+                  ))}
+                </>
+              );
+            })()
                 ) : activeTab === 'catering' && previewType === 'labels' ? (
                   // Catering Items Grid (4 per page)
                   (() => {
-                    const allItems = cateringSelections.flatMap(sel => {
+                    const allItems: any[] = cateringSelections.flatMap(sel => {
                       const b = bundles.find(x => x.id === sel.bundleId);
                       if (!b) return [];
                       return Array(sel.quantity).fill(b).flatMap(() => b.items);
                     });
+                    
+                    // Add Review Card
+                    allItems.push({ isReviewCard: true });
 
                     const pages = [];
                     for (let i = 0; i < allItems.length; i += 4) {
@@ -1097,7 +1148,7 @@ const App: React.FC = () => {
                       <div key={pIdx} className="bg-white shadow-2xl origin-top scale-[0.6] mb-12" style={{ width: '210mm', height: '297mm', display: 'grid', gridTemplateColumns: '105mm 105mm', gridTemplateRows: '148.5mm 148.5mm' }}>
                         {pageItems.map((item, iIdx) => (
                           <div key={iIdx} style={{ width: '105mm', height: '148.5mm' }}>
-                            <CateringItemLabel item={item} lang={lang} forPrint />
+                            {item.isReviewCard ? <ReviewPrint size="A6" /> : <CateringItemLabel item={item} lang={lang} forPrint />}
                           </div>
                         ))}
                       </div>
@@ -1124,13 +1175,13 @@ const App: React.FC = () => {
                 </button>
               </div>
             </div>
-          </div>
-        )
+            </div>
+            )
       }
-    </>
-  );
+          </>
+        );
 };
 
 
-const root = document.getElementById('root');
-if (root) createRoot(root).render(<App />);
+      const root = document.getElementById('root');
+      if (root) createRoot(root).render(<App />);

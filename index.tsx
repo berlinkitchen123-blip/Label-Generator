@@ -152,10 +152,10 @@ const getAllergenIcons = (allergens: string) => {
 
   const createIcon = (key: string, url: string, label: string) => (
     <div key={key} className="flex flex-col items-center gap-0.5" title={label}>
-      <div className="flex flex-col items-center justify-center w-8 h-8 rounded-full bg-white shadow-sm border border-slate-100 p-0.5">
+      <div className="flex flex-col items-center justify-center w-10 h-10 rounded-full bg-white shadow-sm border border-slate-100 p-0.5">
         <img src={url} alt={label} className="w-full h-full object-contain" />
       </div>
-      <span className="text-[7px] font-bold text-[#024930] uppercase tracking-wide leading-none">{label}</span>
+      <span className="text-[8px] font-bold text-[#024930] uppercase tracking-wide leading-none">{label}</span>
     </div>
   );
 
@@ -225,7 +225,6 @@ const CateringItemLabel: React.FC<{ item: BundleItem, lang: 'de' | 'en', forPrin
           <span className="text-[9px] uppercase font-bold text-[#024930] tracking-[0.2em] mb-2 opacity-70">Allergens</span>
           <div className="flex flex-col items-center gap-1">
             {getAllergenIcons(item.allergens_de)}
-            <span className="text-[10px] text-[#024930] font-sans tracking-wide uppercase mt-1 opacity-80">{item.allergens_de}</span>
           </div>
         </div>
       )}

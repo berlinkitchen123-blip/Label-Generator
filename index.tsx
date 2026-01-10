@@ -1133,7 +1133,7 @@ const App: React.FC = () => {
                       ) : (
                         // Standard Labels Preview
                         <div className="flex flex-col gap-12">
-                          {printGroups().map((group, idx) => (
+                          {printGroups.map((group, idx) => (
                             <div key={idx} className="bg-white shadow-2xl mb-12 scale-[0.6] origin-top" style={{ width: '210mm', height: '297mm' }}>
                               <div className="label-page-group">
                                 {group.map((b, bi) => (
@@ -1157,4 +1157,3 @@ const App: React.FC = () => {
 
             const root = document.getElementById('root');
             if (root) createRoot(root).render(<App />);
-            ```

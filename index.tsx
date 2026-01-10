@@ -1074,114 +1074,87 @@ const App: React.FC = () => {
         isPreviewing && (
           <div className="no-print fixed inset-0 z-[200] bg-slate-950/95 backdrop-blur-xl flex items-center justify-center p-8 overflow-y-auto">
             <div className="bg-slate-900 w-full max-w-6xl h-[90vh] rounded-3xl flex flex-col border border-slate-800 shadow-2xl">
-              <div className="p-8 border-b border-slate-800 flex justify-between items-center">
-                <h2 className="text-2xl font-black text-white">Print Preview</h2>
-                <button onClick={() => setIsPreviewing(false)} className="text-white bg-slate-800 p-2 rounded-xl hover:bg-slate-700"><X size={24} /></button>
-              </div>
-              <div className="flex-1 overflow-y-auto p-12 bg-slate-950 flex flex-col items-center gap-16">
-                {/* Content Area */}
-                {previewType === 'menu' && activeTab === 'catering' ? (
-      <div className="print-only">
-        {previewType === 'menu' && activeTab === 'catering' ? (
-          <>
-            <div style={{ width: '210mm', height: '297mm', pageBreakAfter: 'always' }}>
-              <MenuPrint />
-            </div>
-            <div style={{ width: '210mm', height: '297mm', pageBreakAfter: 'always' }}>
-              <ReviewPrint size="A4" />
-            </div>
-          </>
-        ) : (
-          // Label View (A6) Logic
-          // If Catering, we Flatten Print Groups per Item
-          activeTab === 'catering' && previewType === 'labels' ? (
-            (() => {
-              // Flatten all items from all selections
-              const allItems: any[] = cateringSelections.flatMap(sel => {
-                const b = bundles.find(x => x.id === sel.bundleId);
-                if (!b) return [];
-                return Array(sel.quantity).fill(b).flatMap(() => b.items);
-              });
-              
-              // Add Review Card at the end
-              allItems.push({ isReviewCard: true });
+              {/* Modal Overlay for Previews */}
+              {isPreviewing && (
+                <div className="no-print fixed inset-0 z-[200] bg-slate-950/95 backdrop-blur-xl flex items-center justify-center p-8 overflow-y-auto">
+                  <div className="bg-slate-900 w-full max-w-6xl h-[90vh] rounded-3xl flex flex-col border border-slate-800 shadow-2xl">
+                    <div className="p-8 border-b border-slate-800 flex justify-between items-center">
+                      <h2 className="text-2xl font-black text-white flex items-center gap-3">
+                        <Printer className="text-[#FEACCF]" /> Print Preview <span className="text-xs bg-slate-800 px-2 py-1 rounded text-slate-400 uppercase font-mono">{previewType}</span>
+                      </h2>
+                      <div className="flex gap-4">
+                        <button onClick={() => window.print()} className="bg-[#024930] hover:bg-[#036c4a] text-white font-bold px-8 py-3 rounded-xl shadow-lg flex items-center gap-2 transition-all">
+                          <Printer size={20} /> Print Now
+                        </button>
+                        <button onClick={() => setIsPreviewing(false)} className="bg-slate-800 hover:bg-slate-700 text-white font-bold p-3 rounded-xl transition-all"><X size={20} /></button>
+                      </div>
+                    </div>
 
-              // 1. Group items into pages of 4
-              const pages = [];
-              for (let i = 0; i < allItems.length; i += 4) {
-                pages.push(allItems.slice(i, i + 4));
-              }
-
-              // 2. Render each A4 page
-              return (
-                <>
-                  {pages.map((pageItems, pIdx) => (
-                    <div key={pIdx} className="w-[210mm] h-[297mm] bg-white grid grid-cols-2 grid-rows-2" style={{ pageBreakAfter: 'always', margin: 0, padding: 0 }}>
-                      {pageItems.map((item, iIdx) => (
-                        <div key={iIdx} className="w-[105mm] h-[148.5mm] overflow-hidden flex items-center justify-center">
-                          {item.isReviewCard ? <ReviewPrint size="A6" /> : <CateringItemLabel item={item} lang={lang} forPrint />}
+                    <div className="flex-1 overflow-auto bg-slate-950/50 rounded-xl p-8 flex justify-center items-start border border-slate-800/50">
+                      {/* Render Correct Preview */}
+                      {previewType === 'menu' && activeTab === 'catering' ? (
+                        <div className="flex flex-col gap-12">
+                          <div className="bg-white shadow-2xl scale-[0.6] origin-top" style={{ width: '210mm', height: '297mm' }}>
+                            <MenuPrint />
+                          </div>
+                          <div className="bg-white shadow-2xl scale-[0.6] origin-top" style={{ width: '210mm', height: '297mm' }}>
+                            <ReviewPrint size="A4" />
+                          </div>
                         </div>
-                      ))}
-                    </div>
-                  ))}
-                </>
-              );
-            })()
-                ) : activeTab === 'catering' && previewType === 'labels' ? (
-                  // Catering Items Grid (4 per page)
-                  (() => {
-                    const allItems: any[] = cateringSelections.flatMap(sel => {
-                      const b = bundles.find(x => x.id === sel.bundleId);
-                      if (!b) return [];
-                      return Array(sel.quantity).fill(b).flatMap(() => b.items);
-                    });
-                    
-                    // Add Review Card
-                    allItems.push({ isReviewCard: true });
+                      ) : activeTab === 'catering' ? (
+                        // Catering Previews (Labels + Review Card)
+                        (() => {
+                          const allItems: any[] = cateringSelections.flatMap(sel => {
+                            const b = bundles.find(x => x.id === sel.bundleId);
+                            if (!b) return [];
+                            return Array(sel.quantity).fill(b).flatMap(() => b.items);
+                          });
+                          allItems.push({ isReviewCard: true });
 
-                    const pages = [];
-                    for (let i = 0; i < allItems.length; i += 4) {
-                      pages.push(allItems.slice(i, i + 4));
-                    }
+                          const pages = [];
+                          for (let i = 0; i < allItems.length; i += 4) {
+                            pages.push(allItems.slice(i, i + 4));
+                          }
 
-                    return pages.map((pageItems, pIdx) => (
-                      <div key={pIdx} className="bg-white shadow-2xl origin-top scale-[0.6] mb-12" style={{ width: '210mm', height: '297mm', display: 'grid', gridTemplateColumns: '105mm 105mm', gridTemplateRows: '148.5mm 148.5mm' }}>
-                        {pageItems.map((item, iIdx) => (
-                          <div key={iIdx} style={{ width: '105mm', height: '148.5mm' }}>
-                            {item.isReviewCard ? <ReviewPrint size="A6" /> : <CateringItemLabel item={item} lang={lang} forPrint />}
-                          </div>
-                        ))}
-                      </div>
-                    ));
-                  })()
-                ) : (
-                  // Standard Bundles
-                  printGroups.map((group, idx) => (
-                    <div key={idx} className="bg-white shadow-2xl mb-12 scale-[0.6] origin-top" style={{ width: '210mm', height: '297mm' }}>
-                      <div className="label-page-group">
-                        {group.map((b, bi) => (
-                          <div key={bi} className="label-card-container">
-                            <Label bundle={b} lang={lang} packedOn={packedOn} forPrint variant="standard" />
-                          </div>
-                        ))}
-                      </div>
+                          return (
+                            <div className="flex flex-col gap-12 pb-12">
+                              {pages.map((pageItems, pIdx) => (
+                                <div key={pIdx} className="bg-white shadow-2xl origin-top scale-[0.6]" style={{ width: '210mm', height: '297mm', display: 'grid', gridTemplateColumns: '105mm 105mm', gridTemplateRows: '148.5mm 148.5mm' }}>
+                                  {pageItems.map((item, iIdx) => (
+                                    <div key={iIdx} style={{ width: '105mm', height: '148.5mm' }}>
+                                      {item.isReviewCard ? <ReviewPrint size="A6" /> : <CateringItemLabel item={item} lang={lang} forPrint />}
+                                    </div>
+                                  ))}
+                                </div>
+                              ))}
+                            </div>
+                          );
+                        })()
+                      ) : (
+                        // Standard Labels Preview
+                        <div className="flex flex-col gap-12">
+                          {printGroups().map((group, idx) => (
+                            <div key={idx} className="bg-white shadow-2xl mb-12 scale-[0.6] origin-top" style={{ width: '210mm', height: '297mm' }}>
+                              <div className="label-page-group">
+                                {group.map((b, bi) => (
+                                  <div key={bi} className="label-card-container">
+                                    <Label bundle={b} lang={lang} packedOn={packedOn} forPrint variant="standard" />
+                                  </div>
+                                ))}
+                              </div>
+                            </div>
+                          ))}
+                        </div>
+                      )}
                     </div>
-                  ))
-                )}
-              </div>
-              <div className="p-8 border-t border-slate-800">
-                <button onClick={() => window.print()} className="w-full bg-emerald-500 text-slate-950 font-black py-5 rounded-2xl flex items-center justify-center gap-4 text-xl">
-                  <Printer size={28} /> Confirm and Print
-                </button>
-              </div>
+                  </div>
+                </div>
+              )}
             </div>
-            </div>
-            )
-      }
-          </>
-        );
+            );
 };
 
 
-      const root = document.getElementById('root');
-      if (root) createRoot(root).render(<App />);
+            const root = document.getElementById('root');
+            if (root) createRoot(root).render(<App />);
+            ```

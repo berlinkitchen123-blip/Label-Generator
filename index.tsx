@@ -783,7 +783,7 @@ const App: React.FC = () => {
         <div className="bg-white p-4">
           {/* Placeholder QR Code - user can replace standard QR URL here */}
           <img
-            src={`https://api.qrserver.com/v1/create-qr-code/?size=400x400&color=000000&bgcolor=ffffff&data=https://bellabona.com/review`}
+            src="review_qr.png"
             className={qrSize}
             alt="Review QR"
           />

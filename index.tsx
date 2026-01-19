@@ -779,9 +779,8 @@ const App: React.FC = () => {
           RATE YOUR LUNCH<br />WITH US
         </h2>
 
-        {/* QR Code Container */}
-        <div className="bg-white p-4">
-          {/* Placeholder QR Code - user can replace standard QR URL here */}
+        {/* QR Code - Blended */}
+        <div className="p-0 mix-blend-multiply">
           <img
             src="review_qr.png"
             className={qrSize}

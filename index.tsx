@@ -31,7 +31,7 @@ import {
 import { initializeApp, getApp, getApps } from 'firebase/app';
 import { getFirestore, collection, getDocs, doc, deleteDoc, writeBatch } from 'firebase/firestore';
 
-declare const XLSX: any;
+
 
 const firebaseConfig = {
   apiKey: process.env.API_KEY,
@@ -43,8 +43,21 @@ const firebaseConfig = {
   appId: "1:168446433946:web:6536d1d40fb86ee1f61d23"
 };
 
-const app = getApps().length === 0 ? initializeApp(firebaseConfig) : getApp();
-const db = getFirestore(app);
+let app: any;
+try {
+  app = getApps().length === 0 ? initializeApp(firebaseConfig) : getApp();
+} catch (e) {
+  console.error('Firebase init failed', e);
+}
+
+let db: any;
+try {
+  if (app) {
+    db = getFirestore(app);
+  }
+} catch (e) {
+  console.error('Firestore init failed', e);
+}
 
 const DB_KEY = 'bb_label_db_v7_perfect';
 
@@ -112,6 +125,19 @@ interface Selection {
   bundleId: string;
   quantity: number;
 }
+
+interface ImportRow {
+  bundle_name_de?: string;
+  bundle_name_en?: string;
+  item_name_de?: string;
+  item_name_en?: string;
+  allergens_de?: string;
+  diet_de?: string;
+  type?: string;
+  company_name?: string;
+  date?: string;
+}
+
 // --- BRANDING ---
 const BRAND_COLOR_PRIMARY = '#024930'; // Bella&Bona Dark Green
 const BRAND_COLOR_SECONDARY = '#F8F7F6'; // Cream Background
@@ -394,7 +420,7 @@ const Label: React.FC<{ bundle: Bundle, lang: 'de' | 'en', packedOn: string, for
       style={{
         fontFamily: "'Inter', sans-serif",
         boxSizing: 'border-box',
-        backgroundColor: '#FFF1F6', // Light baby pink background
+        backgroundColor: '#fff', // White for crisp printing
         color: '#000',
         width: forPrint ? '105mm' : undefined,
         height: forPrint ? '148.5mm' : undefined
@@ -440,7 +466,7 @@ const Label: React.FC<{ bundle: Bundle, lang: 'de' | 'en', packedOn: string, for
         </div>
       </div>
 
-      <div className={`bg-[#C197AB] ${footerPadding} px-8 flex justify-between items-center text-[#024930] shrink-0`}>
+      <div className={`bg-[#FEACCF] ${footerPadding} px-8 flex justify-between items-center text-[#024930] shrink-0`}>
         <div className="flex flex-col">
           <span className={`${footerDateLabelSize} font-black uppercase tracking-widest opacity-80 leading-none`}>PACKED ON</span>
           <span className={`${footerDateSize} font-black leading-none mt-0.5`}>{packedOn}</span>
@@ -527,7 +553,7 @@ const App: React.FC = () => {
     await DataService.deleteBundle(bundle.id);
   };
 
-  const handleFileUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
+  const handleFileUpload = (e: any) => {
     const file = e.target.files?.[0];
     if (!file) return;
     setIsProcessingImport(true);
@@ -538,7 +564,7 @@ const App: React.FC = () => {
         const workbook = XLSX.read(data, { type: 'array' });
         const rows = XLSX.utils.sheet_to_json(workbook.Sheets[workbook.SheetNames[0]]);
         const bundleMap: Record<string, Bundle> = {};
-        rows.forEach((row: any) => {
+        rows.forEach((row) => {
           const nameDe = String(row.bundle_name_de || 'Unnamed').trim();
           const nameEn = String(row.bundle_name_en || nameDe).trim();
           if (!bundleMap[nameDe]) bundleMap[nameDe] = { id: generateSafeId(), name_de: nameDe, name_en: nameEn, items: [] };
@@ -837,43 +863,43 @@ const App: React.FC = () => {
           ))}
       </div>
 
-      <div className="no-print min-h-screen flex flex-col bg-slate-950 text-slate-100">
+      <div className="no-print min-h-screen flex flex-col bg-[#F8F7F6] text-[#024930]">
         <div className="flex flex-1">
-          <aside className="w-20 lg:w-64 bg-slate-900 border-r border-slate-800 flex flex-col">
-            <div className="p-6 border-b border-slate-800 flex items-center gap-3">
-              <div className="w-10 h-10 rounded-xl bg-[#FEACCF] flex items-center justify-center">
+          <aside className="w-20 lg:w-64 bg-[#024930] border-r border-[#024930] flex flex-col shadow-2xl z-20">
+            <div className="p-6 border-b border-[#F8F7F6]/10 flex items-center gap-3">
+              <div className="w-10 h-10 rounded-xl bg-[#FEACCF] flex items-center justify-center shadow-lg">
                 <Sprout size={24} color="#024930" />
               </div>
               <div className="hidden lg:block">
-                <h1 className="font-black text-sm text-white">BELLA&BONA</h1>
-                <p className="text-[9px] text-slate-500 uppercase">Label Factory</p>
+                <h1 className="font-black text-sm text-white tracking-widest">BELLA&BONA</h1>
+                <p className="text-[9px] text-[#FEACCF] uppercase font-bold tracking-wider">Label Factory</p>
               </div>
             </div>
             <nav className="flex-1 p-4 space-y-2">
-              <button onClick={() => setActiveTab('generator')} className={`w-full flex items-center gap-4 px-4 py-3 rounded-xl ${activeTab === 'generator' ? 'bg-[#FEACCF] text-[#024930]' : 'text-slate-400 hover:bg-slate-800'}`}>
-                <Printer size={20} /><span className="hidden lg:block font-bold">Generator</span>
+              <button onClick={() => setActiveTab('generator')} className={`w-full flex items-center gap-4 px-4 py-3 rounded-xl transition-all font-bold ${activeTab === 'generator' ? 'bg-[#FEACCF] text-[#024930] shadow-lg translate-x-1' : 'text-[#F8F7F6]/60 hover:text-white hover:bg-white/5'}`}>
+                <Printer size={20} /><span className="hidden lg:block">Generator</span>
               </button>
-              <button onClick={() => setActiveTab('catering')} className={`w-full flex items-center gap-4 px-4 py-3 rounded-xl ${activeTab === 'catering' ? 'bg-[#FEACCF] text-[#024930]' : 'text-slate-400 hover:bg-slate-800'}`}>
-                <ChefHat size={20} /><span className="hidden lg:block font-bold">Special Catering</span>
+              <button onClick={() => setActiveTab('catering')} className={`w-full flex items-center gap-4 px-4 py-3 rounded-xl transition-all font-bold ${activeTab === 'catering' ? 'bg-[#FEACCF] text-[#024930] shadow-lg translate-x-1' : 'text-[#F8F7F6]/60 hover:text-white hover:bg-white/5'}`}>
+                <ChefHat size={20} /><span className="hidden lg:block">Special Catering</span>
               </button>
-              <button onClick={() => setActiveTab('database')} className={`w-full flex items-center gap-4 px-4 py-3 rounded-xl ${activeTab === 'database' ? 'bg-[#FEACCF] text-[#024930]' : 'text-slate-400 hover:bg-slate-800'}`}>
-                <Database size={20} /><span className="hidden lg:block font-bold">Database</span>
+              <button onClick={() => setActiveTab('database')} className={`w-full flex items-center gap-4 px-4 py-3 rounded-xl transition-all font-bold ${activeTab === 'database' ? 'bg-[#FEACCF] text-[#024930] shadow-lg translate-x-1' : 'text-[#F8F7F6]/60 hover:text-white hover:bg-white/5'}`}>
+                <Database size={20} /><span className="hidden lg:block">Database</span>
               </button>
             </nav>
 
             <div className="p-4">
-              <button onClick={() => setActiveTab('trash')} className={`w-full flex items-center gap-4 px-4 py-3 rounded-xl ${activeTab === 'trash' ? 'bg-red-500/20 text-red-400' : 'text-slate-600 hover:text-red-400 hover:bg-slate-900'}`}>
-                <Trash2 size={20} /><span className="hidden lg:block font-bold">Trash</span>
+              <button onClick={() => setActiveTab('trash')} className={`w-full flex items-center gap-4 px-4 py-3 rounded-xl transition-all font-bold ${activeTab === 'trash' ? 'bg-red-500/20 text-red-200 shadow-lg' : 'text-[#F8F7F6]/40 hover:text-red-300 hover:bg-red-500/10'}`}>
+                <Trash2 size={20} /><span className="hidden lg:block">Trash</span>
               </button>
             </div>
-            <div className="p-4 border-t border-slate-800 space-y-4">
+            <div className="p-4 border-t border-[#F8F7F6]/10 space-y-4">
               <div className="hidden lg:block px-2">
-                <label className="text-[10px] uppercase text-slate-500 font-bold">Packed On</label>
-                <input type="text" value={packedOn} onChange={e => setPackedOn(e.target.value)} className="w-full bg-slate-800 rounded px-2 py-1 text-white text-xs mt-1 border-none focus:ring-1 focus:ring-pink-400" />
+                <label className="text-[10px] uppercase text-[#F8F7F6]/50 font-bold tracking-wider">Packed On</label>
+                <input type="text" value={packedOn} onChange={e => setPackedOn(e.target.value)} className="w-full bg-[#033b26] rounded-lg px-3 py-2 text-white text-xs mt-1 border-none focus:ring-2 focus:ring-[#FEACCF]" />
               </div>
-              <div className="flex bg-slate-800 rounded p-1">
-                <button onClick={() => setLang('de')} className={`flex-1 py-1 text-xs rounded transition-all ${lang === 'de' ? 'bg-slate-700 text-white shadow-sm' : 'text-slate-500'}`}>DE</button>
-                <button onClick={() => setLang('en')} className={`flex-1 py-1 text-xs rounded transition-all ${lang === 'en' ? 'bg-slate-700 text-white shadow-sm' : 'text-slate-500'}`}>EN</button>
+              <div className="flex bg-[#033b26] rounded-lg p-1">
+                <button onClick={() => setLang('de')} className={`flex-1 py-1.5 text-xs rounded-md transition-all font-bold ${lang === 'de' ? 'bg-[#FEACCF] text-[#024930] shadow-sm' : 'text-[#F8F7F6]/50 hover:text-white'}`}>DE</button>
+                <button onClick={() => setLang('en')} className={`flex-1 py-1.5 text-xs rounded-md transition-all font-bold ${lang === 'en' ? 'bg-[#FEACCF] text-[#024930] shadow-sm' : 'text-[#F8F7F6]/50 hover:text-white'}`}>EN</button>
               </div>
             </div>
           </aside>
@@ -883,56 +909,61 @@ const App: React.FC = () => {
               <div className="grid grid-cols-1 xl:grid-cols-12 gap-10">
                 <div className="xl:col-span-5 space-y-8">
                   <div className="relative">
-                    <Search className="absolute left-5 top-1/2 -translate-y-1/2 text-slate-500" size={20} />
-                    <input type="text" placeholder={t.searchPlaceholder} value={searchTerm} onChange={e => setSearchTerm(e.target.value)} className="w-full bg-slate-900 rounded-2xl pl-14 pr-6 py-4 text-sm text-white focus:ring-2 focus:ring-emerald-500 shadow-xl" />
+                    <Search className="absolute left-5 top-1/2 -translate-y-1/2 text-[#024930]/40" size={20} />
+                    <input type="text" placeholder={t.searchPlaceholder} value={searchTerm} onChange={(e) => setSearchTerm(e.target.value)} className="w-full bg-white rounded-2xl pl-14 pr-6 py-4 text-sm text-[#024930] border-none focus:ring-2 focus:ring-[#FEACCF] shadow-xl placeholder:text-[#024930]/20" />
                   </div>
                   <div className="space-y-4 max-h-[60vh] overflow-y-auto pr-3">
                     {filteredBundles.map(bundle => (
-                      <div key={bundle.id} onClick={() => addSelection(bundle.id)} className="bg-slate-900 border border-slate-800 rounded-2xl p-5 flex items-center justify-between cursor-pointer hover:border-emerald-500 hover:bg-slate-800/50 transition-all shadow-lg">
+                      <div key={bundle.id} onClick={() => addSelection(bundle.id)} className="bg-white rounded-2xl p-5 flex items-center justify-between cursor-pointer group hover:ring-2 hover:ring-[#FEACCF] transition-all shadow-sm hover:shadow-lg">
                         <div className="flex items-center gap-4">
-                          <Soup size={22} className="text-emerald-400" />
+                          <div className="w-10 h-10 rounded-full bg-[#F8F7F6] flex items-center justify-center group-hover:bg-[#FEACCF] transition-colors">
+                            <Soup size={20} className="text-[#024930]" />
+                          </div>
                           <div>
-                            <p className="font-black text-slate-200">{lang === 'de' ? bundle.name_de : bundle.name_en}</p>
-                            <p className="text-[10px] font-bold text-slate-500">{bundle.items.length} items</p>
+                            <p className="font-black text-[#024930] text-sm">{lang === 'de' ? bundle.name_de : bundle.name_en}</p>
+                            <p className="text-[10px] font-bold text-[#024930]/40 uppercase tracking-wider">{bundle.items.length} items</p>
                           </div>
                         </div>
-                        <Plus size={20} />
+                        <Plus size={20} className="text-[#024930]/20 group-hover:text-[#024930]" />
                       </div>
                     ))}
                   </div>
                 </div>
                 <div className="xl:col-span-7">
-                  <section className="bg-slate-900 border border-slate-800 rounded-3xl p-8 flex flex-col min-h-[500px] shadow-2xl">
-                    <div className="flex justify-between mb-10">
-                      <h2 className="text-2xl font-black">Selected <span className="text-emerald-500">{selections.length}</span></h2>
-                      {selections.length > 0 && <button onClick={() => setSelections([])} className="text-red-400 font-bold uppercase text-xs hover:text-red-300">Clear All</button>}
+                  <section className="bg-white rounded-3xl p-8 flex flex-col min-h-[500px] shadow-2xl relative overflow-hidden">
+                    <div className="absolute top-0 right-0 p-8 opacity-[0.03] pointer-events-none">
+                      <Sprout size={400} />
                     </div>
-                    <div className="flex-1 space-y-4">
+                    <div className="flex justify-between mb-10 relative z-10">
+                      <h2 className="text-2xl font-black text-[#024930]">Selected <span className="text-[#FEACCF]">{selections.length}</span></h2>
+                      {selections.length > 0 && <button onClick={() => setSelections([])} className="text-red-400 font-bold uppercase text-[10px] tracking-widest hover:text-red-500">Clear All</button>}
+                    </div>
+                    <div className="flex-1 space-y-4 relative z-10">
                       {selections.map(sel => {
                         const b = bundles.find(x => x.id === sel.bundleId);
                         if (!b) return null;
                         return (
-                          <div key={sel.bundleId} className="flex items-center gap-4 bg-slate-800/50 rounded-xl p-4 border border-slate-700">
-                            <div className="flex-1"><p className="font-bold text-slate-100">{lang === 'de' ? b.name_de : b.name_en}</p></div>
-                            <input type="number" min="1" value={sel.quantity} onChange={e => setSelections(prev => prev.map(s => s.bundleId === sel.bundleId ? { ...s, quantity: parseInt(e.target.value) || 1 } : s))} className="w-16 bg-slate-950 rounded p-2 text-center text-emerald-400 font-bold border-none" />
-                            <button onClick={() => setSelections(prev => prev.filter(s => s.bundleId !== sel.bundleId))} className="text-slate-500 hover:text-red-400"><X size={20} /></button>
+                          <div key={sel.bundleId} className="flex items-center gap-4 bg-[#F8F7F6] rounded-xl p-4 border border-[#F8F7F6] hover:border-[#FEACCF]/50 transition-colors">
+                            <div className="flex-1"><p className="font-bold text-[#024930]">{lang === 'de' ? b.name_de : b.name_en}</p></div>
+                            <input type="number" min="1" value={sel.quantity} onChange={(e) => setSelections(prev => prev.map(s => s.bundleId === sel.bundleId ? { ...s, quantity: parseInt(e.target.value) || 1 } : s))} className="w-16 bg-white rounded-lg p-2 text-center text-[#024930] font-black border-none shadow-sm focus:ring-2 focus:ring-[#FEACCF]" />
+                            <button onClick={() => setSelections(prev => prev.filter(s => s.bundleId !== sel.bundleId))} className="text-[#024930]/20 hover:text-red-400 px-2"><X size={20} /></button>
                           </div>
                         );
                       })}
                       {selections.length === 0 && (
-                        <div className="h-full flex flex-col items-center justify-center opacity-30 text-slate-500 mt-20">
+                        <div className="h-full flex flex-col items-center justify-center opacity-10 text-[#024930] mt-20">
                           <Printer size={64} className="mb-4" />
-                          <p className="font-bold">No bundles selected</p>
+                          <p className="font-bold uppercase tracking-widest">No bundles selected</p>
                         </div>
                       )}
                     </div>
                     {selections.length > 0 && (
-                      <div className="mt-8 pt-8 border-t border-slate-800 flex justify-between items-center">
-                        <button onClick={() => setIsPreviewing(true)} className="flex items-center gap-2 text-emerald-400 font-bold hover:text-emerald-300 transition-colors">
+                      <div className="mt-8 pt-8 border-t border-[#F8F7F6] flex justify-between items-center">
+                        <button onClick={() => setIsPreviewing(true)} className="flex items-center gap-2 text-[#024930] font-bold hover:text-[#FEACCF] transition-colors">
                           <Eye size={20} /> Preview
                         </button>
-                        <button onClick={() => window.print()} className="bg-emerald-500 text-slate-950 font-black px-10 py-4 rounded-xl flex items-center gap-2 shadow-xl active:scale-95 transition-all">
-                          <Printer size={24} /> Print A4 Grid
+                        <button onClick={() => window.print()} className="bg-[#024930] text-white font-black px-10 py-4 rounded-xl flex items-center gap-3 shadow-xl hover:shadow-2xl hover:-translate-y-0.5 active:translate-y-0 transition-all uppercase tracking-wider text-xs">
+                          <Printer size={20} /> Print A4 Grid
                         </button>
                       </div>
                     )}
@@ -944,37 +975,39 @@ const App: React.FC = () => {
                 <div className="xl:col-span-5 space-y-8">
                   {/* Search & Selection for Catering - Reuse but with cateringSelections */}
                   <div className="relative">
-                    <Search className="absolute left-5 top-1/2 -translate-y-1/2 text-slate-500" size={20} />
-                    <input type="text" placeholder="Search menu items..." value={searchTerm} onChange={e => setSearchTerm(e.target.value)} className="w-full bg-slate-900 rounded-2xl pl-14 pr-6 py-4 text-sm text-white focus:ring-2 focus:ring-[#FEACCF] shadow-xl" />
+                    <Search className="absolute left-5 top-1/2 -translate-y-1/2 text-[#024930]/40" size={20} />
+                    <input type="text" placeholder="Search menu items..." value={searchTerm} onChange={(e) => setSearchTerm(e.target.value)} className="w-full bg-white rounded-2xl pl-14 pr-6 py-4 text-sm text-[#024930] border-none focus:ring-2 focus:ring-[#FEACCF] shadow-xl placeholder:text-[#024930]/20" />
                   </div>
 
                   <div className="space-y-4 max-h-[50vh] overflow-y-auto pr-3">
                     {filteredBundles.map(bundle => (
-                      <div key={bundle.id} onClick={() => addSelection(bundle.id, true)} className="bg-slate-900 border border-slate-800 rounded-2xl p-5 flex items-center justify-between cursor-pointer hover:border-[#FEACCF] hover:bg-slate-800/50 transition-all shadow-lg group">
+                      <div key={bundle.id} onClick={() => addSelection(bundle.id, true)} className="bg-white rounded-2xl p-5 flex items-center justify-between cursor-pointer group hover:ring-2 hover:ring-[#FEACCF] transition-all shadow-sm hover:shadow-lg">
                         <div className="flex items-center gap-4">
-                          <Utensils size={22} className="text-[#FEACCF] group-hover:scale-110 transition-transform" />
+                          <div className="w-10 h-10 rounded-full bg-[#F8F7F6] flex items-center justify-center group-hover:bg-[#FEACCF] transition-colors">
+                            <Utensils size={20} className="text-[#024930]" />
+                          </div>
                           <div>
-                            <p className="font-black text-slate-200">{lang === 'de' ? bundle.name_de : bundle.name_en}</p>
+                            <p className="font-black text-[#024930] text-sm">{lang === 'de' ? bundle.name_de : bundle.name_en}</p>
                           </div>
                         </div>
-                        <Plus size={20} className="text-slate-500 group-hover:text-white" />
+                        <Plus size={20} className="text-[#024930]/20 group-hover:text-[#024930]" />
                       </div>
                     ))}
                   </div>
                 </div>
 
                 <div className="xl:col-span-7">
-                  <section className="bg-slate-900 border border-slate-800 rounded-3xl p-8 flex flex-col min-h-[600px] shadow-2xl relative overflow-hidden">
-                    <div className="absolute top-0 right-0 p-4 opacity-5 pointer-events-none">
+                  <section className="bg-white rounded-3xl p-8 flex flex-col min-h-[600px] shadow-2xl relative overflow-hidden">
+                    <div className="absolute top-0 right-0 p-4 opacity-[0.03] pointer-events-none">
                       <ChefHat size={300} />
                     </div>
 
                     <div className="flex justify-between mb-10 relative z-10">
                       <div>
-                        <h2 className="text-2xl font-black">Catering Menu</h2>
-                        <p className="text-slate-500 text-sm">{companyName || 'Untitled Event'} • {cateringDate}</p>
+                        <h2 className="text-2xl font-black text-[#024930]">Catering Menu</h2>
+                        <p className="text-[#024930]/50 text-sm font-bold uppercase tracking-wider mt-1">{companyName || 'Untitled Event'} • {cateringDate}</p>
                       </div>
-                      {cateringSelections.length > 0 && <button onClick={() => setCateringSelections([])} className="text-red-400 font-bold uppercase text-xs hover:text-red-300">Clear Menu</button>}
+                      {cateringSelections.length > 0 && <button onClick={() => setCateringSelections([])} className="text-red-400 font-bold uppercase text-[10px] tracking-widest hover:text-red-500">Clear Menu</button>}
                     </div>
 
                     <div className="flex-1 space-y-4 relative z-10">
@@ -982,21 +1015,21 @@ const App: React.FC = () => {
                         const b = bundles.find(x => x.id === sel.bundleId);
                         if (!b) return null;
                         return (
-                          <div key={sel.bundleId} className="flex items-center gap-4 bg-slate-800/80 rounded-xl p-4 border border-slate-700 backdrop-blur-sm">
+                          <div key={sel.bundleId} className="flex items-center gap-4 bg-[#F8F7F6] rounded-xl p-4 border border-[#F8F7F6] hover:border-[#FEACCF]/50 transition-colors">
                             <div className="flex-1">
-                              <p className="font-bold text-slate-100">{lang === 'de' ? b.name_de : b.name_en}</p>
-                              <p className="text-xs text-slate-500">{b.items.length} items</p>
+                              <p className="font-bold text-[#024930]">{lang === 'de' ? b.name_de : b.name_en}</p>
+                              <p className="text-[10px] text-[#024930]/50 uppercase font-black tracking-wider">{b.items.length} items</p>
                             </div>
-                            <input type="number" min="1" value={sel.quantity} onChange={e => setCateringSelections(prev => prev.map(s => s.bundleId === sel.bundleId ? { ...s, quantity: parseInt(e.target.value) || 1 } : s))} className="w-16 bg-slate-950 rounded p-2 text-center text-[#FEACCF] font-bold border-none" />
-                            <button onClick={() => setCateringSelections(prev => prev.filter(s => s.bundleId !== sel.bundleId))} className="text-slate-500 hover:text-red-400"><X size={20} /></button>
+                            <input type="number" min="1" value={sel.quantity} onChange={(e) => setCateringSelections(prev => prev.map(s => s.bundleId === sel.bundleId ? { ...s, quantity: parseInt(e.target.value) || 1 } : s))} className="w-16 bg-white rounded-lg p-2 text-center text-[#024930] font-black border-none shadow-sm focus:ring-2 focus:ring-[#FEACCF]" />
+                            <button onClick={() => setCateringSelections(prev => prev.filter(s => s.bundleId !== sel.bundleId))} className="text-[#024930]/20 hover:text-red-400 px-2"><X size={20} /></button>
                           </div>
                         );
                       })}
 
                       {cateringSelections.length === 0 && (
-                        <div className="h-full flex flex-col items-center justify-center opacity-30 text-slate-500 mt-20">
+                        <div className="h-full flex flex-col items-center justify-center opacity-10 text-[#024930] mt-20">
                           <ChefHat size={64} className="mb-4" />
-                          <p className="font-bold">Build your menu</p>
+                          <p className="font-bold uppercase tracking-widest">Build your menu</p>
                         </div>
                       )}
                     </div>
@@ -1016,16 +1049,16 @@ const App: React.FC = () => {
               </div>
             ) : activeTab === 'trash' ? (
               <div className="max-w-4xl mx-auto space-y-8">
-                <section className="bg-slate-900 p-10 rounded-3xl border border-slate-800 shadow-2xl">
-                  <h2 className="text-3xl font-black mb-8 text-red-400 flex items-center gap-4"><Trash2 size={32} /> Trash</h2>
-                  <div className="space-y-2">
-                    {deletedBundles.length === 0 && <p className="text-slate-500 text-center py-10 font-bold">Trash is empty</p>}
+                <section className="bg-white p-10 rounded-3xl shadow-2xl relative overflow-hidden">
+                  <h2 className="text-3xl font-black mb-8 text-red-400 flex items-center gap-4 relative z-10"><Trash2 size={32} /> Trash</h2>
+                  <div className="space-y-2 relative z-10">
+                    {deletedBundles.length === 0 && <p className="text-[#024930]/40 text-center py-10 font-bold uppercase tracking-widest">Trash is empty</p>}
                     {deletedBundles.map(b => (
-                      <div key={b.id} className="flex justify-between p-4 bg-slate-950 rounded-lg border border-slate-800 items-center opacity-75 hover:opacity-100 transition-all">
-                        <span className="font-bold text-slate-400 line-through">{b.name_de}</span>
+                      <div key={b.id} className="flex justify-between p-4 bg-white rounded-lg border border-[#F8F7F6] items-center opacity-75 hover:opacity-100 transition-all hover:shadow-md">
+                        <span className="font-bold text-[#024930]/60 line-through">{b.name_de}</span>
                         <div className="flex gap-2">
-                          <button onClick={() => restoreFromTrash(b)} className="flex items-center gap-2 px-3 py-1.5 rounded-lg bg-emerald-900/30 text-emerald-400 hover:bg-emerald-900/50 text-xs font-bold uppercase"><RotateCcw size={14} /> Restore</button>
-                          <button onClick={() => permanentDelete(b)} className="flex items-center gap-2 px-3 py-1.5 rounded-lg bg-red-900/30 text-red-400 hover:bg-red-900/50 text-xs font-bold uppercase"><Trash2 size={14} /> Delete Forever</button>
+                          <button onClick={() => restoreFromTrash(b)} className="flex items-center gap-2 px-3 py-1.5 rounded-lg bg-[#024930]/10 text-[#024930] hover:bg-[#024930]/20 text-xs font-bold uppercase"><RotateCcw size={14} /> Restore</button>
+                          <button onClick={() => permanentDelete(b)} className="flex items-center gap-2 px-3 py-1.5 rounded-lg bg-red-100 text-red-400 hover:bg-red-200 text-xs font-bold uppercase"><Trash2 size={14} /> Delete Forever</button>
                         </div>
                       </div>
                     ))}
@@ -1034,31 +1067,34 @@ const App: React.FC = () => {
               </div>
             ) : (
               <div className="max-w-4xl mx-auto space-y-8">
-                <section className="bg-slate-900 p-10 rounded-3xl border border-slate-800 shadow-2xl">
-                  <h2 className="text-3xl font-black mb-8 text-[#FEACCF]">Data Management</h2>
-                  <div className="grid md:grid-cols-2 gap-6 mb-10">
+                <section className="bg-white p-10 rounded-3xl shadow-2xl relative overflow-hidden">
+                  <div className="absolute top-0 right-0 p-8 opacity-[0.03] pointer-events-none">
+                    <Database size={400} />
+                  </div>
+                  <h2 className="text-3xl font-black mb-8 text-[#024930]">Data Management</h2>
+                  <div className="grid md:grid-cols-2 gap-6 mb-10 relative z-10">
                     <div onClick={() => {
                       const template = [{ 'type': 'Standard', 'company_name': 'Acme Corp', 'date': '12.12.2025', 'bundle_name_de': 'Brunch Set', 'bundle_name_en': 'Brunch Set', 'item_name_de': 'Croissant', 'item_name_en': 'Croissant', 'allergens_de': 'Gluten, Eier', 'diet_de': 'Vegetarisch' }];
                       const ws = XLSX.utils.json_to_sheet(template);
                       const wb = XLSX.utils.book_new();
                       XLSX.utils.book_append_sheet(wb, ws, "Labels");
                       XLSX.writeFile(wb, "BellaBona_Template.xlsx");
-                    }} className="bg-slate-800/30 p-8 rounded-2xl border-2 border-dashed border-slate-700 cursor-pointer hover:border-emerald-500 transition-all group">
-                      <FileSpreadsheet size={32} className="text-emerald-500 mb-4 group-hover:scale-100 transition-transform" />
-                      <p className="font-bold">Download Template</p>
+                    }} className="bg-[#F8F7F6] p-8 rounded-2xl border-2 border-dashed border-[#024930]/10 cursor-pointer hover:border-[#FEACCF] transition-all group hover:bg-white hover:shadow-lg">
+                      <FileSpreadsheet size={32} className="text-[#024930] mb-4 group-hover:scale-110 transition-transform" />
+                      <p className="font-bold text-[#024930]">Download Template</p>
                     </div>
-                    <div onClick={() => fileInputRef.current?.click()} className="bg-slate-800/30 p-8 rounded-2xl border-2 border-dashed border-slate-700 cursor-pointer hover:border-pink-400 transition-all relative group">
-                      {isProcessingImport && <div className="absolute inset-0 bg-slate-900/80 flex items-center justify-center rounded-2xl z-20"><Loader2 className="animate-spin text-pink-400" size={32} /></div>}
-                      <Upload size={32} className="text-pink-400 mb-4 group-hover:scale-100 transition-transform" />
-                      <p className="font-bold">Upload Excel</p>
+                    <div onClick={() => fileInputRef.current?.click()} className="bg-[#F8F7F6] p-8 rounded-2xl border-2 border-dashed border-[#024930]/10 cursor-pointer hover:border-[#FEACCF] transition-all relative group hover:bg-white hover:shadow-lg">
+                      {isProcessingImport && <div className="absolute inset-0 bg-white/80 flex items-center justify-center rounded-2xl z-20"><Loader2 className="animate-spin text-[#FEACCF]" size={32} /></div>}
+                      <Upload size={32} className="text-[#FEACCF] mb-4 group-hover:scale-110 transition-transform" />
+                      <p className="font-bold text-[#024930]">Upload Excel</p>
                       <input type="file" ref={fileInputRef} className="hidden" accept=".xlsx" onChange={handleFileUpload} />
                     </div>
                   </div>
-                  <div className="space-y-2 max-h-[400px] overflow-y-auto pr-2">
+                  <div className="space-y-2 max-h-[400px] overflow-y-auto pr-2 relative z-10">
                     {bundles.map(b => (
-                      <div key={b.id} className="flex justify-between p-4 bg-slate-950 rounded-lg border border-slate-800 items-center hover:bg-slate-900 transition-colors">
-                        <span className="font-bold text-slate-300">{b.name_de}</span>
-                        <button onClick={() => moveBundleToTrash(b)} className="text-slate-600 hover:text-red-500 transition-colors"><Trash2 size={18} /></button>
+                      <div key={b.id} className="flex justify-between p-4 bg-white rounded-lg border border-[#F8F7F6] items-center hover:bg-[#F8F7F6] transition-colors shadow-sm">
+                        <span className="font-bold text-[#024930]">{b.name_de}</span>
+                        <button onClick={() => moveBundleToTrash(b)} className="text-[#024930]/40 hover:text-red-500 transition-colors"><Trash2 size={18} /></button>
                       </div>
                     ))}
                   </div>
@@ -1070,21 +1106,21 @@ const App: React.FC = () => {
       </div>
 
       {isPreviewing && (
-        <div className="no-print fixed inset-0 z-[200] bg-slate-950/95 backdrop-blur-xl flex items-center justify-center p-8 overflow-y-auto">
-          <div className="bg-slate-900 w-full max-w-6xl h-[90vh] rounded-3xl flex flex-col border border-slate-800 shadow-2xl">
-            <div className="p-8 border-b border-slate-800 flex justify-between items-center">
-              <h2 className="text-2xl font-black text-white flex items-center gap-3">
-                <Printer className="text-[#FEACCF]" /> Print Preview <span className="text-xs bg-slate-800 px-2 py-1 rounded text-slate-400 uppercase font-mono">{previewType}</span>
+        <div className="no-print fixed inset-0 z-[200] bg-[#024930]/90 backdrop-blur-xl flex items-center justify-center p-8 overflow-y-auto">
+          <div className="bg-[#F8F7F6] w-full max-w-6xl h-[90vh] rounded-3xl flex flex-col shadow-2xl overflow-hidden">
+            <div className="p-8 border-b border-[#024930]/10 flex justify-between items-center bg-white">
+              <h2 className="text-2xl font-black text-[#024930] flex items-center gap-3">
+                <Printer className="text-[#FEACCF]" /> Print Preview <span className="text-xs bg-[#024930]/10 px-2 py-1 rounded text-[#024930] uppercase font-mono">{previewType}</span>
               </h2>
               <div className="flex gap-4">
                 <button onClick={() => window.print()} className="bg-[#024930] hover:bg-[#036c4a] text-white font-bold px-8 py-3 rounded-xl shadow-lg flex items-center gap-2 transition-all">
                   <Printer size={20} /> Print Now
                 </button>
-                <button onClick={() => setIsPreviewing(false)} className="bg-slate-800 hover:bg-slate-700 text-white font-bold p-3 rounded-xl transition-all"><X size={20} /></button>
+                <button onClick={() => setIsPreviewing(false)} className="bg-white hover:bg-[#FEACCF] text-[#024930] font-bold p-3 rounded-xl transition-all shadow-md"><X size={20} /></button>
               </div>
             </div>
 
-            <div className="flex-1 overflow-auto bg-slate-950/50 rounded-xl p-8 flex justify-center items-start border border-slate-800/50">
+            <div className="flex-1 overflow-auto bg-[#F8F7F6] p-8 flex justify-center items-start">
               {/* Render Correct Preview */}
               {previewType === 'menu' && activeTab === 'catering' ? (
                 <div className="flex flex-col gap-12">
@@ -1116,7 +1152,7 @@ const App: React.FC = () => {
                         <div key={pIdx} className="bg-white shadow-2xl origin-top scale-[0.6]" style={{ width: '210mm', height: '297mm', display: 'grid', gridTemplateColumns: '105mm 105mm', gridTemplateRows: '148.5mm 148.5mm' }}>
                           {pageItems.map((item, iIdx) => (
                             <div key={iIdx} style={{ width: '105mm', height: '148.5mm' }}>
-                              {item.isReviewCard ? <ReviewPrint size="A6" /> : <CateringItemLabel item={item} lang={lang} forPrint />}
+                              {('isReviewCard' in item) ? <ReviewPrint size="A6" /> : <CateringItemLabel item={item} lang={lang} forPrint />}
                             </div>
                           ))}
                         </div>
@@ -1150,4 +1186,9 @@ const App: React.FC = () => {
 
 
 const root = document.getElementById('root');
-if (root) createRoot(root).render(<App />);
+if (root) {
+  console.log('INDEX.TSX: Root element found, mounting app');
+  createRoot(root).render(<App />);
+} else {
+  console.error('INDEX.TSX: Root element NOT found');
+}

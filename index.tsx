@@ -527,7 +527,6 @@ const App: React.FC = () => {
   };
 
   const moveBundleToTrash = async (bundle: Bundle) => {
-    if (!confirm(`Move "${bundle.name_de}" to Trash?`)) return;
     const updated = { ...bundle, deleted: true };
 
     // Update State locally so UI reflects immediately
@@ -779,12 +778,13 @@ const App: React.FC = () => {
           RATE YOUR LUNCH<br />WITH US
         </h2>
 
-        {/* QR Code - Blended */}
-        <div className="p-0 mix-blend-multiply">
+        {/* QR Code - Custom */}
+        <div className="p-0">
           <img
             src="review_qr.png"
             className={qrSize}
             alt="Review QR"
+            style={{ mixBlendMode: 'normal' }}
           />
         </div>
 

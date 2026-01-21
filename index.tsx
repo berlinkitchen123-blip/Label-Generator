@@ -336,83 +336,69 @@ const Label: React.FC<{ bundle: Bundle, lang: 'de' | 'en', packedOn: string, for
     return icons;
   };
 
-  // --- CATERING VARIANT DESIGN ---
+  // --- CATERING VARIANT DESIGN (REFINED) ---
   if (variant === 'catering') {
     return (
       <div
-        className={`relative bg-white flex flex-col items-center justify-between p-8 text-center border-[1px] border-gray-200 overflow-hidden ${!forPrint ? 'shadow-xl w-[105mm] h-[148.5mm]' : 'w-full h-full'}`}
+        className={`relative bg-white flex flex-col items-center justify-between p-10 text-center text-slate-900 border-[1px] border-gray-100 overflow-hidden ${!forPrint ? 'shadow-xl w-[105mm] h-[148.5mm]' : 'w-full h-full'}`}
         style={{ width: forPrint ? '105mm' : undefined, height: forPrint ? '148.5mm' : undefined, fontFamily: 'serif' }}
       >
-        {/* Elegant Border Frame */}
-        <div className="absolute inset-4 border-2 border-[#024930] opacity-20 pointer-events-none" />
-        <div className="absolute inset-5 border border-[#024930] opacity-10 pointer-events-none" />
+        {/* Elegant Frame */}
+        <div className="absolute inset-3 border border-[#024930] pointer-events-none" />
+        <div className="absolute inset-4 border border-[#024930] opacity-30 pointer-events-none" />
 
-        {/* Header */}
+        {/* Header - Classic */}
         <div className="mt-8 z-10 w-full flex flex-col items-center">
-          <span className="text-[10px] uppercase font-sans tracking-[0.3em] text-[#024930] opacity-60 mb-2">Special Selection</span>
-          <h2 className="text-3xl font-bold text-[#024930] leading-tight uppercase font-serif px-4">
+          <BrandLogo className="h-6 mb-4 opacity-80" />
+          <h2 className="text-3xl font-bold text-[#024930] leading-tight font-serif px-6 underline decoration-[#FEACCF] decoration-2 underline-offset-8">
             {lang === 'de' ? bundle.name_de : bundle.name_en}
           </h2>
-          <div className="w-16 h-[2px] bg-[#FEACCF] mt-4 mb-2" />
         </div>
 
-        {/* Body: Items List */}
-        <div className="flex-1 flex flex-col justify-center items-center gap-4 w-full px-6 z-10">
+        {/* Body: Items List - Clean & Spaced */}
+        <div className="flex-1 flex flex-col justify-center items-center gap-6 w-full px-8 z-10">
           {bundle.items.map((item, i) => (
             <div key={i} className="flex flex-col items-center">
-              <span className="text-lg font-medium text-slate-800 italic font-serif">
+              <span className="text-xl font-medium text-slate-800 italic font-serif leading-snug">
                 {lang === 'de' ? item.item_name_de : item.item_name_en}
               </span>
-              <div className="flex items-center gap-2 mt-1">
-                {getItemIcons(item, false)}
-                <span className="text-[10px] uppercase font-sans tracking-widest text-[#024930] border border-[#024930] px-1.5 py-0.5 rounded-sm opacity-50">
+              <div className="flex items-center gap-2 mt-2">
+                <span className="text-[9px] uppercase font-sans tracking-[0.2em] text-[#024930] border-b border-[#024930]/20 pb-0.5">
                   {item.allergens_de || 'No Allergens'}
                 </span>
+                {getItemIcons(item, false)}
               </div>
             </div>
           ))}
         </div>
 
-        {/* Footer */}
-        <div className="mb-8 z-10 flex flex-col items-center">
-          <span className="font-sans text-[9px] uppercase tracking-widest text-slate-400 mb-1">Prepared Fresh</span>
-          <span className="font-serif text-[#024930] italic">Bella&Bona Kitchen</span>
+        {/* Footer - minimal */}
+        <div className="mb-6 z-10 flex flex-col items-center">
+          <span className="font-sans text-[8px] uppercase tracking-[0.3em] text-[#024930] mb-1">Bon Appétit</span>
         </div>
       </div>
     );
   }
 
-  // --- STANDARD VARIANT DESIGN (Existing) ---
+  // --- STANDARD VARIANT DESIGN (REFINED) ---
   const itemCount = bundle.items.length;
   const isHighDensity = itemCount >= 5;
   const isExtremeDensity = itemCount >= 9;
 
-  const nameFontSize = itemCount === 1 ? 'text-[28px]' :
-    itemCount <= 3 ? 'text-[22px]' :
-      itemCount <= 5 ? 'text-[18px]' :
-        itemCount === 6 ? 'text-[16px]' :
-          itemCount <= 8 ? 'text-[13px]' : 'text-[11px]';
+  // Typography scaling - slightly larger base
+  const nameFontSize = itemCount === 1 ? 'text-[32px]' :
+    itemCount <= 3 ? 'text-[24px]' :
+      itemCount <= 5 ? 'text-[20px]' :
+        itemCount === 6 ? 'text-[18px]' :
+          itemCount <= 8 ? 'text-[14px]' : 'text-[12px]';
 
-  const itemVerticalPadding = itemCount === 1 ? 'py-6' :
-    itemCount <= 3 ? 'py-4' :
-      itemCount === 4 ? 'py-2' :
-        itemCount <= 6 ? 'py-1.5' :
-          itemCount <= 8 ? 'py-0.5' : 'py-0.25';
+  const itemVerticalPadding = itemCount === 1 ? 'py-8' :
+    itemCount <= 3 ? 'py-5' :
+      itemCount === 4 ? 'py-3' :
+        itemCount <= 6 ? 'py-2' :
+          itemCount <= 8 ? 'py-1' : 'py-0.5';
 
-  const allergenFontSize = itemCount > 6 ? 'text-[7px]' : 'text-[10px]';
-
-  const iconScaleClass = isExtremeDensity ? 'scale-[0.55]' :
-    isHighDensity ? 'scale-[0.75]' :
-      itemCount >= 4 ? 'scale-90' : 'scale-100';
-
-  const headerMinHeight = isHighDensity ? 'min-h-[40px]' : 'min-h-[50px]';
-  const headerPadding = isHighDensity ? 'py-1' : 'py-2';
-  const headerTitleSize = isHighDensity ? 'text-[16px]' : 'text-[18px]';
-
-  const footerPadding = isHighDensity ? 'py-1' : 'py-2';
-  const footerBrandSize = isHighDensity ? 'text-[18px]' : 'text-[22px]';
-  const footerDateLabelSize = isHighDensity ? 'text-[7px]' : 'text-[8px]';
-  const footerDateSize = isHighDensity ? 'text-[11px]' : 'text-[14px]';
+  const allergenFontSize = itemCount > 6 ? 'text-[8px]' : 'text-[10px]';
 
   return (
     <div
@@ -420,58 +406,60 @@ const Label: React.FC<{ bundle: Bundle, lang: 'de' | 'en', packedOn: string, for
       style={{
         fontFamily: "'Inter', sans-serif",
         boxSizing: 'border-box',
-        backgroundColor: '#fff', // White for crisp printing
+        backgroundColor: '#fff',
         color: '#000',
         width: forPrint ? '105mm' : undefined,
         height: forPrint ? '148.5mm' : undefined
       }}
     >
-      <div className={`bg-[#024930] ${headerPadding} px-6 flex flex-col items-center justify-center ${headerMinHeight} shrink-0 border-b-2 border-[#FEACCF] gap-1`}>
-        <BrandLogo className="h-6 brightness-0 invert" />
-        <h2 className={`text-white text-center font-black ${headerTitleSize} uppercase tracking-wider leading-tight`}>
+      {/* Header - Refined: Clean Green Strip with Pink Accent */}
+      <div className="bg-[#024930] py-3 px-6 flex flex-col items-center justify-center min-h-[55px] shrink-0 border-b-[3px] border-[#FEACCF]">
+        <h2 className="text-white text-center font-serif font-bold text-[18px] uppercase tracking-[0.2em] leading-tight">
           {lang === 'de' ? bundle.name_de : bundle.name_en}
         </h2>
       </div>
 
-      <div className="flex-1 px-8 py-0.5 flex flex-col overflow-hidden relative watermark bg-[#F8F7F6]">
-        <div className="flex-1 flex flex-col justify-around relative z-10 overflow-hidden">
+      {/* Body - Clean White with subtle dividers */}
+      <div className="flex-1 px-8 py-2 flex flex-col overflow-hidden relative bg-white">
+        <div className="flex-1 flex flex-col justify-center relative z-10 overflow-hidden">
           {bundle.items.map((item, idx) => (
-            <div key={item.id} className={`flex justify-between items-center border-b border-gray-100 last:border-none ${itemVerticalPadding} transition-all`}>
-              <div className="flex-1 pr-3">
-                <div className={`font-black ${nameFontSize} leading-tight text-gray-950`}>
+            <div key={item.id} className={`flex justify-between items-center border-b border-gray-100 last:border-none ${itemVerticalPadding}`}>
+              <div className="flex-1 pr-4">
+                {/* Dish Name: Serif, Elegant */}
+                <div className={`font-serif font-medium ${nameFontSize} leading-[1.1] text-slate-900 mb-1`}>
                   {lang === 'de' ? item.item_name_de : item.item_name_en}
                 </div>
-                <div className="flex flex-wrap gap-1 mt-0.5">
+                {/* Allergens: Minimalist tags */}
+                <div className="flex flex-wrap gap-1">
                   {item.allergens_de.split(/[,/]+/).map((alg, aIdx) => {
                     const trimmed = alg.trim();
                     if (!trimmed) return null;
                     return (
-                      <span key={aIdx} className={`bg-[#FEACCF] ${allergenFontSize} font-black px-1 py-0.5 rounded-[1px] uppercase text-[#024930] tracking-tighter`}>
+                      <span key={aIdx} className={`text-[#024930] ${allergenFontSize} font-bold px-1.5 py-[1px] rounded-[2px] uppercase tracking-wider border border-[#FEACCF]/50 bg-[#FEACCF]/10`}>
                         {trimmed}
                       </span>
                     );
                   })}
                 </div>
               </div>
-              <div className={`flex flex-col items-center min-w-[85px] text-center transition-transform origin-center ${iconScaleClass}`}>
-                <div className="flex flex-wrap justify-center gap-2 mb-1">
-                  {getItemIcons(item, isHighDensity)}
-                </div>
-                <span className="text-[9px] font-black uppercase tracking-tight text-[#024930] leading-none opacity-80">
-                  {item.diet_de}
-                </span>
+              <div className="flex flex-col items-center justify-center min-w-[60px] ml-2">
+                <div className="flex gap-1 mb-1">{getItemIcons(item, isHighDensity)}</div>
+                <span className="text-[9px] uppercase tracking-widest text-slate-400 font-bold">{item.diet_de}</span>
               </div>
             </div>
           ))}
         </div>
       </div>
 
-      <div className={`bg-[#FEACCF] ${footerPadding} px-8 flex justify-between items-center text-[#024930] shrink-0`}>
+      {/* Footer - Minimalist Brand */}
+      <div className="py-3 px-8 flex justify-between items-end border-t border-slate-100 mb-1">
         <div className="flex flex-col">
-          <span className={`${footerDateLabelSize} font-black uppercase tracking-widest opacity-80 leading-none`}>PACKED ON</span>
-          <span className={`${footerDateSize} font-black leading-none mt-0.5`}>{packedOn}</span>
+          <span className="text-[7px] uppercase tracking-[0.2em] text-slate-400">Packed On</span>
+          <span className="text-[12px] font-mono text-[#024930]">{packedOn}</span>
         </div>
-        <div className={`font-black ${footerBrandSize} tracking-tighter italic leading-none uppercase`}>BELLA&BONA</div>
+        <div className="flex flex-col items-end">
+          <BrandLogo className="h-4 brightness-0 opacity-80" />
+        </div>
       </div>
     </div>
   );
@@ -671,82 +659,88 @@ const App: React.FC = () => {
     });
 
     return (
+
       <div
-        className="w-[210mm] h-[297mm] relative flex flex-col items-center py-[15mm] px-[15mm] overflow-hidden bg-[#F8F7F6]" // Pink Background
+        className="w-[210mm] h-[297mm] relative flex flex-col items-center bg-[#F8F7F6] overflow-hidden"
       >
-        {/* Colorful Watermark Background */}
-        <div className="absolute inset-0 z-0 flex items-center justify-center opacity-[0.03] pointer-events-none">
-          <ChefHat size={600} color="#00543A" />
+        {/* Subtle Texture/Watermark */}
+        <div className="absolute inset-0 z-0 flex items-center justify-center opacity-[0.02] pointer-events-none">
+          <ChefHat size={500} color="#024930" />
         </div>
 
-        {/* Main Border Frame */}
-        <div className="absolute inset-4 border border-[#FEACCF] opacity-50 pointer-events-none rounded-3xl" />
-        <div className="absolute inset-6 border border-[#FEACCF] opacity-30 pointer-events-none rounded-2xl" />
+        {/* Elegant Frame/Border */}
+        <div className="absolute inset-4 border border-[#024930] opacity-20 pointer-events-none" />
+        <div className="absolute inset-6 border border-[#024930] opacity-10 pointer-events-none" />
 
-        {/* Header */}
-        <div className="flex flex-col items-center w-full mb-12 mt-4 z-10">
-          <div className="w-full flex justify-center py-4 border-b-2 border-[#FEACCF]/20">
-            <BrandLogo className="h-16" />
+        {/* Header Section */}
+        <div className="flex flex-col items-center w-full pt-16 pb-8 z-10 px-16">
+          <BrandLogo className="h-10 mb-6 brightness-0 opacity-90" />
+
+          <div className="flex flex-col items-center border-y border-[#024930]/20 w-full py-4 mb-2">
+            <span className="font-sans text-[10px] uppercase tracking-[0.4em] text-[#024930]/60 mb-2">Fresh & Local</span>
+            <h1 className="text-4xl font-serif font-medium text-[#024930] uppercase tracking-widest text-center">
+              Daily Menu
+            </h1>
+          </div>
+          <p className="font-serif italic text-[#024930]/70 text-sm mt-2">
+            {new Date().toLocaleDateString('en-GB', { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' })}
+          </p>
+        </div>
+
+        {/* Content Section - 2 Columns if enough space, else 1 centered */}
+        <div className="flex-1 w-full px-16 z-10 flex flex-col items-center">
+          <div className="w-full max-w-4xl grid grid-cols-1 gap-10 content-start">
+            {sortedGroups.map((groupTitle, idx) => (
+              <div key={idx} className="flex flex-col w-full break-inside-avoid">
+                {/* Section Header */}
+                <div className="flex items-center justify-center mb-6">
+                  <span className="h-[1px] w-12 bg-[#FEACCF]" />
+                  <h2 className="mx-6 text-xl font-serif font-bold text-[#024930] uppercase tracking-[0.2em]">
+                    {lang === 'de' ? (
+                      groupTitle === 'Vegetarian' ? 'Vegetarisch' :
+                        groupTitle === 'Meat' ? 'Fleisch' :
+                          groupTitle === 'Fish' ? 'Fisch' : groupTitle
+                    ) : groupTitle}
+                  </h2>
+                  <span className="h-[1px] w-12 bg-[#FEACCF]" />
+                </div>
+
+                {/* Items */}
+                <div className="flex flex-col gap-4">
+                  {grouped[groupTitle].map((item, iIdx) => (
+                    <div key={iIdx} className="flex flex-col items-center text-center group">
+                      <span className="text-lg font-serif font-medium text-slate-800 leading-tight group-hover:text-[#024930] transition-colors">
+                        {(lang === 'de' ? item.item_name_de : item.item_name_en)}
+                      </span>
+                      {/* Allergens small underneath */}
+                      {item.allergens_de && (
+                        <span className="text-[9px] uppercase tracking-wider text-[#024930]/50 mt-1">
+                          {item.allergens_de}
+                        </span>
+                      )}
+                    </div>
+                  ))}
+                </div>
+              </div>
+            ))}
           </div>
         </div>
 
-        {/* Menu Content - Grouped by Type */}
-        <div className="flex-1 w-full pl-8 pr-8 flex flex-col z-10">
-          {sortedGroups.map((groupTitle, idx) => (
-            <div key={idx} className="flex flex-col w-full mb-10 last:mb-0">
-              {/* Item Type Header with Lines */}
-              <div className="flex items-center gap-6 mb-6">
-                <div className="h-[2px] bg-[#FEACCF] flex-1"></div>
-                <h2 className="text-2xl font-black text-[#024930] uppercase font-serif tracking-[0.25em] px-4 bg-[#F8F7F6]">
-                  {lang === 'de' ? (
-                    groupTitle === 'Vegetarian' ? 'VEGETARISCH' :
-                      groupTitle === 'Meat' ? 'FLEISCH' :
-                        groupTitle === 'Fish' ? 'FISCH' :
-                          groupTitle
-                  ) : groupTitle}
-                </h2>
-                <div className="h-[2px] bg-[#FEACCF] flex-1"></div>
-              </div>
-
-              {/* Items List */}
-              <div className="flex flex-col gap-6 w-full">
-                {grouped[groupTitle].map((item, iIdx) => (
-                  <div key={iIdx} className="flex flex-col w-full group">
-                    <div className="flex justify-between items-baseline w-full">
-                      <div className="flex-1">
-                        <span className="text-xl font-bold text-[#024930] leading-tight tracking-wide">
-                          {(lang === 'de' ? item.item_name_de : item.item_name_en).toUpperCase()}
-                        </span>
-                      </div>
-                      <div className="flex items-center gap-2 ml-4">
-                        {getAllergenIcons(item.allergens_de)}
-                      </div>
-                    </div>
-                    {/* Dotted Leader */}
-                    <div className="border-b-2 border-dotted border-[#024930]/20 w-full mt-3 opacity-0 group-hover:opacity-100 transition-opacity" />
-                  </div>
-                ))}
-              </div>
-            </div>
-          ))}
-        </div>
-
         {/* Footer */}
-        <div className="w-full text-center mt-auto pt-6 border-t border-[#024930]/10 z-10">
-          <p className="text-[#024930] font-bold text-sm tracking-widest uppercase opacity-70">Bella & Bona • Freshly Prepared for You</p>
+        <div className="w-full text-center pb-10 z-10 mt-auto">
+          <div className="flex flex-col items-center gap-2">
+            <span className="w-8 h-[1px] bg-[#024930]/30" />
+            <p className="text-[10px] font-sans uppercase tracking-[0.3em] text-[#024930] opacity-80">
+              Culinary Excellence
+            </p>
+          </div>
         </div>
 
-        {/* Force Print Styles */}
+        {/* CSS for printing A4 specifically */}
         <style>{`
           @media print {
-            @page {
-              size: A4;
-              margin: 0;
-            }
-            body {
-              print-color-adjust: exact;
-              -webkit-print-color-adjust: exact;
-            }
+            @page { size: A4; margin: 0; }
+            body { print-color-adjust: exact; -webkit-print-color-adjust: exact; }
           }
         `}</style>
       </div>

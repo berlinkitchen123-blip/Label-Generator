@@ -26,7 +26,8 @@ import {
   CheckCircle2,
   ChefHat,
   RotateCcw,
-  Utensils
+  Utensils,
+  BookOpen
 } from 'lucide-react';
 import { initializeApp, getApp, getApps } from 'firebase/app';
 import { getFirestore, collection, getDocs, doc, deleteDoc, writeBatch } from 'firebase/firestore';
@@ -148,7 +149,9 @@ const BRAND_COLOR_PINK = '#f895bd'; // Darker Brand Pink
 const BRAND_LOGO_B64 = "data:image/png;base64,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";
 
 const BrandLogo = ({ className = "h-12" }: { className?: string }) => (
-  <img src={BRAND_LOGO_B64} alt="Bella&Bona" className={`object-contain ${className}`} />
+  <div className={`font-serif font-bold tracking-tight select-none flex items-center justify-center ${className}`} style={{ fontFamily: '"Bona Nova", serif' }}>
+    <span style={{ fontSize: 'inherit', lineHeight: 1 }}>BELLABONA</span>
+  </div>
 );
 
 // Helper for Allergen Icons (Refined)
@@ -412,58 +415,62 @@ const Label: React.FC<{ bundle: Bundle, lang: 'de' | 'en', packedOn: string, for
         height: forPrint ? '148.5mm' : undefined
       }}
     >
-      {/* Header - Refined: Clean Green Strip with Pink Accent */}
+      {/* Header - Dark Green with White Text */}
       <div className="bg-[#024930] py-3 px-6 flex flex-col items-center justify-center min-h-[55px] shrink-0 border-b-[3px] border-[#FEACCF]">
         <h2 className="text-white text-center font-serif font-bold text-[18px] uppercase tracking-[0.2em] leading-tight">
           {lang === 'de' ? bundle.name_de : bundle.name_en}
         </h2>
       </div>
 
-      {/* Body - Clean White with subtle dividers */}
+      {/* Body - Clean White */}
       <div className="flex-1 px-8 py-2 flex flex-col overflow-hidden relative bg-white">
         <div className="flex-1 flex flex-col justify-center relative z-10 overflow-hidden">
           {bundle.items.map((item, idx) => (
             <div key={item.id} className={`flex justify-between items-center border-b border-gray-100 last:border-none ${itemVerticalPadding}`}>
               <div className="flex-1 pr-4">
-                {/* Dish Name: Serif, Elegant */}
-                <div className={`font-serif font-medium ${nameFontSize} leading-[1.1] text-slate-900 mb-1`}>
+                {/* Dish Name: Serif, Elegant - Size tuned for A6 */}
+                <div className={`font-serif font-medium ${nameFontSize} leading-[1.1] text-slate-900 mb-0.5`}>
                   {lang === 'de' ? item.item_name_de : item.item_name_en}
                 </div>
-                {/* Allergens: Minimalist tags */}
+                {/* Allergens */}
                 <div className="flex flex-wrap gap-1">
                   {item.allergens_de.split(/[,/]+/).map((alg, aIdx) => {
                     const trimmed = alg.trim();
                     if (!trimmed) return null;
                     return (
-                      <span key={aIdx} className={`text-[#024930] ${allergenFontSize} font-bold px-1.5 py-[1px] rounded-[2px] uppercase tracking-wider border border-[#FEACCF]/50 bg-[#FEACCF]/10`}>
+                      <span key={aIdx} className={`text-[#024930] ${allergenFontSize} font-bold px-1 py-[0.5px] rounded-[1px] uppercase tracking-wider border border-[#FEACCF]/50 bg-[#F8F7F6]`}>
                         {trimmed}
                       </span>
                     );
                   })}
                 </div>
               </div>
-              <div className="flex flex-col items-center justify-center min-w-[60px] ml-2">
+              <div className="flex flex-col items-center justify-center min-w-[50px] ml-2">
                 <div className="flex gap-1 mb-1">{getItemIcons(item, isHighDensity)}</div>
-                <span className="text-[9px] uppercase tracking-widest text-slate-400 font-bold">{item.diet_de}</span>
+                <span className="text-[9px] uppercase tracking-widest text-[#024930] font-bold">{item.diet_de}</span>
               </div>
             </div>
           ))}
         </div>
       </div>
 
-      {/* Footer - Minimalist Brand */}
-      <div className="py-3 px-8 flex justify-between items-end border-t border-slate-100 mb-1">
+      {/* Footer - Baby Pink with Dark Green Text - BELLABONA */}
+      <div className="bg-[#FEACCF] py-2 px-8 flex justify-between items-center shrink-0 border-t border-[#024930]/10">
         <div className="flex flex-col">
-          <span className="text-[7px] uppercase tracking-[0.2em] text-slate-400">Packed On</span>
-          <span className="text-[12px] font-mono text-[#024930]">{packedOn}</span>
+          <span className="text-[7px] uppercase tracking-[0.2em] text-[#024930]/80 font-bold">Packed On</span>
+          <span className="text-[11px] font-mono text-[#024930] font-bold">{packedOn}</span>
         </div>
         <div className="flex flex-col items-end">
-          <BrandLogo className="h-4 brightness-0 opacity-80" />
+          {/* Logo in text form for strict crispness */}
+          <div style={{ fontFamily: '"Bona Nova", serif' }} className="text-xl font-bold text-[#024930] tracking-tight leading-none">
+            BELLABONA
+          </div>
         </div>
       </div>
     </div>
   );
 };
+
 
 const App: React.FC = () => {
   const [lang, setLang] = useState<'de' | 'en'>('de');
@@ -617,15 +624,13 @@ const App: React.FC = () => {
     return groups;
   }, [selections, cateringSelections, bundles, activeTab, isPreviewing, previewType]);
 
-  // Menu Print Logic (A4) - Refined Grouping
+  // Menu Print Logic (A4) - Premium Redesign
   const MenuPrint = () => {
     // 1. Flatten all items from selected bundles
     const allItems: BundleItem[] = [];
     cateringSelections.forEach(s => {
       const b = bundles.find(x => x.id === s.bundleId);
       if (b) {
-        // Add items quantity times? Usually menu just lists unique items available.
-        // Let's assume the menu lists UNIQUE items available.
         allItems.push(...b.items);
       }
     });
@@ -638,9 +643,7 @@ const App: React.FC = () => {
     const order = ['Vegan', 'Vegetarisch', 'Vegetarian', 'Fish', 'Fisch', 'Meat', 'Fleisch', 'Beef'];
 
     uniqueItems.forEach(item => {
-      // Normalize diet string for grouping header
       let diet = item.diet_de || 'Other';
-      // Simple normalization
       if (diet.toLowerCase().includes('vegan')) diet = 'Vegan';
       else if (diet.toLowerCase().includes('vegetarisch')) diet = 'Vegetarian';
       else if (diet.toLowerCase().includes('fish') || diet.toLowerCase().includes('fisch')) diet = 'Fish';
@@ -650,74 +653,94 @@ const App: React.FC = () => {
       grouped[diet].push(item);
     });
 
-    // Sort groups by defined order
+    // Sort groups
     const sortedGroups = Object.keys(grouped).sort((a, b) => {
       const idxA = order.indexOf(a);
       const idxB = order.indexOf(b);
-      // if not found, push to end
       return (idxA === -1 ? 99 : idxA) - (idxB === -1 ? 99 : idxB);
     });
 
-    return (
+    const isDense = uniqueItems.length > 15;
 
+    return (
       <div
         className="w-[210mm] h-[297mm] relative flex flex-col items-center bg-[#F8F7F6] overflow-hidden"
+        style={{ fontFamily: "'Bona Nova', serif" }}
       >
-        {/* Subtle Texture/Watermark */}
-        <div className="absolute inset-0 z-0 flex items-center justify-center opacity-[0.02] pointer-events-none">
-          <ChefHat size={500} color="#024930" />
+        {/* Paper Texture Effect */}
+        <div className="absolute inset-0 z-0 bg-white/50" />
+
+        {/* Subtle Watermark */}
+        <div className="absolute inset-0 z-0 flex items-center justify-center opacity-[0.03] pointer-events-none">
+          <ChefHat size={400} color="#024930" />
         </div>
 
-        {/* Elegant Frame/Border */}
-        <div className="absolute inset-4 border border-[#024930] opacity-20 pointer-events-none" />
-        <div className="absolute inset-6 border border-[#024930] opacity-10 pointer-events-none" />
+        {/* Elegant Double Border Frame */}
+        <div className="absolute inset-6 border-[3px] border-[#024930] pointer-events-none" />
+        <div className="absolute inset-7 border border-[#024930] pointer-events-none" />
+
+        {/* Corner Accents */}
+        <div className="absolute top-6 left-6 w-16 h-16 border-r border-b border-[#F8F7F6] z-10" />
+        <div className="absolute top-6 right-6 w-16 h-16 border-l border-b border-[#F8F7F6] z-10" />
+        <div className="absolute bottom-6 left-6 w-16 h-16 border-r border-t border-[#F8F7F6] z-10" />
+        <div className="absolute bottom-6 right-6 w-16 h-16 border-l border-t border-[#F8F7F6] z-10" />
 
         {/* Header Section */}
-        <div className="flex flex-col items-center w-full pt-16 pb-8 z-10 px-16">
-          <BrandLogo className="h-10 mb-6 brightness-0 opacity-90" />
+        <div className="flex flex-col items-center w-full pt-20 pb-8 z-20 px-24">
+          <BrandLogo className="h-16 mb-8 text-[#024930]" />
 
-          <div className="flex flex-col items-center border-y border-[#024930]/20 w-full py-4 mb-2">
-            <span className="font-sans text-[10px] uppercase tracking-[0.4em] text-[#024930]/60 mb-2">Fresh & Local</span>
-            <h1 className="text-4xl font-serif font-medium text-[#024930] uppercase tracking-widest text-center">
-              Daily Menu
-            </h1>
+          <div className="flex flex-col items-center w-full py-4 mb-4 relative">
+            <div className="absolute top-1/2 left-0 w-full h-[1px] bg-[#024930]/20 -z-10" />
+            <div className="bg-[#F8F7F6] px-10 z-10">
+              <h1 className="text-7xl font-serif text-[#024930] uppercase tracking-[0.2em] text-center leading-none" style={{ fontFamily: "'Playfair Display', serif" }}>
+                Menu du Jour
+              </h1>
+            </div>
           </div>
-          <p className="font-serif italic text-[#024930]/70 text-sm mt-2">
-            {new Date().toLocaleDateString('en-GB', { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' })}
-          </p>
+
+          <div className="flex items-center gap-6 mt-6">
+            <span className="h-[1px] w-12 bg-[#024930]/40" />
+            <p className="font-serif italic text-[#024930] text-2xl" style={{ fontFamily: "'Playfair Display', serif" }}>
+              {new Date().toLocaleDateString('en-GB', { weekday: 'long', day: 'numeric', month: 'long', year: 'numeric' })}
+            </p>
+            <span className="h-[1px] w-12 bg-[#024930]/40" />
+          </div>
         </div>
 
-        {/* Content Section - 2 Columns if enough space, else 1 centered */}
-        <div className="flex-1 w-full px-16 z-10 flex flex-col items-center">
-          <div className="w-full max-w-4xl grid grid-cols-1 gap-10 content-start">
+        {/* Content Section */}
+        <div className="flex-1 w-full px-24 z-20 flex flex-col items-center justify-center">
+          <div className={`w-full ${isDense ? 'columns-2 gap-16' : 'flex flex-col items-center gap-16'} space-y-12`}>
             {sortedGroups.map((groupTitle, idx) => (
-              <div key={idx} className="flex flex-col w-full break-inside-avoid">
+              <div key={idx} className="break-inside-avoid mb-8 w-full">
                 {/* Section Header */}
-                <div className="flex items-center justify-center mb-6">
-                  <span className="h-[1px] w-12 bg-[#FEACCF]" />
-                  <h2 className="mx-6 text-xl font-serif font-bold text-[#024930] uppercase tracking-[0.2em]">
+                <div className={`flex items-center ${isDense ? 'justify-start' : 'justify-center'} mb-6 border-b-2 border-[#024930]/10 pb-3`}>
+                  <h2 className="text-3xl font-bold text-[#024930] uppercase tracking-[0.15em] relative" style={{ fontFamily: "'Playfair Display', serif" }}>
                     {lang === 'de' ? (
                       groupTitle === 'Vegetarian' ? 'Vegetarisch' :
                         groupTitle === 'Meat' ? 'Fleisch' :
                           groupTitle === 'Fish' ? 'Fisch' : groupTitle
                     ) : groupTitle}
                   </h2>
-                  <span className="h-[1px] w-12 bg-[#FEACCF]" />
                 </div>
 
                 {/* Items */}
-                <div className="flex flex-col gap-4">
+                <div className={`flex flex-col ${isDense ? 'items-start text-left' : 'items-center text-center'} gap-5`}>
                   {grouped[groupTitle].map((item, iIdx) => (
-                    <div key={iIdx} className="flex flex-col items-center text-center group">
-                      <span className="text-lg font-serif font-medium text-slate-800 leading-tight group-hover:text-[#024930] transition-colors">
-                        {(lang === 'de' ? item.item_name_de : item.item_name_en)}
-                      </span>
-                      {/* Allergens small underneath */}
-                      {item.allergens_de && (
-                        <span className="text-[9px] uppercase tracking-wider text-[#024930]/50 mt-1">
-                          {item.allergens_de}
+                    <div key={iIdx} className="flex flex-col group w-full">
+                      <div className="flex items-baseline justify-between w-full">
+                        <span className="text-[17px] font-medium text-[#1a1a1a] leading-tight" style={{ fontFamily: "'Bona Nova', serif" }}>
+                          {(lang === 'de' ? item.item_name_de : item.item_name_en)}
                         </span>
-                      )}
+                      </div>
+
+                      {/* Allergens & Diet */}
+                      <div className={`flex items-center gap-3 mt-1.5 ${isDense ? 'justify-start' : 'justify-center'}`}>
+                        <span className="text-[11px] uppercase tracking-widest text-[#024930] font-sans font-bold" style={{ fontFamily: "'Inter', sans-serif" }}>
+                          {item.allergens_de || 'Keine Allergene'}
+                        </span>
+                        {/* Optional small icons */}
+                        {item.diet_de.toLowerCase().includes('vegan') && <Leaf size={12} className="text-[#024930]" />}
+                      </div>
                     </div>
                   ))}
                 </div>
@@ -727,13 +750,14 @@ const App: React.FC = () => {
         </div>
 
         {/* Footer */}
-        <div className="w-full text-center pb-10 z-10 mt-auto">
-          <div className="flex flex-col items-center gap-2">
-            <span className="w-8 h-[1px] bg-[#024930]/30" />
-            <p className="text-[10px] font-sans uppercase tracking-[0.3em] text-[#024930] opacity-80">
-              Culinary Excellence
-            </p>
-          </div>
+        <div className="w-full text-center pb-12 z-20 mt-auto flex flex-col items-center">
+          <span className="text-4xl text-[#024930]/40 rotate-180 mb-4" style={{ fontFamily: "'Pinyon Script', cursive" }}>❦</span>
+          <p className="text-3xl text-[#024930]" style={{ fontFamily: "'Pinyon Script', cursive" }}>
+            Bon Appétit
+          </p>
+          <p className="text-[9px] font-sans uppercase tracking-[0.25em] text-[#024930]/50 mt-4">
+            Prepared Freshly for You
+          </p>
         </div>
 
         {/* CSS for printing A4 specifically */}
@@ -1099,79 +1123,104 @@ const App: React.FC = () => {
       </div>
 
       {isPreviewing && (
-        <div className="no-print fixed inset-0 z-[200] bg-[#024930]/90 backdrop-blur-xl flex items-center justify-center p-8 overflow-y-auto">
-          <div className="bg-[#F8F7F6] w-full max-w-6xl h-[90vh] rounded-3xl flex flex-col shadow-2xl overflow-hidden">
-            <div className="p-8 border-b border-[#024930]/10 flex justify-between items-center bg-white">
-              <h2 className="text-2xl font-black text-[#024930] flex items-center gap-3">
-                <Printer className="text-[#FEACCF]" /> Print Preview <span className="text-xs bg-[#024930]/10 px-2 py-1 rounded text-[#024930] uppercase font-mono">{previewType}</span>
-              </h2>
-              <div className="flex gap-4">
-                <button onClick={() => window.print()} className="bg-[#024930] hover:bg-[#036c4a] text-white font-bold px-8 py-3 rounded-xl shadow-lg flex items-center gap-2 transition-all">
-                  <Printer size={20} /> Print Now
-                </button>
-                <button onClick={() => setIsPreviewing(false)} className="bg-white hover:bg-[#FEACCF] text-[#024930] font-bold p-3 rounded-xl transition-all shadow-md"><X size={20} /></button>
-              </div>
-            </div>
-
-            <div className="flex-1 overflow-auto bg-[#F8F7F6] p-8 flex justify-center items-start">
-              {/* Render Correct Preview */}
-              {previewType === 'menu' && activeTab === 'catering' ? (
-                <div className="flex flex-col gap-12">
-                  <div className="bg-white shadow-2xl scale-[0.6] origin-top" style={{ width: '210mm', height: '297mm' }}>
-                    <MenuPrint />
+        <React.Fragment>
+          {/* Force re-render on lang change or content change */}
+          <div className="no-print fixed inset-0 z-[200] bg-[#024930]/90 backdrop-blur-xl flex items-center justify-center p-8 overflow-y-auto" key={`${lang}-${previewType}-${activeTab}`}>
+            <div className="bg-[#F8F7F6] w-full max-w-6xl h-[90vh] rounded-3xl flex flex-col shadow-2xl overflow-hidden">
+              <div className="p-8 border-b border-[#024930]/10 flex justify-between items-center bg-white">
+                <div className="flex items-center gap-4">
+                  <div className="bg-[#024930]/5 p-3 rounded-xl">
+                    <Printer className="text-[#024930] w-6 h-6" />
                   </div>
-                  <div className="bg-white shadow-2xl scale-[0.6] origin-top" style={{ width: '210mm', height: '297mm' }}>
-                    <ReviewPrint size="A4" />
+                  <div>
+                    <h2 className="text-2xl font-serif font-bold text-[#024930]">Print Preview</h2>
+                    <div className="flex items-center gap-2 mt-1">
+                      <span className="text-xs font-sans text-slate-500">Checking layout for</span>
+                      <span className="text-xs bg-[#FEACCF]/20 px-2 py-0.5 rounded text-[#024930] uppercase font-bold tracking-wider">{previewType}</span>
+                    </div>
                   </div>
                 </div>
-              ) : activeTab === 'catering' ? (
-                // Catering Previews (Labels + Review Card)
-                (() => {
-                  const allItems: any[] = cateringSelections.flatMap(sel => {
-                    const b = bundles.find(x => x.id === sel.bundleId);
-                    if (!b) return [];
-                    return Array(sel.quantity).fill(b).flatMap(() => b.items);
-                  });
-                  allItems.push({ isReviewCard: true });
+                <div className="flex gap-4">
+                  <button onClick={() => setIsPreviewing(false)} className="px-6 py-3 rounded-xl text-slate-500 font-medium hover:bg-slate-50 transition-colors">
+                    Close
+                  </button>
+                  {previewType === 'labels' && (
+                    <button
+                      onClick={() => window.print()}
+                      className="bg-[#FEACCF] hover:bg-[#ffbfe0] text-[#024930] font-bold px-6 py-3 rounded-xl shadow-lg shadow-[#FEACCF]/20 flex items-center gap-2 transition-all transform hover:-translate-y-0.5"
+                    >
+                      <BookOpen size={20} /> Print Label Sheets
+                    </button>
+                  )}
+                  <button
+                    onClick={() => window.print()}
+                    className="bg-[#024930] hover:bg-[#035e3e] text-white font-bold px-8 py-3 rounded-xl shadow-lg shadow-[#024930]/30 flex items-center gap-2 transition-all transform hover:-translate-y-0.5"
+                  >
+                    <Printer size={20} /> Print Now
+                  </button>
+                </div>
+              </div>
 
-                  const pages = [];
-                  for (let i = 0; i < allItems.length; i += 4) {
-                    pages.push(allItems.slice(i, i + 4));
-                  }
-
-                  return (
-                    <div className="flex flex-col gap-12 pb-12">
-                      {pages.map((pageItems, pIdx) => (
-                        <div key={pIdx} className="bg-white shadow-2xl origin-top scale-[0.6]" style={{ width: '210mm', height: '297mm', display: 'grid', gridTemplateColumns: '105mm 105mm', gridTemplateRows: '148.5mm 148.5mm' }}>
-                          {pageItems.map((item, iIdx) => (
-                            <div key={iIdx} style={{ width: '105mm', height: '148.5mm' }}>
-                              {('isReviewCard' in item) ? <ReviewPrint size="A6" /> : <CateringItemLabel item={item} lang={lang} forPrint />}
-                            </div>
-                          ))}
-                        </div>
-                      ))}
+              <div className="flex-1 overflow-auto bg-[#F8F7F6] p-8 flex justify-center items-start">
+                {/* Render Correct Preview */}
+                {previewType === 'menu' && activeTab === 'catering' ? (
+                  <div className="flex flex-col gap-12">
+                    <div className="bg-white shadow-2xl scale-[0.6] origin-top" style={{ width: '210mm', height: '297mm' }}>
+                      <MenuPrint />
                     </div>
-                  );
-                })()
-              ) : (
-                // Standard Labels Preview
-                <div className="flex flex-col gap-12">
-                  {printGroups.map((group, idx) => (
-                    <div key={idx} className="bg-white shadow-2xl mb-12 scale-[0.6] origin-top" style={{ width: '210mm', height: '297mm' }}>
-                      <div className="label-page-group">
-                        {group.map((b, bi) => (
-                          <div key={bi} className="label-card-container">
-                            <Label bundle={b} lang={lang} packedOn={packedOn} forPrint variant="standard" />
+                    <div className="bg-white shadow-2xl scale-[0.6] origin-top" style={{ width: '210mm', height: '297mm' }}>
+                      <ReviewPrint size="A4" />
+                    </div>
+                  </div>
+                ) : activeTab === 'catering' ? (
+                  // Catering Previews (Labels + Review Card)
+                  (() => {
+                    const allItems: any[] = cateringSelections.flatMap(sel => {
+                      const b = bundles.find(x => x.id === sel.bundleId);
+                      if (!b) return [];
+                      return Array(sel.quantity).fill(b).flatMap(() => b.items);
+                    });
+                    allItems.push({ isReviewCard: true });
+
+                    const pages = [];
+                    for (let i = 0; i < allItems.length; i += 4) {
+                      pages.push(allItems.slice(i, i + 4));
+                    }
+
+                    return (
+                      <div className="flex flex-col gap-12 pb-12">
+                        {pages.map((pageItems, pIdx) => (
+                          <div key={pIdx} className="bg-white shadow-2xl origin-top scale-[0.6]" style={{ width: '210mm', height: '297mm', display: 'grid', gridTemplateColumns: '105mm 105mm', gridTemplateRows: '148.5mm 148.5mm' }}>
+                            {pageItems.map((item, iIdx) => (
+                              <div key={iIdx} style={{ width: '105mm', height: '148.5mm' }}>
+                                {('isReviewCard' in item) ? <ReviewPrint size="A6" /> : <CateringItemLabel item={item} lang={lang} forPrint />}
+                              </div>
+                            ))}
                           </div>
                         ))}
                       </div>
-                    </div>
-                  ))}
-                </div>
-              )}
+                    );
+                  })()
+                ) : (
+                  // Standard Labels Preview
+                  <div className="flex flex-col gap-12">
+                    {printGroups.map((group, idx) => (
+                      <div key={idx} className="bg-white shadow-2xl mb-12 scale-[0.6] origin-top" style={{ width: '210mm', height: '297mm' }}>
+                        <div className="label-page-group">
+                          {group.map((b, bi) => (
+                            <div key={bi} className="label-card-container">
+                              <Label bundle={b} lang={lang} packedOn={packedOn} forPrint variant="standard" />
+                            </div>
+                          ))}
+                        </div>
+                      </div>
+                    ))}
+                  </div>
+                )}
+              </div>
             </div>
           </div>
-        </div>
+        </React.Fragment>
       )}
     </>
   );

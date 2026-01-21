@@ -686,24 +686,15 @@ const App: React.FC = () => {
         <div className="absolute bottom-6 right-6 w-16 h-16 border-l border-t border-[#F8F7F6] z-10" />
 
         {/* Header Section */}
-        <div className="flex flex-col items-center w-full pt-20 pb-8 z-20 px-24">
-          <BrandLogo className="h-16 mb-8 text-[#024930]" />
+        <div className="flex flex-col items-center w-full pt-16 pb-6 z-20 px-24">
+          <BrandLogo className="h-48 mb-8 text-[#024930]" />
 
-          <div className="flex flex-col items-center w-full py-4 mb-4 relative">
-            <div className="absolute top-1/2 left-0 w-full h-[1px] bg-[#024930]/20 -z-10" />
-            <div className="bg-[#F8F7F6] px-10 z-10">
-              <h1 className="text-7xl font-serif text-[#024930] uppercase tracking-[0.2em] text-center leading-none" style={{ fontFamily: "'Playfair Display', serif" }}>
-                Menu du Jour
-              </h1>
-            </div>
-          </div>
-
-          <div className="flex items-center gap-6 mt-6">
-            <span className="h-[1px] w-12 bg-[#024930]/40" />
-            <p className="font-serif italic text-[#024930] text-2xl" style={{ fontFamily: "'Playfair Display', serif" }}>
+          <div className="flex items-center gap-6 mt-2">
+            <span className="h-[1px] w-20 bg-[#024930]/60" />
+            <p className="font-serif italic text-[#024930] text-3xl font-medium" style={{ fontFamily: "'Playfair Display', serif" }}>
               {new Date().toLocaleDateString('en-GB', { weekday: 'long', day: 'numeric', month: 'long', year: 'numeric' })}
             </p>
-            <span className="h-[1px] w-12 bg-[#024930]/40" />
+            <span className="h-[1px] w-20 bg-[#024930]/60" />
           </div>
         </div>
 
@@ -724,22 +715,29 @@ const App: React.FC = () => {
                 </div>
 
                 {/* Items */}
-                <div className={`flex flex-col ${isDense ? 'items-start text-left' : 'items-center text-center'} gap-5`}>
+                <div className={`flex flex-col ${isDense ? 'items-start text-left' : 'items-center text-center'} gap-8 flex-grow justify-center`}>
                   {grouped[groupTitle].map((item, iIdx) => (
-                    <div key={iIdx} className="flex flex-col group w-full">
-                      <div className="flex items-baseline justify-between w-full">
-                        <span className="text-[17px] font-medium text-[#1a1a1a] leading-tight" style={{ fontFamily: "'Bona Nova', serif" }}>
+                    <div key={iIdx} className="flex flex-col group w-full py-2">
+                      <div className="flex items-start justify-between w-full">
+                        <span className="text-3xl font-bold text-[#1a1a1a] leading-tight tracking-wide text-left flex-1" style={{ fontFamily: "'Bona Nova', serif" }}>
                           {(lang === 'de' ? item.item_name_de : item.item_name_en)}
                         </span>
-                      </div>
 
-                      {/* Allergens & Diet */}
-                      <div className={`flex items-center gap-3 mt-1.5 ${isDense ? 'justify-start' : 'justify-center'}`}>
-                        <span className="text-[11px] uppercase tracking-widest text-[#024930] font-sans font-bold" style={{ fontFamily: "'Inter', sans-serif" }}>
-                          {item.allergens_de || 'Keine Allergene'}
-                        </span>
-                        {/* Optional small icons */}
-                        {item.diet_de.toLowerCase().includes('vegan') && <Leaf size={12} className="text-[#024930]" />}
+                        {/* Allergens on Right */}
+                        <div className="flex flex-col items-end pl-6 shrink-0 max-w-[35%]">
+                          {(item.allergens_de) && (
+                            <div className="flex items-center gap-2">
+                              <span className="text-sm uppercase tracking-widest text-[#024930] font-sans font-bold text-right leading-tight" style={{ fontFamily: "'Inter', sans-serif" }}>
+                                {item.allergens_de}
+                              </span>
+                            </div>
+                          )}
+                          {item.diet_de.toLowerCase().includes('vegan') && (
+                            <div className="mt-1">
+                              <Leaf size={18} className="text-[#024930]" />
+                            </div>
+                          )}
+                        </div>
                       </div>
                     </div>
                   ))}

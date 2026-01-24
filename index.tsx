@@ -689,12 +689,12 @@ const App: React.FC = () => {
         <div className="flex flex-col items-center w-full pt-16 pb-6 z-20 px-24">
           <BrandLogo className="h-48 mb-8 text-[#024930]" />
 
-          <div className="flex items-center gap-6 mt-2">
-            <span className="h-[1px] w-20 bg-[#024930]/60" />
-            <p className="font-serif italic text-[#024930] text-3xl font-medium" style={{ fontFamily: "'Playfair Display', serif" }}>
+          <div className="flex items-center gap-6 mt-4">
+            <span className="h-[1px] w-16 bg-[#024930]/40" />
+            <p className="font-serif text-[#024930] text-xl tracking-[0.1em] uppercase" style={{ fontFamily: "'Cinzel', serif" }}>
               {new Date().toLocaleDateString('en-GB', { weekday: 'long', day: 'numeric', month: 'long', year: 'numeric' })}
             </p>
-            <span className="h-[1px] w-20 bg-[#024930]/60" />
+            <span className="h-[1px] w-16 bg-[#024930]/40" />
           </div>
         </div>
 
@@ -704,8 +704,8 @@ const App: React.FC = () => {
             {sortedGroups.map((groupTitle, idx) => (
               <div key={idx} className="break-inside-avoid mb-8 w-full">
                 {/* Section Header */}
-                <div className={`flex items-center ${isDense ? 'justify-start' : 'justify-center'} mb-6 border-b-2 border-[#024930]/10 pb-3`}>
-                  <h2 className="text-3xl font-bold text-[#024930] uppercase tracking-[0.15em] relative" style={{ fontFamily: "'Playfair Display', serif" }}>
+                <div className={`flex items-center justify-center mb-8 border-b border-[#024930]/20 pb-4`}>
+                  <h2 className="text-3xl font-bold text-[#024930] uppercase tracking-[0.25em]" style={{ fontFamily: "'Cinzel', serif" }}>
                     {lang === 'de' ? (
                       groupTitle === 'Vegetarian' ? 'Vegetarisch' :
                         groupTitle === 'Meat' ? 'Fleisch' :
@@ -715,30 +715,30 @@ const App: React.FC = () => {
                 </div>
 
                 {/* Items */}
-                <div className={`flex flex-col ${isDense ? 'items-start text-left' : 'items-center text-center'} gap-8 flex-grow justify-center`}>
+                <div className={`flex flex-col items-center text-center gap-10 flex-grow justify-center`}>
                   {grouped[groupTitle].map((item, iIdx) => (
-                    <div key={iIdx} className="flex flex-col group w-full py-2">
-                      <div className="flex items-start justify-between w-full">
-                        <span className="text-3xl font-bold text-[#1a1a1a] leading-tight tracking-wide text-left flex-1" style={{ fontFamily: "'Bona Nova', serif" }}>
-                          {(lang === 'de' ? item.item_name_de : item.item_name_en)}
-                        </span>
+                    <div key={iIdx} className="flex flex-col group w-full py-2 items-center">
+                      {/* Item Name - Centered & Elegant */}
+                      <span className="text-4xl font-semibold text-[#1a1a1a] leading-tight tracking-wide mb-2" style={{ fontFamily: "'Cormorant Garamond', serif" }}>
+                        {(lang === 'de' ? item.item_name_de : item.item_name_en)}
+                      </span>
 
-                        {/* Allergens on Right */}
-                        <div className="flex flex-col items-end pl-6 shrink-0 max-w-[35%]">
-                          {(item.allergens_de) && (
-                            <div className="flex items-center gap-2">
-                              <span className="text-sm uppercase tracking-widest text-[#024930] font-sans font-bold text-right leading-tight" style={{ fontFamily: "'Inter', sans-serif" }}>
-                                {item.allergens_de}
-                              </span>
-                            </div>
+                      {/* Allergens - Centered Below */}
+                      {(item.allergens_de || item.diet_de.toLowerCase().includes('vegan')) && (
+                        <div className="flex items-center gap-3 justify-center">
+                          {item.allergens_de && (
+                            <span className="text-[10px] uppercase tracking-[0.2em] text-[#024930]/80 font-sans font-semibold">
+                              {item.allergens_de}
+                            </span>
+                          )}
+                          {item.allergens_de && item.diet_de.toLowerCase().includes('vegan') && (
+                            <span className="h-1 w-1 bg-[#024930]/40 rounded-full" />
                           )}
                           {item.diet_de.toLowerCase().includes('vegan') && (
-                            <div className="mt-1">
-                              <Leaf size={18} className="text-[#024930]" />
-                            </div>
+                            <Leaf size={14} className="text-[#024930]" />
                           )}
                         </div>
-                      </div>
+                      )}
                     </div>
                   ))}
                 </div>

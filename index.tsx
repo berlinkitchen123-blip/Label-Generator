@@ -30,7 +30,7 @@ import {
   BookOpen
 } from 'lucide-react';
 import { initializeApp, getApp, getApps, FirebaseApp } from 'firebase/app';
-import { getFirestore, collection, getDocs, doc, deleteDoc, writeBatch, Firestore } from 'firebase/firestore';
+import { getDatabase, ref, child, get, set, remove, update, Database } from 'firebase/database';
 
 
 
@@ -54,13 +54,13 @@ try {
   console.error('Firebase init failed', e);
 }
 
-let db: Firestore;
+let db: Database;
 try {
   if (app) {
-    db = getFirestore(app);
+    db = getDatabase(app);
   }
 } catch (e) {
-  console.error('Firestore init failed', e);
+  console.error('Database init failed', e);
 }
 
 const DB_KEY = 'bb_label_db_v7_perfect';
@@ -270,11 +270,17 @@ const CateringItemLabel: React.FC<{ item: BundleItem, lang: 'de' | 'en', forPrin
 const DataService = {
   getBundles: async (): Promise<Bundle[]> => {
     try {
-      const querySnapshot = await getDocs(collection(db, "bundles"));
-      const bundles: Bundle[] = [];
-      querySnapshot.forEach((doc) => bundles.push(doc.data() as Bundle));
-      localStorage.setItem(DB_KEY, JSON.stringify(bundles));
-      return bundles;
+      const dbRef = ref(db);
+      const snapshot = await get(child(dbRef, `bundles`));
+      if (snapshot.exists()) {
+        const data = snapshot.val();
+        const bundles = Object.values(data) as Bundle[];
+        localStorage.setItem(DB_KEY, JSON.stringify(bundles));
+        return bundles;
+      } else {
+        localStorage.setItem(DB_KEY, JSON.stringify([]));
+        return [];
+      }
     } catch (e) {
       console.error("Fetch Error:", e);
       const data = localStorage.getItem(DB_KEY);
@@ -292,21 +298,26 @@ const DataService = {
 
     // Cloud Update
     try {
-      const d = doc(db, "bundles", bundle.id);
-      await writeBatch(db).set(d, bundle).commit();
+      await set(ref(db, 'bundles/' + bundle.id), bundle);
     } catch (e) { }
   },
   saveBundles: async (bundles: Bundle[]) => {
     localStorage.setItem(DB_KEY, JSON.stringify(bundles));
-    const batch = writeBatch(db);
+
+    // Batch update object
+    const updates: any = {};
     bundles.forEach(b => {
-      const d = doc(db, "bundles", b.id);
-      batch.set(d, b);
+      updates['bundles/' + b.id] = b;
     });
-    await batch.commit();
+
+    try {
+      await update(ref(db), updates);
+    } catch (e) { }
   },
   deleteBundle: async (id: string) => {
-    await deleteDoc(doc(db, "bundles", id));
+    try {
+      await remove(ref(db, 'bundles/' + id));
+    } catch (e) { }
   }
 };
 

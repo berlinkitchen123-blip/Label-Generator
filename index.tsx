@@ -698,7 +698,6 @@ const App: React.FC = () => {
             <span className="h-[1px] w-16 bg-[#024930]/40" />
           </div>
         </div>
-
         {/* Content Section */}
         <div className="flex-1 w-full px-24 z-20 flex flex-col items-center justify-center">
           <div className={`w-full ${isDense ? 'columns-2 gap-16' : 'flex flex-col items-center gap-16'} space-y-12`}>
@@ -763,7 +762,7 @@ const App: React.FC = () => {
             body { print-color-adjust: exact; -webkit-print-color-adjust: exact; }
           }
         `}</style>
-      </div >
+      </div>
     );
   };
 

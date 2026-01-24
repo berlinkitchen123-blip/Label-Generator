@@ -669,11 +669,6 @@ const App: React.FC = () => {
         {/* Paper Texture Effect */}
         <div className="absolute inset-0 z-0 bg-white/50" />
 
-        {/* Subtle Watermark */}
-        <div className="absolute inset-0 z-0 flex items-center justify-center opacity-[0.03] pointer-events-none">
-          <ChefHat size={400} color="#024930" />
-        </div>
-
         {/* Elegant Double Border Frame */}
         <div className="absolute inset-6 border-[3px] border-[#024930] pointer-events-none" />
 

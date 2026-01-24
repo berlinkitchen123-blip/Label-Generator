@@ -34,8 +34,11 @@ import { getFirestore, collection, getDocs, doc, deleteDoc, writeBatch, Firestor
 
 
 
+// @ts-ignore
+declare var process: { env: { API_KEY: string } };
+
 const firebaseConfig = {
-  apiKey: (window as any).process?.env?.API_KEY || "AIzaSyBlB6j_w_-Mb_ughrrz8BDFdiIJEDNTKGM",
+  apiKey: process.env.API_KEY,
   authDomain: "label-c61eb.firebaseapp.com",
   databaseURL: "https://label-c61eb-default-rtdb.europe-west1.firebasedatabase.app",
   projectId: "label-c61eb",

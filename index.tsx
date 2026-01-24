@@ -30,7 +30,9 @@ import {
   BookOpen
 } from 'lucide-react';
 import { initializeApp, getApp, getApps, FirebaseApp } from 'firebase/app';
+import { initializeApp, getApp, getApps, FirebaseApp } from 'firebase/app';
 import { getDatabase, ref, child, get, set, remove, update, Database } from 'firebase/database';
+import { getFirestore, collection, getDocs, Firestore } from 'firebase/firestore';
 
 
 
@@ -55,9 +57,14 @@ try {
 }
 
 let db: Database;
+let firestoreDb: Firestore;
+
 try {
   if (app) {
     db = getDatabase(app);
+    try {
+      firestoreDb = getFirestore(app);
+    } catch (e) { console.warn("Firestore not loaded", e); }
   }
 } catch (e) {
   console.error('Database init failed', e);
@@ -318,6 +325,22 @@ const DataService = {
     try {
       await remove(ref(db, 'bundles/' + id));
     } catch (e) { }
+  },
+  migrateFromFirestore: async () => {
+    if (!firestoreDb) throw new Error("Firestore not initialized");
+    const querySnapshot = await getDocs(collection(firestoreDb, "bundles"));
+    const updates: any = {};
+    let count = 0;
+    querySnapshot.forEach((doc) => {
+      const data = doc.data() as Bundle;
+      updates['bundles/' + data.id] = data;
+      count++;
+    });
+
+    if (count > 0) {
+      await update(ref(db), updates);
+    }
+    return count;
   }
 };
 
@@ -1077,6 +1100,26 @@ const App: React.FC = () => {
                       <input type="file" ref={fileInputRef} className="hidden" accept=".xlsx" onChange={handleFileUpload} />
                     </div>
                   </div>
+
+                  <div className="mb-10 text-center">
+                    <button
+                      onClick={async () => {
+                        if (confirm("Attempt to migrate data from old Firestore database?")) {
+                          try {
+                            const count = await DataService.migrateFromFirestore();
+                            alert(`Migration successful! Moved ${count} bundles.`);
+                            window.location.reload();
+                          } catch (e: any) {
+                            alert("Migration failed: " + e.message);
+                          }
+                        }
+                      }}
+                      className="text-sm bg-[#024930]/5 hover:bg-[#024930]/10 text-[#024930] px-4 py-2 rounded-lg font-bold"
+                    >
+                      Recover Data from Firestore
+                    </button>
+                  </div>
+
                   <div className="space-y-2 max-h-[400px] overflow-y-auto pr-2 relative z-10">
                     {bundles.map(b => (
                       <div key={b.id} className="flex justify-between p-4 bg-white rounded-lg border border-[#F8F7F6] items-center hover:bg-[#F8F7F6] transition-colors shadow-sm">

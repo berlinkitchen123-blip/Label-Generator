@@ -10,6 +10,7 @@ import {
   X,
   Sprout,
   Soup,
+  Database as DatabaseIcon,
   Eye,
   Loader2,
   FileSpreadsheet,
@@ -865,8 +866,11 @@ const App: React.FC = () => {
               <button onClick={() => setActiveTab('catering')} className={`w-full flex items-center gap-4 px-4 py-3 rounded-xl transition-all font-bold ${activeTab === 'catering' ? 'bg-[#FEACCF] text-[#024930] shadow-lg translate-x-1' : 'text-[#F8F7F6]/60 hover:text-white hover:bg-white/5'}`}>
                 <ChefHat size={20} /><span className="hidden lg:block">Special Catering</span>
               </button>
-              <button onClick={() => setActiveTab('database')} className={`w-full flex items-center gap-4 px-4 py-3 rounded-xl transition-all font-bold ${activeTab === 'database' ? 'bg-[#FEACCF] text-[#024930] shadow-lg translate-x-1' : 'text-[#F8F7F6]/60 hover:text-white hover:bg-white/5'}`}>
-                <Database size={20} /><span className="hidden lg:block">Database</span>
+              <button
+                onClick={() => setActiveTab('db')}
+                className={`w-full flex items-center gap-4 px-4 py-3 rounded-xl transition-all font-bold ${activeTab === 'db' ? 'bg-[#FEACCF] text-[#024930] shadow-lg translate-x-1' : 'text-[#F8F7F6]/60 hover:text-white hover:bg-white/5'}`}
+              >
+                <DatabaseIcon size={20} /><span className="hidden lg:block">Database</span>
               </button>
             </nav>
 
@@ -1052,7 +1056,7 @@ const App: React.FC = () => {
               <div className="max-w-4xl mx-auto space-y-8">
                 <section className="bg-white p-10 rounded-3xl shadow-2xl relative overflow-hidden">
                   <div className="absolute top-0 right-0 p-8 opacity-[0.03] pointer-events-none">
-                    <Database size={400} />
+                    <DatabaseIcon size={400} />
                   </div>
                   <h2 className="text-3xl font-black mb-8 text-[#024930]">Data Management</h2>
                   <div className="grid md:grid-cols-2 gap-6 mb-10 relative z-10">

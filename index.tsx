@@ -677,7 +677,14 @@ const App: React.FC = () => {
 
         {/* Elegant Double Border Frame */}
         <div className="absolute inset-6 border-[3px] border-[#024930] pointer-events-none" />
-        <div className="absolute inset-7 border border-[#024930] pointer-events-none" />
+
+        <div className="absolute inset-0 flex items-center justify-center opacity-[0.03] pointer-events-none z-0">
+          <div style={{ fontFamily: '"Bona Nova", serif' }} className="text-[15rem] font-bold text-[#024930] tracking-wide -rotate-45 whitespace-nowrap">
+            BELLABONA
+          </div>
+        </div>
+
+        <div className="absolute inset-7 border border-[#024930] pointer-events-none z-10" />
 
         {/* Corner Accents */}
         <div className="absolute top-6 left-6 w-16 h-16 border-r border-b border-[#F8F7F6] z-10" />
@@ -687,7 +694,9 @@ const App: React.FC = () => {
 
         {/* Header Section */}
         <div className="flex flex-col items-center w-full pt-16 pb-6 z-20 px-24">
-          <BrandLogo className="h-32 mb-8 text-[#024930]" />
+          <div style={{ fontFamily: '"Bona Nova", serif' }} className="text-7xl font-bold text-[#024930] tracking-tight leading-none mb-8">
+            BELLABONA
+          </div>
 
           <div className="flex items-center gap-6 mt-4">
             <span className="h-[1px] w-16 bg-[#024930]/40" />
@@ -733,11 +742,7 @@ const App: React.FC = () => {
                               </span>
                             </div>
                           )}
-                          {item.diet_de.toLowerCase().includes('vegan') && (
-                            <div className="mt-1">
-                              <Leaf size={18} className="text-[#024930]" />
-                            </div>
-                          )}
+                          {/* User requested removal of vegan symbol from vegan items */}
                         </div>
                       </div>
                     </div>

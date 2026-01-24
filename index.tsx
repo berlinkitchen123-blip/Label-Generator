@@ -625,19 +625,13 @@ const App: React.FC = () => {
 
   // Menu Print Logic (A4) - Premium Redesign
   const MenuPrint = () => {
-    // 1. Flatten all items from selected bundles
     const allItems: BundleItem[] = [];
     cateringSelections.forEach(s => {
       const b = bundles.find(x => x.id === s.bundleId);
-      if (b) {
-        allItems.push(...b.items);
-      }
+      if (b) allItems.push(...b.items);
     });
 
-    // 2. Deduplicate items by name
     const uniqueItems = Array.from(new Map(allItems.map(item => [item.item_name_de, item])).values());
-
-    // 3. Group by Diet Type (Item Type)
     const grouped: Record<string, BundleItem[]> = {};
     const order = ['Vegan', 'Vegetarisch', 'Vegetarian', 'Fish', 'Fisch', 'Meat', 'Fleisch', 'Beef'];
 
@@ -647,12 +641,10 @@ const App: React.FC = () => {
       else if (diet.toLowerCase().includes('vegetarisch')) diet = 'Vegetarian';
       else if (diet.toLowerCase().includes('fish') || diet.toLowerCase().includes('fisch')) diet = 'Fish';
       else if (diet.toLowerCase().includes('meat') || diet.toLowerCase().includes('fleisch')) diet = 'Meat';
-
       if (!grouped[diet]) grouped[diet] = [];
       grouped[diet].push(item);
     });
 
-    // Sort groups
     const sortedGroups = Object.keys(grouped).sort((a, b) => {
       const idxA = order.indexOf(a);
       const idxB = order.indexOf(b);
@@ -662,34 +654,19 @@ const App: React.FC = () => {
     const isDense = uniqueItems.length > 15;
 
     return (
-      <div
-        className="w-[210mm] h-[297mm] relative flex flex-col items-center bg-[#F8F7F6] overflow-hidden"
-        style={{ fontFamily: "'Bona Nova', serif" }}
-      >
-        {/* Paper Texture Effect */}
+      <div className="w-[210mm] h-[297mm] relative flex flex-col items-center bg-[#F8F7F6] overflow-hidden" style={{ fontFamily: "'Bona Nova', serif" }}>
         <div className="absolute inset-0 z-0 bg-white/50" />
-
-        {/* Elegant Double Border Frame */}
         <div className="absolute inset-6 border-[3px] border-[#024930] pointer-events-none" />
-
         <div className="absolute inset-0 flex items-center justify-center opacity-[0.03] pointer-events-none z-0">
-          <div style={{ fontFamily: '"Bona Nova", serif' }} className="text-[15rem] font-bold text-[#024930] tracking-wide -rotate-45 whitespace-nowrap">
-            BELLABONA
-          </div>
+          <div style={{ fontFamily: '"Bona Nova", serif' }} className="text-[15rem] font-bold text-[#024930] tracking-wide -rotate-45 whitespace-nowrap">BELLABONA</div>
         </div>
-
         <div className="absolute inset-7 border border-[#024930] pointer-events-none z-10" />
-
-        {/* Corner Accents */}
         <div className="absolute top-6 left-6 w-16 h-16 border-r border-b border-[#F8F7F6] z-10" />
         <div className="absolute top-6 right-6 w-16 h-16 border-l border-b border-[#F8F7F6] z-10" />
         <div className="absolute bottom-6 left-6 w-16 h-16 border-r border-t border-[#F8F7F6] z-10" />
         <div className="absolute bottom-6 right-6 w-16 h-16 border-l border-t border-[#F8F7F6] z-10" />
-
-        {/* Header Section */}
         <div className="flex flex-col items-center w-full pt-16 pb-6 z-20 px-24">
           <BrandLogo className="h-[auto] text-7xl mb-8 text-[#024930]" />
-
           <div className="flex items-center gap-6 mt-4">
             <span className="h-[1px] w-16 bg-[#024930]/40" />
             <p className="font-serif text-[#024930] text-xl tracking-[0.1em] uppercase" style={{ fontFamily: "'Playfair Display', serif" }}>
@@ -698,42 +675,30 @@ const App: React.FC = () => {
             <span className="h-[1px] w-16 bg-[#024930]/40" />
           </div>
         </div>
-        {/* Content Section */}
         <div className="flex-1 w-full px-24 z-20 flex flex-col items-center justify-center">
           <div className={`w-full ${isDense ? 'columns-2 gap-16' : 'flex flex-col items-center gap-16'} space-y-12`}>
             {sortedGroups.map((groupTitle, idx) => (
               <div key={idx} className="break-inside-avoid mb-8 w-full">
-                {/* Section Header */}
                 <div className={`flex items-center justify-center mb-8 border-b border-[#024930]/20 pb-4`}>
                   <h2 className="text-3xl font-bold text-[#024930] uppercase tracking-[0.25em]" style={{ fontFamily: "'Playfair Display', serif" }}>
-                    {lang === 'de' ? (
-                      groupTitle === 'Vegetarian' ? 'Vegetarisch' :
-                        groupTitle === 'Meat' ? 'Fleisch' :
-                          groupTitle === 'Fish' ? 'Fisch' : groupTitle
-                    ) : groupTitle}
+                    {lang === 'de' ? (groupTitle === 'Vegetarian' ? 'Vegetarisch' : groupTitle === 'Meat' ? 'Fleisch' : groupTitle === 'Fish' ? 'Fisch' : groupTitle) : groupTitle}
                   </h2>
                 </div>
-
-                {/* Items */}
                 <div className={`flex flex-col ${isDense ? 'items-start text-left' : 'items-center text-center'} gap-8 flex-grow justify-center`}>
                   {grouped[groupTitle].map((item, iIdx) => (
                     <div key={iIdx} className="flex flex-col group w-full py-2">
                       <div className="flex items-start justify-between w-full">
-                        {/* Item Name - Left */}
                         <span className="text-3xl font-bold text-[#1a1a1a] leading-tight tracking-wide text-left flex-1" style={{ fontFamily: "'Bona Nova', serif" }}>
-                          {(lang === 'de' ? item.item_name_de : item.item_name_en)}
+                          {lang === 'de' ? item.item_name_de : item.item_name_en}
                         </span>
-
-                        {/* Allergens - Right */}
                         <div className="flex flex-col items-end pl-6 shrink-0 max-w-[35%]">
-                          {(item.allergens_de) && (
+                          {item.allergens_de && (
                             <div className="flex items-center gap-2">
                               <span className="text-sm uppercase tracking-widest text-[#024930] font-sans font-bold text-right leading-tight" style={{ fontFamily: "'Inter', sans-serif" }}>
                                 {item.allergens_de}
                               </span>
                             </div>
                           )}
-                          {/* User requested removal of vegan symbol from vegan items */}
                         </div>
                       </div>
                     </div>
@@ -743,19 +708,11 @@ const App: React.FC = () => {
             ))}
           </div>
         </div>
-
-        {/* Footer */}
         <div className="w-full text-center pb-12 z-20 mt-auto flex flex-col items-center">
           <span className="text-4xl text-[#024930]/40 rotate-180 mb-4" style={{ fontFamily: "'Pinyon Script', cursive" }}>❦</span>
-          <p className="text-3xl text-[#024930]" style={{ fontFamily: "'Pinyon Script', cursive" }}>
-            Bon Appétit
-          </p>
-          <p className="text-[9px] font-sans uppercase tracking-[0.25em] text-[#024930]/50 mt-4">
-            Prepared Freshly for You
-          </p>
+          <p className="text-3xl text-[#024930]" style={{ fontFamily: "'Pinyon Script', cursive" }}>Bon Appétit</p>
+          <p className="text-[9px] font-sans uppercase tracking-[0.25em] text-[#024930]/50 mt-4">Prepared Freshly for You</p>
         </div>
-
-        {/* CSS for printing A4 specifically */}
         <style>{`
           @media print {
             @page { size: A4; margin: 0; }

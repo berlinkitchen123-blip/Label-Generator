@@ -10,7 +10,6 @@ import {
   X,
   Sprout,
   Soup,
-  Database,
   Eye,
   Loader2,
   FileSpreadsheet,

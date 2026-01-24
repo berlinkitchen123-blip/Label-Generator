@@ -693,10 +693,13 @@ const App: React.FC = () => {
 
         {/* Header Section */}
         <div className="flex flex-col items-center w-full pt-16 pb-6 z-20 px-24">
-          {/* Header Section */}
-          <div className="flex flex-col items-center w-full pt-16 pb-6 z-20 px-24">
-            <BrandLogo className="h-[auto] text-7xl mb-8 text-[#024930]" />
+          <BrandLogo className="h-[auto] text-7xl mb-8 text-[#024930]" />
 
+          <div className="flex items-center gap-6 mt-4">
+            <span className="h-[1px] w-16 bg-[#024930]/40" />
+            <p className="font-serif text-[#024930] text-xl tracking-[0.1em] uppercase" style={{ fontFamily: "'Playfair Display', serif" }}>
+              {new Date().toLocaleDateString('en-GB', { weekday: 'long', day: 'numeric', month: 'long', year: 'numeric' })}
+            </p>
             <div className="flex items-center gap-6 mt-4">
               <span className="h-[1px] w-16 bg-[#024930]/40" />
               <p className="font-serif text-[#024930] text-xl tracking-[0.1em] uppercase" style={{ fontFamily: "'Playfair Display', serif" }}>

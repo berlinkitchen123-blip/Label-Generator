@@ -149,8 +149,8 @@ const BRAND_COLOR_PINK = '#f895bd'; // Darker Brand Pink
 const BRAND_LOGO_B64 = "data:image/png;base64,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";
 
 const BrandLogo = ({ className = "h-12" }: { className?: string }) => (
-  <div className={`font-serif font-bold tracking-tight select-none flex items-center justify-center ${className}`} style={{ fontFamily: '"Bona Nova", serif' }}>
-    <span style={{ fontSize: 'inherit', lineHeight: 1 }}>BELLABONA</span>
+  <div className={`font-serif font-bold tracking-tight select-none flex items-center justify-center leading-none ${className}`} style={{ fontFamily: '"Bona Nova", serif' }}>
+    <span style={{ fontSize: 'inherit' }}>BELLABONA</span>
   </div>
 );
 
@@ -462,9 +462,8 @@ const Label: React.FC<{ bundle: Bundle, lang: 'de' | 'en', packedOn: string, for
         </div>
         <div className="flex flex-col items-end">
           {/* Logo in text form for strict crispness */}
-          <div style={{ fontFamily: '"Bona Nova", serif' }} className="text-xl font-bold text-[#024930] tracking-tight leading-none">
-            BELLABONA
-          </div>
+          {/* Logo in text form for strict crispness */}
+          <BrandLogo className="text-xl text-[#024930] h-[auto]" />
         </div>
       </div>
     </div>
@@ -694,547 +693,547 @@ const App: React.FC = () => {
 
         {/* Header Section */}
         <div className="flex flex-col items-center w-full pt-16 pb-6 z-20 px-24">
-          <div style={{ fontFamily: '"Bona Nova", serif' }} className="text-7xl font-bold text-[#024930] tracking-tight leading-none mb-8">
-            BELLABONA
+          {/* Header Section */}
+          <div className="flex flex-col items-center w-full pt-16 pb-6 z-20 px-24">
+            <BrandLogo className="h-[auto] text-7xl mb-8 text-[#024930]" />
+
+            <div className="flex items-center gap-6 mt-4">
+              <span className="h-[1px] w-16 bg-[#024930]/40" />
+              <p className="font-serif text-[#024930] text-xl tracking-[0.1em] uppercase" style={{ fontFamily: "'Playfair Display', serif" }}>
+                {new Date().toLocaleDateString('en-GB', { weekday: 'long', day: 'numeric', month: 'long', year: 'numeric' })}
+              </p>
+              <span className="h-[1px] w-16 bg-[#024930]/40" />
+            </div>
           </div>
 
-          <div className="flex items-center gap-6 mt-4">
-            <span className="h-[1px] w-16 bg-[#024930]/40" />
-            <p className="font-serif text-[#024930] text-xl tracking-[0.1em] uppercase" style={{ fontFamily: "'Playfair Display', serif" }}>
-              {new Date().toLocaleDateString('en-GB', { weekday: 'long', day: 'numeric', month: 'long', year: 'numeric' })}
-            </p>
-            <span className="h-[1px] w-16 bg-[#024930]/40" />
-          </div>
-        </div>
+          {/* Content Section */}
+          <div className="flex-1 w-full px-24 z-20 flex flex-col items-center justify-center">
+            <div className={`w-full ${isDense ? 'columns-2 gap-16' : 'flex flex-col items-center gap-16'} space-y-12`}>
+              {sortedGroups.map((groupTitle, idx) => (
+                <div key={idx} className="break-inside-avoid mb-8 w-full">
+                  {/* Section Header */}
+                  <div className={`flex items-center justify-center mb-8 border-b border-[#024930]/20 pb-4`}>
+                    <h2 className="text-3xl font-bold text-[#024930] uppercase tracking-[0.25em]" style={{ fontFamily: "'Playfair Display', serif" }}>
+                      {lang === 'de' ? (
+                        groupTitle === 'Vegetarian' ? 'Vegetarisch' :
+                          groupTitle === 'Meat' ? 'Fleisch' :
+                            groupTitle === 'Fish' ? 'Fisch' : groupTitle
+                      ) : groupTitle}
+                    </h2>
+                  </div>
 
-        {/* Content Section */}
-        <div className="flex-1 w-full px-24 z-20 flex flex-col items-center justify-center">
-          <div className={`w-full ${isDense ? 'columns-2 gap-16' : 'flex flex-col items-center gap-16'} space-y-12`}>
-            {sortedGroups.map((groupTitle, idx) => (
-              <div key={idx} className="break-inside-avoid mb-8 w-full">
-                {/* Section Header */}
-                <div className={`flex items-center justify-center mb-8 border-b border-[#024930]/20 pb-4`}>
-                  <h2 className="text-3xl font-bold text-[#024930] uppercase tracking-[0.25em]" style={{ fontFamily: "'Playfair Display', serif" }}>
-                    {lang === 'de' ? (
-                      groupTitle === 'Vegetarian' ? 'Vegetarisch' :
-                        groupTitle === 'Meat' ? 'Fleisch' :
-                          groupTitle === 'Fish' ? 'Fisch' : groupTitle
-                    ) : groupTitle}
-                  </h2>
-                </div>
+                  {/* Items */}
+                  <div className={`flex flex-col ${isDense ? 'items-start text-left' : 'items-center text-center'} gap-8 flex-grow justify-center`}>
+                    {grouped[groupTitle].map((item, iIdx) => (
+                      <div key={iIdx} className="flex flex-col group w-full py-2">
+                        <div className="flex items-start justify-between w-full">
+                          {/* Item Name - Left */}
+                          <span className="text-3xl font-bold text-[#1a1a1a] leading-tight tracking-wide text-left flex-1" style={{ fontFamily: "'Bona Nova', serif" }}>
+                            {(lang === 'de' ? item.item_name_de : item.item_name_en)}
+                          </span>
 
-                {/* Items */}
-                <div className={`flex flex-col ${isDense ? 'items-start text-left' : 'items-center text-center'} gap-8 flex-grow justify-center`}>
-                  {grouped[groupTitle].map((item, iIdx) => (
-                    <div key={iIdx} className="flex flex-col group w-full py-2">
-                      <div className="flex items-start justify-between w-full">
-                        {/* Item Name - Left */}
-                        <span className="text-3xl font-bold text-[#1a1a1a] leading-tight tracking-wide text-left flex-1" style={{ fontFamily: "'Bona Nova', serif" }}>
-                          {(lang === 'de' ? item.item_name_de : item.item_name_en)}
-                        </span>
-
-                        {/* Allergens - Right */}
-                        <div className="flex flex-col items-end pl-6 shrink-0 max-w-[35%]">
-                          {(item.allergens_de) && (
-                            <div className="flex items-center gap-2">
-                              <span className="text-sm uppercase tracking-widest text-[#024930] font-sans font-bold text-right leading-tight" style={{ fontFamily: "'Inter', sans-serif" }}>
-                                {item.allergens_de}
-                              </span>
-                            </div>
-                          )}
-                          {/* User requested removal of vegan symbol from vegan items */}
+                          {/* Allergens - Right */}
+                          <div className="flex flex-col items-end pl-6 shrink-0 max-w-[35%]">
+                            {(item.allergens_de) && (
+                              <div className="flex items-center gap-2">
+                                <span className="text-sm uppercase tracking-widest text-[#024930] font-sans font-bold text-right leading-tight" style={{ fontFamily: "'Inter', sans-serif" }}>
+                                  {item.allergens_de}
+                                </span>
+                              </div>
+                            )}
+                            {/* User requested removal of vegan symbol from vegan items */}
+                          </div>
                         </div>
                       </div>
-                    </div>
-                  ))}
+                    ))}
+                  </div>
                 </div>
-              </div>
-            ))}
+              ))}
+            </div>
           </div>
-        </div>
 
-        {/* Footer */}
-        <div className="w-full text-center pb-12 z-20 mt-auto flex flex-col items-center">
-          <span className="text-4xl text-[#024930]/40 rotate-180 mb-4" style={{ fontFamily: "'Pinyon Script', cursive" }}>❦</span>
-          <p className="text-3xl text-[#024930]" style={{ fontFamily: "'Pinyon Script', cursive" }}>
-            Bon Appétit
-          </p>
-          <p className="text-[9px] font-sans uppercase tracking-[0.25em] text-[#024930]/50 mt-4">
-            Prepared Freshly for You
-          </p>
-        </div>
+          {/* Footer */}
+          <div className="w-full text-center pb-12 z-20 mt-auto flex flex-col items-center">
+            <span className="text-4xl text-[#024930]/40 rotate-180 mb-4" style={{ fontFamily: "'Pinyon Script', cursive" }}>❦</span>
+            <p className="text-3xl text-[#024930]" style={{ fontFamily: "'Pinyon Script', cursive" }}>
+              Bon Appétit
+            </p>
+            <p className="text-[9px] font-sans uppercase tracking-[0.25em] text-[#024930]/50 mt-4">
+              Prepared Freshly for You
+            </p>
+          </div>
 
-        {/* CSS for printing A4 specifically */}
-        <style>{`
+          {/* CSS for printing A4 specifically */}
+          <style>{`
           @media print {
             @page { size: A4; margin: 0; }
             body { print-color-adjust: exact; -webkit-print-color-adjust: exact; }
           }
         `}</style>
-      </div>
-    );
+        </div>
+        );
   };
 
-  // Review Print Component
-  const ReviewPrint: React.FC<{ size: 'A4' | 'A6' }> = ({ size }) => {
+        // Review Print Component
+        const ReviewPrint: React.FC<{ size: 'A4' | 'A6' }> = ({size}) => {
     // A4: 210mm x 297mm
     // A6: 105mm x 148.5mm
-    const dim = size === 'A4' ? { w: '210mm', h: '297mm' } : { w: '105mm', h: '148.5mm' };
-    const titleSize = size === 'A4' ? 'text-7xl mb-24' : 'text-3xl mb-12'; // Scaled down for A6
-    const subSize = size === 'A4' ? 'text-5xl leading-tight mb-20' : 'text-xl leading-tight mb-8';
-    const qrSize = size === 'A4' ? 'w-[400px] h-[400px]' : 'w-[150px] h-[150px]';
-    const logoSize = size === 'A4' ? 'text-5xl' : 'text-2xl';
+    const dim = size === 'A4' ? {w: '210mm', h: '297mm' } : {w: '105mm', h: '148.5mm' };
+        const titleSize = size === 'A4' ? 'text-7xl mb-24' : 'text-3xl mb-12'; // Scaled down for A6
+        const subSize = size === 'A4' ? 'text-5xl leading-tight mb-20' : 'text-xl leading-tight mb-8';
+        const qrSize = size === 'A4' ? 'w-[400px] h-[400px]' : 'w-[150px] h-[150px]';
+        const logoSize = size === 'A4' ? 'text-5xl' : 'text-2xl';
 
-    return (
-      <div
-        className="flex flex-col items-center text-center bg-[#FEACCF] relative font-sans p-10 overflow-hidden"
-        style={{ width: dim.w, height: dim.h }}
-      >
-        {/* Company Name Header */}
-        <h1 className={`${titleSize} font-black text-[#024930] uppercase mt-10 tracking-wide`}>
-          {companyName || 'COMPANY NAME'}
-        </h1>
+        return (
+        <div
+          className="flex flex-col items-center text-center bg-[#FEACCF] relative font-sans p-10 overflow-hidden"
+          style={{ width: dim.w, height: dim.h }}
+        >
+          {/* Company Name Header */}
+          <h1 className={`${titleSize} font-black text-[#024930] uppercase mt-10 tracking-wide`}>
+            {companyName || 'COMPANY NAME'}
+          </h1>
 
-        {/* Call to Action */}
-        <h2 className={`${subSize} font-bold text-[#024930] uppercase tracking-wide`}>
-          RATE YOUR LUNCH<br />WITH US
-        </h2>
+          {/* Call to Action */}
+          <h2 className={`${subSize} font-bold text-[#024930] uppercase tracking-wide`}>
+            RATE YOUR LUNCH<br />WITH US
+          </h2>
 
-        {/* QR Code - Custom */}
-        <div className="p-0">
-          <img
-            src="review_qr.png"
-            className={qrSize}
-            alt="Review QR"
-            style={{ mixBlendMode: 'normal' }}
-          />
+          {/* QR Code - Custom */}
+          <div className="p-0">
+            <img
+              src="review_qr.png"
+              className={qrSize}
+              alt="Review QR"
+              style={{ mixBlendMode: 'normal' }}
+            />
+          </div>
+
+          {/* Footer Brand */}
+          <div className={`mt-auto font-black ${logoSize} text-[#024930] uppercase tracking-tighter mb-4`}>
+            BELLABONA
+          </div>
         </div>
-
-        {/* Footer Brand */}
-        <div className={`mt-auto font-black ${logoSize} text-[#024930] uppercase tracking-tighter mb-4`}>
-          BELLABONA
-        </div>
-      </div>
-    );
+        );
   };
 
-  return (
-    <>
-      <div className="print-only">
-        {previewType === 'menu' && activeTab === 'catering' ? (
-          <>
-            <div style={{ width: '210mm', height: '297mm', pageBreakAfter: 'always' }}>
-              <MenuPrint />
-            </div>
-            <div style={{ width: '210mm', height: '297mm', pageBreakAfter: 'always' }}>
-              <ReviewPrint size="A4" />
-            </div>
-          </>
-        ) : (
-          // Label View (A6) Logic
-          // If Catering, we Flatten Print Groups per Item
-          activeTab === 'catering' && previewType === 'labels' ? (
-            (() => {
-              // Flatten all items from all selections
-              const allItems: any[] = cateringSelections.flatMap(sel => {
-                const b = bundles.find(x => x.id === sel.bundleId);
-                if (!b) return [];
-                return Array(sel.quantity).fill(b).flatMap(() => b.items);
-              });
-
-              // Add Review Card at the end
-              allItems.push({ isReviewCard: true });
-
-              // 1. Group items into pages of 4
-              const pages = [];
-              for (let i = 0; i < allItems.length; i += 4) {
-                pages.push(allItems.slice(i, i + 4));
-              }
-
-              // 2. Render each A4 page
-              return (
-                <>
-                  {pages.map((pageItems, pIdx) => (
-                    <div key={pIdx} className="w-[210mm] h-[297mm] bg-white grid grid-cols-2 grid-rows-2" style={{ pageBreakAfter: 'always', margin: 0, padding: 0 }}>
-                      {pageItems.map((item, iIdx) => (
-                        <div key={iIdx} className="w-[105mm] h-[148.5mm] overflow-hidden flex items-center justify-center">
-                          {item.isReviewCard ? <ReviewPrint size="A6" /> : <CateringItemLabel item={item} lang={lang} forPrint />}
-                        </div>
-                      ))}
-                    </div>
-                  ))}
-                </>
-              );
-            })()
-          ) : previewType === 'review-a4' ? (
-            <ReviewPrint size="A4" />
-          ) : previewType === 'review-a6' ? (
-            <ReviewPrint size="A6" />
-          ) : (
-            // Standard Bundle Labels Preview
-            printGroups.map((group, groupIdx) => (
-              <div key={groupIdx} className="label-page-group mb-12" style={{ breakAfter: 'always' }}>
-                {group.map((bundle, bIdx) => (
-                  <div key={bIdx} className="label-card-container">
-                    <Label bundle={bundle} lang={lang} packedOn={packedOn} forPrint variant="standard" />
-                  </div>
-                ))}
-              </div>
-            ))
-          ))}
-      </div>
-
-      <div className="no-print min-h-screen flex flex-col bg-[#F8F7F6] text-[#024930]">
-        <div className="flex flex-1">
-          <aside className="w-20 lg:w-64 bg-[#024930] border-r border-[#024930] flex flex-col shadow-2xl z-20">
-            <div className="p-6 border-b border-[#F8F7F6]/10 flex items-center gap-3">
-              <div className="w-10 h-10 rounded-xl bg-[#FEACCF] flex items-center justify-center shadow-lg">
-                <Sprout size={24} color="#024930" />
-              </div>
-              <div className="hidden lg:block">
-                <h1 className="font-black text-sm text-white tracking-widest">BELLA&BONA</h1>
-                <p className="text-[9px] text-[#FEACCF] uppercase font-bold tracking-wider">Label Factory</p>
-              </div>
-            </div>
-            <nav className="flex-1 p-4 space-y-2">
-              <button onClick={() => setActiveTab('generator')} className={`w-full flex items-center gap-4 px-4 py-3 rounded-xl transition-all font-bold ${activeTab === 'generator' ? 'bg-[#FEACCF] text-[#024930] shadow-lg translate-x-1' : 'text-[#F8F7F6]/60 hover:text-white hover:bg-white/5'}`}>
-                <Printer size={20} /><span className="hidden lg:block">Generator</span>
-              </button>
-              <button onClick={() => setActiveTab('catering')} className={`w-full flex items-center gap-4 px-4 py-3 rounded-xl transition-all font-bold ${activeTab === 'catering' ? 'bg-[#FEACCF] text-[#024930] shadow-lg translate-x-1' : 'text-[#F8F7F6]/60 hover:text-white hover:bg-white/5'}`}>
-                <ChefHat size={20} /><span className="hidden lg:block">Special Catering</span>
-              </button>
-              <button onClick={() => setActiveTab('database')} className={`w-full flex items-center gap-4 px-4 py-3 rounded-xl transition-all font-bold ${activeTab === 'database' ? 'bg-[#FEACCF] text-[#024930] shadow-lg translate-x-1' : 'text-[#F8F7F6]/60 hover:text-white hover:bg-white/5'}`}>
-                <Database size={20} /><span className="hidden lg:block">Database</span>
-              </button>
-            </nav>
-
-            <div className="p-4">
-              <button onClick={() => setActiveTab('trash')} className={`w-full flex items-center gap-4 px-4 py-3 rounded-xl transition-all font-bold ${activeTab === 'trash' ? 'bg-red-500/20 text-red-200 shadow-lg' : 'text-[#F8F7F6]/40 hover:text-red-300 hover:bg-red-500/10'}`}>
-                <Trash2 size={20} /><span className="hidden lg:block">Trash</span>
-              </button>
-            </div>
-            <div className="p-4 border-t border-[#F8F7F6]/10 space-y-4">
-              <div className="hidden lg:block px-2">
-                <label className="text-[10px] uppercase text-[#F8F7F6]/50 font-bold tracking-wider">Packed On</label>
-                <input type="text" value={packedOn} onChange={e => setPackedOn(e.target.value)} className="w-full bg-[#033b26] rounded-lg px-3 py-2 text-white text-xs mt-1 border-none focus:ring-2 focus:ring-[#FEACCF]" />
-              </div>
-              <div className="flex bg-[#033b26] rounded-lg p-1">
-                <button onClick={() => setLang('de')} className={`flex-1 py-1.5 text-xs rounded-md transition-all font-bold ${lang === 'de' ? 'bg-[#FEACCF] text-[#024930] shadow-sm' : 'text-[#F8F7F6]/50 hover:text-white'}`}>DE</button>
-                <button onClick={() => setLang('en')} className={`flex-1 py-1.5 text-xs rounded-md transition-all font-bold ${lang === 'en' ? 'bg-[#FEACCF] text-[#024930] shadow-sm' : 'text-[#F8F7F6]/50 hover:text-white'}`}>EN</button>
-              </div>
-            </div>
-          </aside>
-
-          <main className="flex-1 overflow-y-auto p-8 lg:p-12">
-            {activeTab === 'generator' ? (
-              <div className="grid grid-cols-1 xl:grid-cols-12 gap-10">
-                <div className="xl:col-span-5 space-y-8">
-                  <div className="relative">
-                    <Search className="absolute left-5 top-1/2 -translate-y-1/2 text-[#024930]/40" size={20} />
-                    <input type="text" placeholder={t.searchPlaceholder} value={searchTerm} onChange={(e) => setSearchTerm(e.target.value)} className="w-full bg-white rounded-2xl pl-14 pr-6 py-4 text-sm text-[#024930] border-none focus:ring-2 focus:ring-[#FEACCF] shadow-xl placeholder:text-[#024930]/20" />
-                  </div>
-                  <div className="space-y-4 max-h-[60vh] overflow-y-auto pr-3">
-                    {filteredBundles.map(bundle => (
-                      <div key={bundle.id} onClick={() => addSelection(bundle.id)} className="bg-white rounded-2xl p-5 flex items-center justify-between cursor-pointer group hover:ring-2 hover:ring-[#FEACCF] transition-all shadow-sm hover:shadow-lg">
-                        <div className="flex items-center gap-4">
-                          <div className="w-10 h-10 rounded-full bg-[#F8F7F6] flex items-center justify-center group-hover:bg-[#FEACCF] transition-colors">
-                            <Soup size={20} className="text-[#024930]" />
-                          </div>
-                          <div>
-                            <p className="font-black text-[#024930] text-sm">{lang === 'de' ? bundle.name_de : bundle.name_en}</p>
-                            <p className="text-[10px] font-bold text-[#024930]/40 uppercase tracking-wider">{bundle.items.length} items</p>
-                          </div>
-                        </div>
-                        <Plus size={20} className="text-[#024930]/20 group-hover:text-[#024930]" />
-                      </div>
-                    ))}
-                  </div>
+        return (
+        <>
+          <div className="print-only">
+            {previewType === 'menu' && activeTab === 'catering' ? (
+              <>
+                <div style={{ width: '210mm', height: '297mm', pageBreakAfter: 'always' }}>
+                  <MenuPrint />
                 </div>
-                <div className="xl:col-span-7">
-                  <section className="bg-white rounded-3xl p-8 flex flex-col min-h-[500px] shadow-2xl relative overflow-hidden">
-                    <div className="absolute top-0 right-0 p-8 opacity-[0.03] pointer-events-none">
-                      <Sprout size={400} />
-                    </div>
-                    <div className="flex justify-between mb-10 relative z-10">
-                      <h2 className="text-2xl font-black text-[#024930]">Selected <span className="text-[#FEACCF]">{selections.length}</span></h2>
-                      {selections.length > 0 && <button onClick={() => setSelections([])} className="text-red-400 font-bold uppercase text-[10px] tracking-widest hover:text-red-500">Clear All</button>}
-                    </div>
-                    <div className="flex-1 space-y-4 relative z-10">
-                      {selections.map(sel => {
-                        const b = bundles.find(x => x.id === sel.bundleId);
-                        if (!b) return null;
-                        return (
-                          <div key={sel.bundleId} className="flex items-center gap-4 bg-[#F8F7F6] rounded-xl p-4 border border-[#F8F7F6] hover:border-[#FEACCF]/50 transition-colors">
-                            <div className="flex-1"><p className="font-bold text-[#024930]">{lang === 'de' ? b.name_de : b.name_en}</p></div>
-                            <input type="number" min="1" value={sel.quantity} onChange={(e) => setSelections(prev => prev.map(s => s.bundleId === sel.bundleId ? { ...s, quantity: parseInt(e.target.value) || 1 } : s))} className="w-16 bg-white rounded-lg p-2 text-center text-[#024930] font-black border-none shadow-sm focus:ring-2 focus:ring-[#FEACCF]" />
-                            <button onClick={() => setSelections(prev => prev.filter(s => s.bundleId !== sel.bundleId))} className="text-[#024930]/20 hover:text-red-400 px-2"><X size={20} /></button>
-                          </div>
-                        );
-                      })}
-                      {selections.length === 0 && (
-                        <div className="h-full flex flex-col items-center justify-center opacity-10 text-[#024930] mt-20">
-                          <Printer size={64} className="mb-4" />
-                          <p className="font-bold uppercase tracking-widest">No bundles selected</p>
-                        </div>
-                      )}
-                    </div>
-                    {selections.length > 0 && (
-                      <div className="mt-8 pt-8 border-t border-[#F8F7F6] flex justify-between items-center">
-                        <button onClick={() => setIsPreviewing(true)} className="flex items-center gap-2 text-[#024930] font-bold hover:text-[#FEACCF] transition-colors">
-                          <Eye size={20} /> Preview
-                        </button>
-                        <button onClick={() => window.print()} className="bg-[#024930] text-white font-black px-10 py-4 rounded-xl flex items-center gap-3 shadow-xl hover:shadow-2xl hover:-translate-y-0.5 active:translate-y-0 transition-all uppercase tracking-wider text-xs">
-                          <Printer size={20} /> Print A4 Grid
-                        </button>
-                      </div>
-                    )}
-                  </section>
+                <div style={{ width: '210mm', height: '297mm', pageBreakAfter: 'always' }}>
+                  <ReviewPrint size="A4" />
                 </div>
-              </div>
-            ) : activeTab === 'catering' ? (
-              <div className="grid grid-cols-1 xl:grid-cols-12 gap-10">
-                <div className="xl:col-span-5 space-y-8">
-                  {/* Search & Selection for Catering - Reuse but with cateringSelections */}
-                  <div className="relative">
-                    <Search className="absolute left-5 top-1/2 -translate-y-1/2 text-[#024930]/40" size={20} />
-                    <input type="text" placeholder="Search menu items..." value={searchTerm} onChange={(e) => setSearchTerm(e.target.value)} className="w-full bg-white rounded-2xl pl-14 pr-6 py-4 text-sm text-[#024930] border-none focus:ring-2 focus:ring-[#FEACCF] shadow-xl placeholder:text-[#024930]/20" />
-                  </div>
-
-                  <div className="space-y-4 max-h-[50vh] overflow-y-auto pr-3">
-                    {filteredBundles.map(bundle => (
-                      <div key={bundle.id} onClick={() => addSelection(bundle.id, true)} className="bg-white rounded-2xl p-5 flex items-center justify-between cursor-pointer group hover:ring-2 hover:ring-[#FEACCF] transition-all shadow-sm hover:shadow-lg">
-                        <div className="flex items-center gap-4">
-                          <div className="w-10 h-10 rounded-full bg-[#F8F7F6] flex items-center justify-center group-hover:bg-[#FEACCF] transition-colors">
-                            <Utensils size={20} className="text-[#024930]" />
-                          </div>
-                          <div>
-                            <p className="font-black text-[#024930] text-sm">{lang === 'de' ? bundle.name_de : bundle.name_en}</p>
-                          </div>
-                        </div>
-                        <Plus size={20} className="text-[#024930]/20 group-hover:text-[#024930]" />
-                      </div>
-                    ))}
-                  </div>
-                </div>
-
-                <div className="xl:col-span-7">
-                  <section className="bg-white rounded-3xl p-8 flex flex-col min-h-[600px] shadow-2xl relative overflow-hidden">
-                    <div className="absolute top-0 right-0 p-4 opacity-[0.03] pointer-events-none">
-                      <ChefHat size={300} />
-                    </div>
-
-                    <div className="flex justify-between mb-10 relative z-10">
-                      <div>
-                        <h2 className="text-2xl font-black text-[#024930]">Catering Menu</h2>
-                        <p className="text-[#024930]/50 text-sm font-bold uppercase tracking-wider mt-1">{companyName || 'Untitled Event'} • {cateringDate}</p>
-                      </div>
-                      {cateringSelections.length > 0 && <button onClick={() => setCateringSelections([])} className="text-red-400 font-bold uppercase text-[10px] tracking-widest hover:text-red-500">Clear Menu</button>}
-                    </div>
-
-                    <div className="flex-1 space-y-4 relative z-10">
-                      {cateringSelections.map(sel => {
-                        const b = bundles.find(x => x.id === sel.bundleId);
-                        if (!b) return null;
-                        return (
-                          <div key={sel.bundleId} className="flex items-center gap-4 bg-[#F8F7F6] rounded-xl p-4 border border-[#F8F7F6] hover:border-[#FEACCF]/50 transition-colors">
-                            <div className="flex-1">
-                              <p className="font-bold text-[#024930]">{lang === 'de' ? b.name_de : b.name_en}</p>
-                              <p className="text-[10px] text-[#024930]/50 uppercase font-black tracking-wider">{b.items.length} items</p>
-                            </div>
-                            <input type="number" min="1" value={sel.quantity} onChange={(e) => setCateringSelections(prev => prev.map(s => s.bundleId === sel.bundleId ? { ...s, quantity: parseInt(e.target.value) || 1 } : s))} className="w-16 bg-white rounded-lg p-2 text-center text-[#024930] font-black border-none shadow-sm focus:ring-2 focus:ring-[#FEACCF]" />
-                            <button onClick={() => setCateringSelections(prev => prev.filter(s => s.bundleId !== sel.bundleId))} className="text-[#024930]/20 hover:text-red-400 px-2"><X size={20} /></button>
-                          </div>
-                        );
-                      })}
-
-                      {cateringSelections.length === 0 && (
-                        <div className="h-full flex flex-col items-center justify-center opacity-10 text-[#024930] mt-20">
-                          <ChefHat size={64} className="mb-4" />
-                          <p className="font-bold uppercase tracking-widest">Build your menu</p>
-                        </div>
-                      )}
-                    </div>
-
-                    {cateringSelections.length > 0 && (
-                      <div className="mt-8 pt-8 border-t border-slate-800 grid grid-cols-2 gap-4 relative z-10">
-                        <button onClick={() => { setPreviewType('menu'); setIsPreviewing(true); }} className="bg-slate-800 text-white font-bold py-4 rounded-xl flex items-center justify-center gap-2 hover:bg-slate-700 transition-all">
-                          <FileSpreadsheet size={20} /> Preview Menu (A4)
-                        </button>
-                        <button onClick={() => { setPreviewType('labels'); setIsPreviewing(true); }} className="bg-[#FEACCF] text-[#024930] font-black py-4 rounded-xl flex items-center justify-center gap-2 hover:bg-[#ff9ec6] transition-all shadow-lg">
-                          <Printer size={20} /> Print Labels (A6)
-                        </button>
-                      </div>
-                    )}
-                  </section>
-                </div>
-              </div>
-            ) : activeTab === 'trash' ? (
-              <div className="max-w-4xl mx-auto space-y-8">
-                <section className="bg-white p-10 rounded-3xl shadow-2xl relative overflow-hidden">
-                  <h2 className="text-3xl font-black mb-8 text-red-400 flex items-center gap-4 relative z-10"><Trash2 size={32} /> Trash</h2>
-                  <div className="space-y-2 relative z-10">
-                    {deletedBundles.length === 0 && <p className="text-[#024930]/40 text-center py-10 font-bold uppercase tracking-widest">Trash is empty</p>}
-                    {deletedBundles.map(b => (
-                      <div key={b.id} className="flex justify-between p-4 bg-white rounded-lg border border-[#F8F7F6] items-center opacity-75 hover:opacity-100 transition-all hover:shadow-md">
-                        <span className="font-bold text-[#024930]/60 line-through">{b.name_de}</span>
-                        <div className="flex gap-2">
-                          <button onClick={() => restoreFromTrash(b)} className="flex items-center gap-2 px-3 py-1.5 rounded-lg bg-[#024930]/10 text-[#024930] hover:bg-[#024930]/20 text-xs font-bold uppercase"><RotateCcw size={14} /> Restore</button>
-                          <button onClick={() => permanentDelete(b)} className="flex items-center gap-2 px-3 py-1.5 rounded-lg bg-red-100 text-red-400 hover:bg-red-200 text-xs font-bold uppercase"><Trash2 size={14} /> Delete Forever</button>
-                        </div>
-                      </div>
-                    ))}
-                  </div>
-                </section>
-              </div>
+              </>
             ) : (
-              <div className="max-w-4xl mx-auto space-y-8">
-                <section className="bg-white p-10 rounded-3xl shadow-2xl relative overflow-hidden">
-                  <div className="absolute top-0 right-0 p-8 opacity-[0.03] pointer-events-none">
-                    <Database size={400} />
-                  </div>
-                  <h2 className="text-3xl font-black mb-8 text-[#024930]">Data Management</h2>
-                  <div className="grid md:grid-cols-2 gap-6 mb-10 relative z-10">
-                    <div onClick={() => {
-                      const template = [{ 'type': 'Standard', 'company_name': 'Acme Corp', 'date': '12.12.2025', 'bundle_name_de': 'Brunch Set', 'bundle_name_en': 'Brunch Set', 'item_name_de': 'Croissant', 'item_name_en': 'Croissant', 'allergens_de': 'Gluten, Eier', 'diet_de': 'Vegetarisch' }];
-                      const ws = XLSX.utils.json_to_sheet(template);
-                      const wb = XLSX.utils.book_new();
-                      XLSX.utils.book_append_sheet(wb, ws, "Labels");
-                      XLSX.writeFile(wb, "BellaBona_Template.xlsx");
-                    }} className="bg-[#F8F7F6] p-8 rounded-2xl border-2 border-dashed border-[#024930]/10 cursor-pointer hover:border-[#FEACCF] transition-all group hover:bg-white hover:shadow-lg">
-                      <FileSpreadsheet size={32} className="text-[#024930] mb-4 group-hover:scale-110 transition-transform" />
-                      <p className="font-bold text-[#024930]">Download Template</p>
-                    </div>
-                    <div onClick={() => fileInputRef.current?.click()} className="bg-[#F8F7F6] p-8 rounded-2xl border-2 border-dashed border-[#024930]/10 cursor-pointer hover:border-[#FEACCF] transition-all relative group hover:bg-white hover:shadow-lg">
-                      {isProcessingImport && <div className="absolute inset-0 bg-white/80 flex items-center justify-center rounded-2xl z-20"><Loader2 className="animate-spin text-[#FEACCF]" size={32} /></div>}
-                      <Upload size={32} className="text-[#FEACCF] mb-4 group-hover:scale-110 transition-transform" />
-                      <p className="font-bold text-[#024930]">Upload Excel</p>
-                      <input type="file" ref={fileInputRef} className="hidden" accept=".xlsx" onChange={handleFileUpload} />
-                    </div>
-                  </div>
-                  <div className="space-y-2 max-h-[400px] overflow-y-auto pr-2 relative z-10">
-                    {bundles.map(b => (
-                      <div key={b.id} className="flex justify-between p-4 bg-white rounded-lg border border-[#F8F7F6] items-center hover:bg-[#F8F7F6] transition-colors shadow-sm">
-                        <span className="font-bold text-[#024930]">{b.name_de}</span>
-                        <button onClick={() => moveBundleToTrash(b)} className="text-[#024930]/40 hover:text-red-500 transition-colors"><Trash2 size={18} /></button>
-                      </div>
-                    ))}
-                  </div>
-                </section>
-              </div>
-            )}
-          </main>
-        </div>
-      </div>
+              // Label View (A6) Logic
+              // If Catering, we Flatten Print Groups per Item
+              activeTab === 'catering' && previewType === 'labels' ? (
+                (() => {
+                  // Flatten all items from all selections
+                  const allItems: any[] = cateringSelections.flatMap(sel => {
+                    const b = bundles.find(x => x.id === sel.bundleId);
+                    if (!b) return [];
+                    return Array(sel.quantity).fill(b).flatMap(() => b.items);
+                  });
 
-      {isPreviewing && (
-        <React.Fragment>
-          {/* Force re-render on lang change or content change */}
-          <div className="no-print fixed inset-0 z-[200] bg-[#024930]/90 backdrop-blur-xl flex items-center justify-center p-8 overflow-y-auto" key={`${lang}-${previewType}-${activeTab}`}>
-            <div className="bg-[#F8F7F6] w-full max-w-6xl h-[90vh] rounded-3xl flex flex-col shadow-2xl overflow-hidden">
-              <div className="p-8 border-b border-[#024930]/10 flex justify-between items-center bg-white">
-                <div className="flex items-center gap-4">
-                  <div className="bg-[#024930]/5 p-3 rounded-xl">
-                    <Printer className="text-[#024930] w-6 h-6" />
-                  </div>
-                  <div>
-                    <h2 className="text-2xl font-serif font-bold text-[#024930]">Print Preview</h2>
-                    <div className="flex items-center gap-2 mt-1">
-                      <span className="text-xs font-sans text-slate-500">Checking layout for</span>
-                      <span className="text-xs bg-[#FEACCF]/20 px-2 py-0.5 rounded text-[#024930] uppercase font-bold tracking-wider">{previewType}</span>
-                    </div>
-                  </div>
-                </div>
-                <div className="flex gap-4">
-                  <button onClick={() => setIsPreviewing(false)} className="px-6 py-3 rounded-xl text-slate-500 font-medium hover:bg-slate-50 transition-colors">
-                    Close
-                  </button>
-                  {previewType === 'labels' && (
-                    <button
-                      onClick={() => window.print()}
-                      className="bg-[#FEACCF] hover:bg-[#ffbfe0] text-[#024930] font-bold px-6 py-3 rounded-xl shadow-lg shadow-[#FEACCF]/20 flex items-center gap-2 transition-all transform hover:-translate-y-0.5"
-                    >
-                      <BookOpen size={20} /> Print Label Sheets
-                    </button>
-                  )}
-                  <button
-                    onClick={() => window.print()}
-                    className="bg-[#024930] hover:bg-[#035e3e] text-white font-bold px-8 py-3 rounded-xl shadow-lg shadow-[#024930]/30 flex items-center gap-2 transition-all transform hover:-translate-y-0.5"
-                  >
-                    <Printer size={20} /> Print Now
-                  </button>
-                </div>
-              </div>
+                  // Add Review Card at the end
+                  allItems.push({ isReviewCard: true });
 
-              <div className="flex-1 overflow-auto bg-[#F8F7F6] p-8 flex justify-center items-start">
-                {/* Render Correct Preview */}
-                {previewType === 'menu' && activeTab === 'catering' ? (
-                  <div className="flex flex-col gap-12">
-                    <div className="bg-white shadow-2xl scale-[0.6] origin-top" style={{ width: '210mm', height: '297mm' }}>
-                      <MenuPrint />
-                    </div>
-                    <div className="bg-white shadow-2xl scale-[0.6] origin-top" style={{ width: '210mm', height: '297mm' }}>
-                      <ReviewPrint size="A4" />
-                    </div>
-                  </div>
-                ) : activeTab === 'catering' ? (
-                  // Catering Previews (Labels + Review Card)
-                  (() => {
-                    const allItems: any[] = cateringSelections.flatMap(sel => {
-                      const b = bundles.find(x => x.id === sel.bundleId);
-                      if (!b) return [];
-                      return Array(sel.quantity).fill(b).flatMap(() => b.items);
-                    });
-                    allItems.push({ isReviewCard: true });
+                  // 1. Group items into pages of 4
+                  const pages = [];
+                  for (let i = 0; i < allItems.length; i += 4) {
+                    pages.push(allItems.slice(i, i + 4));
+                  }
 
-                    const pages = [];
-                    for (let i = 0; i < allItems.length; i += 4) {
-                      pages.push(allItems.slice(i, i + 4));
-                    }
-
-                    return (
-                      <div className="flex flex-col gap-12 pb-12">
-                        {pages.map((pageItems, pIdx) => (
-                          <div key={pIdx} className="bg-white shadow-2xl origin-top scale-[0.6]" style={{ width: '210mm', height: '297mm', display: 'grid', gridTemplateColumns: '105mm 105mm', gridTemplateRows: '148.5mm 148.5mm' }}>
-                            {pageItems.map((item, iIdx) => (
-                              <div key={iIdx} style={{ width: '105mm', height: '148.5mm' }}>
-                                {('isReviewCard' in item) ? <ReviewPrint size="A6" /> : <CateringItemLabel item={item} lang={lang} forPrint />}
-                              </div>
-                            ))}
-                          </div>
-                        ))}
-                      </div>
-                    );
-                  })()
-                ) : (
-                  // Standard Labels Preview
-                  <div className="flex flex-col gap-12">
-                    {printGroups.map((group, idx) => (
-                      <div key={idx} className="bg-white shadow-2xl mb-12 scale-[0.6] origin-top" style={{ width: '210mm', height: '297mm' }}>
-                        <div className="label-page-group">
-                          {group.map((b, bi) => (
-                            <div key={bi} className="label-card-container">
-                              <Label bundle={b} lang={lang} packedOn={packedOn} forPrint variant="standard" />
+                  // 2. Render each A4 page
+                  return (
+                    <>
+                      {pages.map((pageItems, pIdx) => (
+                        <div key={pIdx} className="w-[210mm] h-[297mm] bg-white grid grid-cols-2 grid-rows-2" style={{ pageBreakAfter: 'always', margin: 0, padding: 0 }}>
+                          {pageItems.map((item, iIdx) => (
+                            <div key={iIdx} className="w-[105mm] h-[148.5mm] overflow-hidden flex items-center justify-center">
+                              {item.isReviewCard ? <ReviewPrint size="A6" /> : <CateringItemLabel item={item} lang={lang} forPrint />}
                             </div>
                           ))}
                         </div>
+                      ))}
+                    </>
+                  );
+                })()
+              ) : previewType === 'review-a4' ? (
+                <ReviewPrint size="A4" />
+              ) : previewType === 'review-a6' ? (
+                <ReviewPrint size="A6" />
+              ) : (
+                // Standard Bundle Labels Preview
+                printGroups.map((group, groupIdx) => (
+                  <div key={groupIdx} className="label-page-group mb-12" style={{ breakAfter: 'always' }}>
+                    {group.map((bundle, bIdx) => (
+                      <div key={bIdx} className="label-card-container">
+                        <Label bundle={bundle} lang={lang} packedOn={packedOn} forPrint variant="standard" />
                       </div>
                     ))}
                   </div>
+                ))
+              ))}
+          </div>
+
+          <div className="no-print min-h-screen flex flex-col bg-[#F8F7F6] text-[#024930]">
+            <div className="flex flex-1">
+              <aside className="w-20 lg:w-64 bg-[#024930] border-r border-[#024930] flex flex-col shadow-2xl z-20">
+                <div className="p-6 border-b border-[#F8F7F6]/10 flex items-center gap-3">
+                  <div className="w-10 h-10 rounded-xl bg-[#FEACCF] flex items-center justify-center shadow-lg">
+                    <Sprout size={24} color="#024930" />
+                  </div>
+                  <div className="hidden lg:block">
+                    <h1 className="font-black text-sm text-white tracking-widest">BELLA&BONA</h1>
+                    <p className="text-[9px] text-[#FEACCF] uppercase font-bold tracking-wider">Label Factory</p>
+                  </div>
+                </div>
+                <nav className="flex-1 p-4 space-y-2">
+                  <button onClick={() => setActiveTab('generator')} className={`w-full flex items-center gap-4 px-4 py-3 rounded-xl transition-all font-bold ${activeTab === 'generator' ? 'bg-[#FEACCF] text-[#024930] shadow-lg translate-x-1' : 'text-[#F8F7F6]/60 hover:text-white hover:bg-white/5'}`}>
+                    <Printer size={20} /><span className="hidden lg:block">Generator</span>
+                  </button>
+                  <button onClick={() => setActiveTab('catering')} className={`w-full flex items-center gap-4 px-4 py-3 rounded-xl transition-all font-bold ${activeTab === 'catering' ? 'bg-[#FEACCF] text-[#024930] shadow-lg translate-x-1' : 'text-[#F8F7F6]/60 hover:text-white hover:bg-white/5'}`}>
+                    <ChefHat size={20} /><span className="hidden lg:block">Special Catering</span>
+                  </button>
+                  <button onClick={() => setActiveTab('database')} className={`w-full flex items-center gap-4 px-4 py-3 rounded-xl transition-all font-bold ${activeTab === 'database' ? 'bg-[#FEACCF] text-[#024930] shadow-lg translate-x-1' : 'text-[#F8F7F6]/60 hover:text-white hover:bg-white/5'}`}>
+                    <Database size={20} /><span className="hidden lg:block">Database</span>
+                  </button>
+                </nav>
+
+                <div className="p-4">
+                  <button onClick={() => setActiveTab('trash')} className={`w-full flex items-center gap-4 px-4 py-3 rounded-xl transition-all font-bold ${activeTab === 'trash' ? 'bg-red-500/20 text-red-200 shadow-lg' : 'text-[#F8F7F6]/40 hover:text-red-300 hover:bg-red-500/10'}`}>
+                    <Trash2 size={20} /><span className="hidden lg:block">Trash</span>
+                  </button>
+                </div>
+                <div className="p-4 border-t border-[#F8F7F6]/10 space-y-4">
+                  <div className="hidden lg:block px-2">
+                    <label className="text-[10px] uppercase text-[#F8F7F6]/50 font-bold tracking-wider">Packed On</label>
+                    <input type="text" value={packedOn} onChange={e => setPackedOn(e.target.value)} className="w-full bg-[#033b26] rounded-lg px-3 py-2 text-white text-xs mt-1 border-none focus:ring-2 focus:ring-[#FEACCF]" />
+                  </div>
+                  <div className="flex bg-[#033b26] rounded-lg p-1">
+                    <button onClick={() => setLang('de')} className={`flex-1 py-1.5 text-xs rounded-md transition-all font-bold ${lang === 'de' ? 'bg-[#FEACCF] text-[#024930] shadow-sm' : 'text-[#F8F7F6]/50 hover:text-white'}`}>DE</button>
+                    <button onClick={() => setLang('en')} className={`flex-1 py-1.5 text-xs rounded-md transition-all font-bold ${lang === 'en' ? 'bg-[#FEACCF] text-[#024930] shadow-sm' : 'text-[#F8F7F6]/50 hover:text-white'}`}>EN</button>
+                  </div>
+                </div>
+              </aside>
+
+              <main className="flex-1 overflow-y-auto p-8 lg:p-12">
+                {activeTab === 'generator' ? (
+                  <div className="grid grid-cols-1 xl:grid-cols-12 gap-10">
+                    <div className="xl:col-span-5 space-y-8">
+                      <div className="relative">
+                        <Search className="absolute left-5 top-1/2 -translate-y-1/2 text-[#024930]/40" size={20} />
+                        <input type="text" placeholder={t.searchPlaceholder} value={searchTerm} onChange={(e) => setSearchTerm(e.target.value)} className="w-full bg-white rounded-2xl pl-14 pr-6 py-4 text-sm text-[#024930] border-none focus:ring-2 focus:ring-[#FEACCF] shadow-xl placeholder:text-[#024930]/20" />
+                      </div>
+                      <div className="space-y-4 max-h-[60vh] overflow-y-auto pr-3">
+                        {filteredBundles.map(bundle => (
+                          <div key={bundle.id} onClick={() => addSelection(bundle.id)} className="bg-white rounded-2xl p-5 flex items-center justify-between cursor-pointer group hover:ring-2 hover:ring-[#FEACCF] transition-all shadow-sm hover:shadow-lg">
+                            <div className="flex items-center gap-4">
+                              <div className="w-10 h-10 rounded-full bg-[#F8F7F6] flex items-center justify-center group-hover:bg-[#FEACCF] transition-colors">
+                                <Soup size={20} className="text-[#024930]" />
+                              </div>
+                              <div>
+                                <p className="font-black text-[#024930] text-sm">{lang === 'de' ? bundle.name_de : bundle.name_en}</p>
+                                <p className="text-[10px] font-bold text-[#024930]/40 uppercase tracking-wider">{bundle.items.length} items</p>
+                              </div>
+                            </div>
+                            <Plus size={20} className="text-[#024930]/20 group-hover:text-[#024930]" />
+                          </div>
+                        ))}
+                      </div>
+                    </div>
+                    <div className="xl:col-span-7">
+                      <section className="bg-white rounded-3xl p-8 flex flex-col min-h-[500px] shadow-2xl relative overflow-hidden">
+                        <div className="absolute top-0 right-0 p-8 opacity-[0.03] pointer-events-none">
+                          <Sprout size={400} />
+                        </div>
+                        <div className="flex justify-between mb-10 relative z-10">
+                          <h2 className="text-2xl font-black text-[#024930]">Selected <span className="text-[#FEACCF]">{selections.length}</span></h2>
+                          {selections.length > 0 && <button onClick={() => setSelections([])} className="text-red-400 font-bold uppercase text-[10px] tracking-widest hover:text-red-500">Clear All</button>}
+                        </div>
+                        <div className="flex-1 space-y-4 relative z-10">
+                          {selections.map(sel => {
+                            const b = bundles.find(x => x.id === sel.bundleId);
+                            if (!b) return null;
+                            return (
+                              <div key={sel.bundleId} className="flex items-center gap-4 bg-[#F8F7F6] rounded-xl p-4 border border-[#F8F7F6] hover:border-[#FEACCF]/50 transition-colors">
+                                <div className="flex-1"><p className="font-bold text-[#024930]">{lang === 'de' ? b.name_de : b.name_en}</p></div>
+                                <input type="number" min="1" value={sel.quantity} onChange={(e) => setSelections(prev => prev.map(s => s.bundleId === sel.bundleId ? { ...s, quantity: parseInt(e.target.value) || 1 } : s))} className="w-16 bg-white rounded-lg p-2 text-center text-[#024930] font-black border-none shadow-sm focus:ring-2 focus:ring-[#FEACCF]" />
+                                <button onClick={() => setSelections(prev => prev.filter(s => s.bundleId !== sel.bundleId))} className="text-[#024930]/20 hover:text-red-400 px-2"><X size={20} /></button>
+                              </div>
+                            );
+                          })}
+                          {selections.length === 0 && (
+                            <div className="h-full flex flex-col items-center justify-center opacity-10 text-[#024930] mt-20">
+                              <Printer size={64} className="mb-4" />
+                              <p className="font-bold uppercase tracking-widest">No bundles selected</p>
+                            </div>
+                          )}
+                        </div>
+                        {selections.length > 0 && (
+                          <div className="mt-8 pt-8 border-t border-[#F8F7F6] flex justify-between items-center">
+                            <button onClick={() => setIsPreviewing(true)} className="flex items-center gap-2 text-[#024930] font-bold hover:text-[#FEACCF] transition-colors">
+                              <Eye size={20} /> Preview
+                            </button>
+                            <button onClick={() => window.print()} className="bg-[#024930] text-white font-black px-10 py-4 rounded-xl flex items-center gap-3 shadow-xl hover:shadow-2xl hover:-translate-y-0.5 active:translate-y-0 transition-all uppercase tracking-wider text-xs">
+                              <Printer size={20} /> Print A4 Grid
+                            </button>
+                          </div>
+                        )}
+                      </section>
+                    </div>
+                  </div>
+                ) : activeTab === 'catering' ? (
+                  <div className="grid grid-cols-1 xl:grid-cols-12 gap-10">
+                    <div className="xl:col-span-5 space-y-8">
+                      {/* Search & Selection for Catering - Reuse but with cateringSelections */}
+                      <div className="relative">
+                        <Search className="absolute left-5 top-1/2 -translate-y-1/2 text-[#024930]/40" size={20} />
+                        <input type="text" placeholder="Search menu items..." value={searchTerm} onChange={(e) => setSearchTerm(e.target.value)} className="w-full bg-white rounded-2xl pl-14 pr-6 py-4 text-sm text-[#024930] border-none focus:ring-2 focus:ring-[#FEACCF] shadow-xl placeholder:text-[#024930]/20" />
+                      </div>
+
+                      <div className="space-y-4 max-h-[50vh] overflow-y-auto pr-3">
+                        {filteredBundles.map(bundle => (
+                          <div key={bundle.id} onClick={() => addSelection(bundle.id, true)} className="bg-white rounded-2xl p-5 flex items-center justify-between cursor-pointer group hover:ring-2 hover:ring-[#FEACCF] transition-all shadow-sm hover:shadow-lg">
+                            <div className="flex items-center gap-4">
+                              <div className="w-10 h-10 rounded-full bg-[#F8F7F6] flex items-center justify-center group-hover:bg-[#FEACCF] transition-colors">
+                                <Utensils size={20} className="text-[#024930]" />
+                              </div>
+                              <div>
+                                <p className="font-black text-[#024930] text-sm">{lang === 'de' ? bundle.name_de : bundle.name_en}</p>
+                              </div>
+                            </div>
+                            <Plus size={20} className="text-[#024930]/20 group-hover:text-[#024930]" />
+                          </div>
+                        ))}
+                      </div>
+                    </div>
+
+                    <div className="xl:col-span-7">
+                      <section className="bg-white rounded-3xl p-8 flex flex-col min-h-[600px] shadow-2xl relative overflow-hidden">
+                        <div className="absolute top-0 right-0 p-4 opacity-[0.03] pointer-events-none">
+                          <ChefHat size={300} />
+                        </div>
+
+                        <div className="flex justify-between mb-10 relative z-10">
+                          <div>
+                            <h2 className="text-2xl font-black text-[#024930]">Catering Menu</h2>
+                            <p className="text-[#024930]/50 text-sm font-bold uppercase tracking-wider mt-1">{companyName || 'Untitled Event'} • {cateringDate}</p>
+                          </div>
+                          {cateringSelections.length > 0 && <button onClick={() => setCateringSelections([])} className="text-red-400 font-bold uppercase text-[10px] tracking-widest hover:text-red-500">Clear Menu</button>}
+                        </div>
+
+                        <div className="flex-1 space-y-4 relative z-10">
+                          {cateringSelections.map(sel => {
+                            const b = bundles.find(x => x.id === sel.bundleId);
+                            if (!b) return null;
+                            return (
+                              <div key={sel.bundleId} className="flex items-center gap-4 bg-[#F8F7F6] rounded-xl p-4 border border-[#F8F7F6] hover:border-[#FEACCF]/50 transition-colors">
+                                <div className="flex-1">
+                                  <p className="font-bold text-[#024930]">{lang === 'de' ? b.name_de : b.name_en}</p>
+                                  <p className="text-[10px] text-[#024930]/50 uppercase font-black tracking-wider">{b.items.length} items</p>
+                                </div>
+                                <input type="number" min="1" value={sel.quantity} onChange={(e) => setCateringSelections(prev => prev.map(s => s.bundleId === sel.bundleId ? { ...s, quantity: parseInt(e.target.value) || 1 } : s))} className="w-16 bg-white rounded-lg p-2 text-center text-[#024930] font-black border-none shadow-sm focus:ring-2 focus:ring-[#FEACCF]" />
+                                <button onClick={() => setCateringSelections(prev => prev.filter(s => s.bundleId !== sel.bundleId))} className="text-[#024930]/20 hover:text-red-400 px-2"><X size={20} /></button>
+                              </div>
+                            );
+                          })}
+
+                          {cateringSelections.length === 0 && (
+                            <div className="h-full flex flex-col items-center justify-center opacity-10 text-[#024930] mt-20">
+                              <ChefHat size={64} className="mb-4" />
+                              <p className="font-bold uppercase tracking-widest">Build your menu</p>
+                            </div>
+                          )}
+                        </div>
+
+                        {cateringSelections.length > 0 && (
+                          <div className="mt-8 pt-8 border-t border-slate-800 grid grid-cols-2 gap-4 relative z-10">
+                            <button onClick={() => { setPreviewType('menu'); setIsPreviewing(true); }} className="bg-slate-800 text-white font-bold py-4 rounded-xl flex items-center justify-center gap-2 hover:bg-slate-700 transition-all">
+                              <FileSpreadsheet size={20} /> Preview Menu (A4)
+                            </button>
+                            <button onClick={() => { setPreviewType('labels'); setIsPreviewing(true); }} className="bg-[#FEACCF] text-[#024930] font-black py-4 rounded-xl flex items-center justify-center gap-2 hover:bg-[#ff9ec6] transition-all shadow-lg">
+                              <Printer size={20} /> Print Labels (A6)
+                            </button>
+                          </div>
+                        )}
+                      </section>
+                    </div>
+                  </div>
+                ) : activeTab === 'trash' ? (
+                  <div className="max-w-4xl mx-auto space-y-8">
+                    <section className="bg-white p-10 rounded-3xl shadow-2xl relative overflow-hidden">
+                      <h2 className="text-3xl font-black mb-8 text-red-400 flex items-center gap-4 relative z-10"><Trash2 size={32} /> Trash</h2>
+                      <div className="space-y-2 relative z-10">
+                        {deletedBundles.length === 0 && <p className="text-[#024930]/40 text-center py-10 font-bold uppercase tracking-widest">Trash is empty</p>}
+                        {deletedBundles.map(b => (
+                          <div key={b.id} className="flex justify-between p-4 bg-white rounded-lg border border-[#F8F7F6] items-center opacity-75 hover:opacity-100 transition-all hover:shadow-md">
+                            <span className="font-bold text-[#024930]/60 line-through">{b.name_de}</span>
+                            <div className="flex gap-2">
+                              <button onClick={() => restoreFromTrash(b)} className="flex items-center gap-2 px-3 py-1.5 rounded-lg bg-[#024930]/10 text-[#024930] hover:bg-[#024930]/20 text-xs font-bold uppercase"><RotateCcw size={14} /> Restore</button>
+                              <button onClick={() => permanentDelete(b)} className="flex items-center gap-2 px-3 py-1.5 rounded-lg bg-red-100 text-red-400 hover:bg-red-200 text-xs font-bold uppercase"><Trash2 size={14} /> Delete Forever</button>
+                            </div>
+                          </div>
+                        ))}
+                      </div>
+                    </section>
+                  </div>
+                ) : (
+                  <div className="max-w-4xl mx-auto space-y-8">
+                    <section className="bg-white p-10 rounded-3xl shadow-2xl relative overflow-hidden">
+                      <div className="absolute top-0 right-0 p-8 opacity-[0.03] pointer-events-none">
+                        <Database size={400} />
+                      </div>
+                      <h2 className="text-3xl font-black mb-8 text-[#024930]">Data Management</h2>
+                      <div className="grid md:grid-cols-2 gap-6 mb-10 relative z-10">
+                        <div onClick={() => {
+                          const template = [{ 'type': 'Standard', 'company_name': 'Acme Corp', 'date': '12.12.2025', 'bundle_name_de': 'Brunch Set', 'bundle_name_en': 'Brunch Set', 'item_name_de': 'Croissant', 'item_name_en': 'Croissant', 'allergens_de': 'Gluten, Eier', 'diet_de': 'Vegetarisch' }];
+                          const ws = XLSX.utils.json_to_sheet(template);
+                          const wb = XLSX.utils.book_new();
+                          XLSX.utils.book_append_sheet(wb, ws, "Labels");
+                          XLSX.writeFile(wb, "BellaBona_Template.xlsx");
+                        }} className="bg-[#F8F7F6] p-8 rounded-2xl border-2 border-dashed border-[#024930]/10 cursor-pointer hover:border-[#FEACCF] transition-all group hover:bg-white hover:shadow-lg">
+                          <FileSpreadsheet size={32} className="text-[#024930] mb-4 group-hover:scale-110 transition-transform" />
+                          <p className="font-bold text-[#024930]">Download Template</p>
+                        </div>
+                        <div onClick={() => fileInputRef.current?.click()} className="bg-[#F8F7F6] p-8 rounded-2xl border-2 border-dashed border-[#024930]/10 cursor-pointer hover:border-[#FEACCF] transition-all relative group hover:bg-white hover:shadow-lg">
+                          {isProcessingImport && <div className="absolute inset-0 bg-white/80 flex items-center justify-center rounded-2xl z-20"><Loader2 className="animate-spin text-[#FEACCF]" size={32} /></div>}
+                          <Upload size={32} className="text-[#FEACCF] mb-4 group-hover:scale-110 transition-transform" />
+                          <p className="font-bold text-[#024930]">Upload Excel</p>
+                          <input type="file" ref={fileInputRef} className="hidden" accept=".xlsx" onChange={handleFileUpload} />
+                        </div>
+                      </div>
+                      <div className="space-y-2 max-h-[400px] overflow-y-auto pr-2 relative z-10">
+                        {bundles.map(b => (
+                          <div key={b.id} className="flex justify-between p-4 bg-white rounded-lg border border-[#F8F7F6] items-center hover:bg-[#F8F7F6] transition-colors shadow-sm">
+                            <span className="font-bold text-[#024930]">{b.name_de}</span>
+                            <button onClick={() => moveBundleToTrash(b)} className="text-[#024930]/40 hover:text-red-500 transition-colors"><Trash2 size={18} /></button>
+                          </div>
+                        ))}
+                      </div>
+                    </section>
+                  </div>
                 )}
-              </div>
+              </main>
             </div>
           </div>
-        </React.Fragment>
-      )}
-    </>
-  );
+
+          {isPreviewing && (
+            <React.Fragment>
+              {/* Force re-render on lang change or content change */}
+              <div className="no-print fixed inset-0 z-[200] bg-[#024930]/90 backdrop-blur-xl flex items-center justify-center p-8 overflow-y-auto" key={`${lang}-${previewType}-${activeTab}`}>
+                <div className="bg-[#F8F7F6] w-full max-w-6xl h-[90vh] rounded-3xl flex flex-col shadow-2xl overflow-hidden">
+                  <div className="p-8 border-b border-[#024930]/10 flex justify-between items-center bg-white">
+                    <div className="flex items-center gap-4">
+                      <div className="bg-[#024930]/5 p-3 rounded-xl">
+                        <Printer className="text-[#024930] w-6 h-6" />
+                      </div>
+                      <div>
+                        <h2 className="text-2xl font-serif font-bold text-[#024930]">Print Preview</h2>
+                        <div className="flex items-center gap-2 mt-1">
+                          <span className="text-xs font-sans text-slate-500">Checking layout for</span>
+                          <span className="text-xs bg-[#FEACCF]/20 px-2 py-0.5 rounded text-[#024930] uppercase font-bold tracking-wider">{previewType}</span>
+                        </div>
+                      </div>
+                    </div>
+                    <div className="flex gap-4">
+                      <button onClick={() => setIsPreviewing(false)} className="px-6 py-3 rounded-xl text-slate-500 font-medium hover:bg-slate-50 transition-colors">
+                        Close
+                      </button>
+                      {previewType === 'labels' && (
+                        <button
+                          onClick={() => window.print()}
+                          className="bg-[#FEACCF] hover:bg-[#ffbfe0] text-[#024930] font-bold px-6 py-3 rounded-xl shadow-lg shadow-[#FEACCF]/20 flex items-center gap-2 transition-all transform hover:-translate-y-0.5"
+                        >
+                          <BookOpen size={20} /> Print Label Sheets
+                        </button>
+                      )}
+                      <button
+                        onClick={() => window.print()}
+                        className="bg-[#024930] hover:bg-[#035e3e] text-white font-bold px-8 py-3 rounded-xl shadow-lg shadow-[#024930]/30 flex items-center gap-2 transition-all transform hover:-translate-y-0.5"
+                      >
+                        <Printer size={20} /> Print Now
+                      </button>
+                    </div>
+                  </div>
+
+                  <div className="flex-1 overflow-auto bg-[#F8F7F6] p-8 flex justify-center items-start">
+                    {/* Render Correct Preview */}
+                    {previewType === 'menu' && activeTab === 'catering' ? (
+                      <div className="flex flex-col gap-12">
+                        <div className="bg-white shadow-2xl scale-[0.6] origin-top" style={{ width: '210mm', height: '297mm' }}>
+                          <MenuPrint />
+                        </div>
+                        <div className="bg-white shadow-2xl scale-[0.6] origin-top" style={{ width: '210mm', height: '297mm' }}>
+                          <ReviewPrint size="A4" />
+                        </div>
+                      </div>
+                    ) : activeTab === 'catering' ? (
+                      // Catering Previews (Labels + Review Card)
+                      (() => {
+                        const allItems: any[] = cateringSelections.flatMap(sel => {
+                          const b = bundles.find(x => x.id === sel.bundleId);
+                          if (!b) return [];
+                          return Array(sel.quantity).fill(b).flatMap(() => b.items);
+                        });
+                        allItems.push({ isReviewCard: true });
+
+                        const pages = [];
+                        for (let i = 0; i < allItems.length; i += 4) {
+                          pages.push(allItems.slice(i, i + 4));
+                        }
+
+                        return (
+                          <div className="flex flex-col gap-12 pb-12">
+                            {pages.map((pageItems, pIdx) => (
+                              <div key={pIdx} className="bg-white shadow-2xl origin-top scale-[0.6]" style={{ width: '210mm', height: '297mm', display: 'grid', gridTemplateColumns: '105mm 105mm', gridTemplateRows: '148.5mm 148.5mm' }}>
+                                {pageItems.map((item, iIdx) => (
+                                  <div key={iIdx} style={{ width: '105mm', height: '148.5mm' }}>
+                                    {('isReviewCard' in item) ? <ReviewPrint size="A6" /> : <CateringItemLabel item={item} lang={lang} forPrint />}
+                                  </div>
+                                ))}
+                              </div>
+                            ))}
+                          </div>
+                        );
+                      })()
+                    ) : (
+                      // Standard Labels Preview
+                      <div className="flex flex-col gap-12">
+                        {printGroups.map((group, idx) => (
+                          <div key={idx} className="bg-white shadow-2xl mb-12 scale-[0.6] origin-top" style={{ width: '210mm', height: '297mm' }}>
+                            <div className="label-page-group">
+                              {group.map((b, bi) => (
+                                <div key={bi} className="label-card-container">
+                                  <Label bundle={b} lang={lang} packedOn={packedOn} forPrint variant="standard" />
+                                </div>
+                              ))}
+                            </div>
+                          </div>
+                        ))}
+                      </div>
+                    )}
+                  </div>
+                </div>
+              </div>
+            </React.Fragment>
+          )}
+        </>
+        );
 };
 
 
-const root = document.getElementById('root');
-if (root) {
-  console.log('INDEX.TSX: Root element found, mounting app');
-  createRoot(root).render(<App />);
+        const root = document.getElementById('root');
+        if (root) {
+          console.log('INDEX.TSX: Root element found, mounting app');
+        createRoot(root).render(<App />);
 } else {
-  console.error('INDEX.TSX: Root element NOT found');
+          console.error('INDEX.TSX: Root element NOT found');
 }

@@ -1135,7 +1135,13 @@ const App: React.FC = () => {
                             alert(`Migration successful! Moved ${count} bundles.`);
                             window.location.reload();
                           } catch (e: any) {
-                            alert("Migration failed: " + e.message);
+                            console.error("Migration error", e);
+                            if (e.message && e.message.includes("Missing or insufficient permissions")) {
+                              alert("BLOCKED BY FIREBASE RULES! \n\nYou must allow read access to your old database.\n\n1. Go to Firebase Console > Firestore > Rules\n2. Set: allow read, write: if true;\n3. Publish\n\nI will open the page for you now.");
+                              window.open("https://console.firebase.google.com/u/0/project/label-c61eb/firestore/rules", "_blank");
+                            } else {
+                              alert("Migration failed: " + e.message);
+                            }
                           }
                         }
                       }}

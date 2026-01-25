@@ -276,17 +276,43 @@ const CateringItemLabel: React.FC<{ item: BundleItem, lang: 'de' | 'en', forPrin
 const DataService = {
   getBundles: async (): Promise<Bundle[]> => {
     try {
+      // 1. Try Realtime Database First
       const dbRef = ref(db);
       const snapshot = await get(child(dbRef, `bundles`));
+
       if (snapshot.exists()) {
         const data = snapshot.val();
         const bundles = Object.values(data) as Bundle[];
         localStorage.setItem(DB_KEY, JSON.stringify(bundles));
         return bundles;
-      } else {
-        localStorage.setItem(DB_KEY, JSON.stringify([]));
-        return [];
       }
+
+      // 2. If RTDB is empty, Auto-Migrate from Firestore
+      console.log("RTDB empty, attempting auto-migration from Firestore...");
+      if (firestoreDb) {
+        try {
+          const querySnapshot = await getDocs(collection(firestoreDb, "bundles"));
+          if (!querySnapshot.empty) {
+            const bundles: Bundle[] = [];
+            const updates: any = {};
+            querySnapshot.forEach((doc) => {
+              const data = doc.data() as Bundle;
+              bundles.push(data);
+              updates['bundles/' + data.id] = data;
+            });
+
+            // Save to RTDB for next time
+            await update(ref(db), updates);
+            localStorage.setItem(DB_KEY, JSON.stringify(bundles));
+            return bundles;
+          }
+        } catch (migrationError) {
+          console.warn("Auto-migration failed:", migrationError);
+        }
+      }
+
+      localStorage.setItem(DB_KEY, JSON.stringify([]));
+      return [];
     } catch (e) {
       console.error("Fetch Error:", e);
       const data = localStorage.getItem(DB_KEY);

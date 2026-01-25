@@ -30,7 +30,6 @@ import {
   BookOpen
 } from 'lucide-react';
 import { initializeApp, getApp, getApps, FirebaseApp } from 'firebase/app';
-import { initializeApp, getApp, getApps, FirebaseApp } from 'firebase/app';
 import { getDatabase, ref, child, get, set, remove, update, Database } from 'firebase/database';
 import { getFirestore, collection, getDocs, Firestore } from 'firebase/firestore';
 

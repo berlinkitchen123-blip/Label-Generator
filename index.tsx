@@ -1152,7 +1152,7 @@ const App: React.FC = () => {
                   </div>
 
                   <div className="space-y-2 max-h-[400px] overflow-y-auto pr-2 relative z-10">
-                    {bundles.map(b => (
+                    {bundles.slice().sort((a, b) => a.name_de.localeCompare(b.name_de)).map(b => (
                       <div key={b.id} className="flex justify-between p-4 bg-white rounded-lg border border-[#F8F7F6] items-center hover:bg-[#F8F7F6] transition-colors shadow-sm">
                         <span className="font-bold text-[#024930]">{b.name_de}</span>
                         <button onClick={() => moveBundleToTrash(b)} className="text-[#024930]/40 hover:text-red-500 transition-colors"><Trash2 size={18} /></button>

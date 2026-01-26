@@ -168,7 +168,7 @@ const BrandLogo = ({ className = "h-12" }: { className?: string }) => (
 // Helper for Allergen Icons (Premium "Sticker Style" SVG Set - EU 14)
 // Helper for Allergen Icons (Professional Line Art - Single Color)
 // Helper for Allergen Icons (Photorealistic Images)
-const getAllergenIcons = (allergens: string) => {
+const getAllergenIcons = (allergens: string, variant: 'card' | 'menu' = 'card') => {
   if (!allergens) return null;
   const list = allergens.toLowerCase();
 
@@ -185,19 +185,28 @@ const getAllergenIcons = (allergens: string) => {
     celery: "https://img.icons8.com/color/96/celery.png",
     mustard: "https://img.icons8.com/color/96/mustard.png",
     sesame: "https://img.icons8.com/color/96/sesame.png",
-    sulphites: "https://img.icons8.com/color/96/wine-bottle.png", // Wine contains sulphites
-    lupin: "https://img.icons8.com/color/96/bean.png",           // Lupin is a legume/bean
-    mollusc: "https://img.icons8.com/color/96/snail.png"         // Snail is a mollusc
+    sulphites: "https://img.icons8.com/color/96/wine-bottle.png",
+    lupin: "https://img.icons8.com/color/96/bean.png",
+    mollusc: "https://img.icons8.com/color/96/snail.png"
   };
 
-  const createIcon = (key: string, url: string, label: string) => (
-    <div key={key} className="flex flex-col items-center gap-0.5" title={label}>
-      <div className="flex flex-col items-center justify-center w-10 h-10 rounded-full bg-white shadow-sm border border-slate-100 p-0.5">
-        <img src={url} alt={label} className="w-full h-full object-contain" />
+  const createIcon = (key: string, url: string, label: string) => {
+    if (variant === 'menu') {
+      return (
+        <div key={key} className="w-5 h-5 p-0.5 bg-white rounded-full border border-gray-100 shadow-sm" title={label}>
+          <img src={url} alt={label} className="w-full h-full object-contain" />
+        </div>
+      );
+    }
+    return (
+      <div key={key} className="flex flex-col items-center gap-0.5" title={label}>
+        <div className="flex flex-col items-center justify-center w-10 h-10 rounded-full bg-white shadow-sm border border-slate-100 p-0.5">
+          <img src={url} alt={label} className="w-full h-full object-contain" />
+        </div>
+        <span className="text-[8px] font-bold text-[#024930] uppercase tracking-wide leading-none">{label}</span>
       </div>
-      <span className="text-[8px] font-bold text-[#024930] uppercase tracking-wide leading-none">{label}</span>
-    </div>
-  );
+    );
+  };
 
   const foundIcons: React.ReactNode[] = [];
 
@@ -216,7 +225,7 @@ const getAllergenIcons = (allergens: string) => {
   if (list.includes('lupin')) foundIcons.push(createIcon('lupin', IconUrls.lupin, 'Lupin'));
   if (list.includes('weichtier') || list.includes('mollusc')) foundIcons.push(createIcon('mollusc', IconUrls.mollusc, 'Molluscs'));
 
-  return foundIcons.length > 0 ? <div className="flex gap-2 flex-wrap justify-center">{foundIcons}</div> : null;
+  return foundIcons.length > 0 ? <div className={`flex gap-2 flex-wrap ${variant === 'card' ? 'justify-center' : 'justify-end'}`}>{foundIcons}</div> : null;
 };
 
 // Helper for Diet Icons (Refined)
@@ -264,7 +273,7 @@ const CateringItemLabel: React.FC<{ item: BundleItem, lang: 'de' | 'en', forPrin
         <div className="bg-[#FFF1F6] min-h-[90px] border-t border-[#FEACCF] p-6 flex flex-col items-center justify-center">
           <span className="text-[9px] uppercase font-bold text-[#024930] tracking-[0.2em] mb-2 opacity-70">Allergens</span>
           <div className="flex flex-col items-center gap-1">
-            {getAllergenIcons(item.allergens_de)}
+            {getAllergenIcons(item.allergens_de, 'card')}
           </div>
         </div>
       )}
@@ -734,10 +743,15 @@ const App: React.FC = () => {
         <div className="absolute bottom-6 right-6 w-16 h-16 border-l border-t border-[#F8F7F6] z-10" />
         <div className="flex flex-col items-center w-full pt-16 pb-6 z-20 px-24">
           <BrandLogo className="h-[auto] text-7xl mb-8 text-[#024930]" />
-          <div className="flex items-center gap-6 mt-4">
+          {companyName && (
+            <h1 className="text-4xl font-black text-[#024930] uppercase mb-4 tracking-wider text-center" style={{ fontFamily: "'Playfair Display', serif" }}>
+              {companyName}
+            </h1>
+          )}
+          <div className="flex items-center gap-6 mt-2">
             <span className="h-[1px] w-16 bg-[#024930]/40" />
             <p className="font-serif text-[#024930] text-xl tracking-[0.1em] uppercase" style={{ fontFamily: "'Playfair Display', serif" }}>
-              {new Date().toLocaleDateString('en-GB', { weekday: 'long', day: 'numeric', month: 'long', year: 'numeric' })}
+              {new Date(cateringDate).toLocaleDateString('en-GB', { weekday: 'long', day: 'numeric', month: 'long', year: 'numeric' })}
             </p>
             <span className="h-[1px] w-16 bg-[#024930]/40" />
           </div>
@@ -760,10 +774,8 @@ const App: React.FC = () => {
                         </span>
                         <div className="flex flex-col items-end pl-6 shrink-0 max-w-[35%]">
                           {item.allergens_de && (
-                            <div className="flex items-center gap-2">
-                              <span className="text-sm uppercase tracking-widest text-[#024930] font-sans font-bold text-right leading-tight" style={{ fontFamily: "'Inter', sans-serif" }}>
-                                {item.allergens_de}
-                              </span>
+                            <div className="flex items-center gap-1 justify-end flex-wrap">
+                              {getAllergenIcons(item.allergens_de, 'menu')}
                             </div>
                           )}
                         </div>

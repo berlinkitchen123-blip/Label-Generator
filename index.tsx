@@ -283,6 +283,7 @@ const DataService = {
       if (snapshot.exists()) {
         const data = snapshot.val();
         const bundles = Object.values(data) as Bundle[];
+        bundles.sort((a, b) => a.name_de.localeCompare(b.name_de));
         localStorage.setItem(DB_KEY, JSON.stringify(bundles));
         return bundles;
       }
@@ -301,6 +302,8 @@ const DataService = {
               updates['bundles/' + data.id] = data;
             });
 
+            bundles.sort((a, b) => a.name_de.localeCompare(b.name_de));
+
             // Save to RTDB for next time
             await update(ref(db), updates);
             localStorage.setItem(DB_KEY, JSON.stringify(bundles));
@@ -316,7 +319,8 @@ const DataService = {
     } catch (e) {
       console.error("Fetch Error:", e);
       const data = localStorage.getItem(DB_KEY);
-      return data ? JSON.parse(data) : [];
+      const bundles = data ? JSON.parse(data) : [];
+      return bundles.sort((a: Bundle, b: Bundle) => a.name_de.localeCompare(b.name_de));
     }
   },
   saveBundle: async (bundle: Bundle) => {

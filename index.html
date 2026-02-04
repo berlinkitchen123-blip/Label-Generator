@@ -1,131 +1,19 @@
 <!DOCTYPE html>
-<html lang="en" class="dark">
+<html lang="en">
 
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta charset="UTF-8" />
+    <link rel="icon" type="image/png" href="/logo.png" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Bella&Bona Label Generator</title>
-    <script src="https://cdn.tailwindcss.com"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
-    <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
     <style>
         @import url('https://fonts.googleapis.com/css2?family=Bona+Nova:ital,wght@0,400;0,700;1,400&family=Cinzel:wght@400;700&family=Cormorant+Garamond:ital,wght@0,300;0,400;0,600;1,400&family=Inter:wght@400;500;600;700;800;900&family=Pinyon+Script&family=Playfair+Display:ital,wght@0,400;0,700;1,400&display=swap');
-
-        :root {
-            --brand-green: #024930;
-            --brand-pink: #FEACCF;
-            --footer-bg: #FEACCF;
-        }
-
-        body {
-            font-family: 'Inter', sans-serif;
-            margin: 0;
-            padding: 0;
-            background-color: #F8F7F6;
-        }
-
-        .watermark {
-            background-image: url("data:image/svg+xml,%3Csvg width='80' height='80' viewBox='0 0 100 100' xmlns='http://www.w3.org/2000/svg'%3E%3Cg fill='%23024930' fill-opacity='0.03'%3E%3Cpath d='M20 20c0 5-4 9-9 9s-9-4-9-9 4-9 9-9 9 4 9 9zm50 40c0 5-4 9-9 9s-9-4-9-9 4-9 9-9 9 4 9 9zM30 80c0 3-2 5-5 5s-5-2-5-5 2-5 5-5 5 2 5 5z'/%3E%3C/g%3E%3C/svg%3E");
-            background-repeat: repeat;
-        }
-
-        @media screen {
-            .print-only {
-                display: none !important;
-            }
-        }
-
-        @media print {
-            .no-print {
-                display: none !important;
-            }
-
-            .print-only {
-                display: block !important;
-                visibility: visible !important;
-            }
-
-            body,
-            html {
-                background: white !important;
-                margin: 0 !important;
-                padding: 0 !important;
-                width: 210mm !important;
-                height: 297mm !important;
-                display: block !important;
-                -webkit-print-color-adjust: exact !important;
-                print-color-adjust: exact !important;
-            }
-
-            #root {
-                margin: 0 !important;
-                padding: 0 !important;
-            }
-
-            @page {
-                size: A4;
-                margin: 0 !important;
-            }
-
-            /* 
-               Printable area: 210mm wide, 297mm high.
-               Grid 2x2: Each cell is exactly 105mm x 148.5mm.
-            */
-            .label-page-group {
-                display: grid;
-                grid-template-columns: 105mm 105mm;
-                grid-template-rows: 148.5mm 148.5mm;
-                width: 210mm !important;
-                height: 297mm !important;
-                page-break-after: always;
-                margin: 0 !important;
-                padding: 0 !important;
-                box-sizing: border-box;
-                overflow: hidden;
-            }
-
-            .label-card-container {
-                width: 105mm !important;
-                height: 148.5mm !important;
-                box-sizing: border-box;
-                border: 0.01mm dashed rgba(0, 0, 0, 0.1);
-                /* Minimal cutting guide at the very edge */
-                padding: 0;
-                margin: 0;
-                overflow: hidden;
-            }
-
-            .label-card {
-                width: 105mm !important;
-                height: 148.5mm !important;
-                box-sizing: border-box;
-                border: none !important;
-                box-shadow: none !important;
-                margin: 0 !important;
-            }
-        }
     </style>
-    <script type="importmap">
-{
-  "imports": {
-    "react": "https://esm.sh/react@18.2.0",
-    "react-dom": "https://esm.sh/react-dom@18.2.0",
-    "react-dom/client": "https://esm.sh/react-dom@18.2.0/client",
-    "lucide-react": "https://esm.sh/lucide-react@0.292.0",
-    "firebase/app": "https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js",
-    "firebase/database": "https://www.gstatic.com/firebasejs/10.12.2/firebase-database.js",
-    "firebase/firestore": "https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js"
-  }
-}
-</script>
-    <script>
-        window.process = { env: { API_KEY: "AIzaSyBlB6j_w_-Mb_ughrrz8BDFdiIJEDNTKGM" } };
-    </script>
 </head>
 
 <body class="bg-[#F8F7F6] text-[#024930]">
     <div id="root"></div>
-    <script type="text/babel" data-presets="typescript,react" data-type="module" src="index.tsx"></script>
+    <script type="module" src="/src/main.tsx"></script>
 </body>
 
 </html>

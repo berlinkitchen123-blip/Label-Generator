@@ -1,6 +1,4 @@
-
 import React, { useState, useEffect, useMemo, useRef } from 'react';
-import { createRoot } from 'react-dom/client';
 import {
   Plus,
   Trash2,
@@ -35,11 +33,13 @@ import { getFirestore, collection, getDocs, Firestore } from 'firebase/firestore
 
 
 
-// @ts-ignore
-declare var process: { env: { API_KEY: string } };
+import * as XLSX from 'xlsx';
+
+const API_KEY = import.meta.env.VITE_API_KEY || "AIzaSyBlB6j_w_-Mb_ughrrz8BDFdiIJEDNTKGM";
+
 
 const firebaseConfig = {
-  apiKey: process.env.API_KEY,
+  apiKey: API_KEY,
   authDomain: "label-c61eb.firebaseapp.com",
   databaseURL: "https://label-c61eb-default-rtdb.europe-west1.firebasedatabase.app",
   projectId: "label-c61eb",
@@ -835,7 +835,7 @@ const App: React.FC = () => {
         {/* QR Code - Custom */}
         <div className="p-0">
           <img
-            src="review_qr.png"
+            src="/review_qr.png"
             className={qrSize}
             alt="Review QR"
             style={{ mixBlendMode: 'normal' }}
@@ -1296,10 +1296,4 @@ const App: React.FC = () => {
 };
 
 
-const root = document.getElementById('root');
-if (root) {
-  console.log('INDEX.TSX: Root element found, mounting app');
-  createRoot(root).render(<App />);
-} else {
-  console.error('INDEX.TSX: Root element NOT found');
-}
+export default App;

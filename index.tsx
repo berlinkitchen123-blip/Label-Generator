@@ -90,7 +90,9 @@ const TEXT = {
     errorImport: 'Fehler beim Datei-Import.',
     noSelected: 'Keine Auswahl getroffen.',
     syncing: 'Synchronisierung...',
-    synced: 'Cloud-Daten geladen'
+    synced: 'Cloud-Daten geladen',
+    dataManagement: 'Datenverwaltung',
+    recoverData: 'Daten aus Firestore laden'
   },
   en: {
     labelGenerator: 'Generator',
@@ -108,7 +110,9 @@ const TEXT = {
     errorImport: 'Error importing file.',
     noSelected: 'Nothing selected yet.',
     syncing: 'Syncing...',
-    synced: 'Cloud data loaded'
+    synced: 'Cloud data loaded',
+    dataManagement: 'Data Management',
+    recoverData: 'Recover Data from Firestore'
   }
 };
 
@@ -563,6 +567,7 @@ const App: React.FC = () => {
   const [packedOn, setPackedOn] = useState(new Date().toLocaleDateString('en-GB'));
   const [activeTab, setActiveTab] = useState<'generator' | 'database' | 'catering' | 'trash'>('generator');
   const [isProcessingImport, setIsProcessingImport] = useState(false);
+  const [isMigrating, setIsMigrating] = useState(false);
   const [isPreviewing, setIsPreviewing] = useState(false);
   const [previewType, setPreviewType] = useState<'labels' | 'menu' | 'review-a4' | 'review-a6'>('labels'); // New state for preview type
   const fileInputRef = useRef<HTMLInputElement>(null);
@@ -707,7 +712,7 @@ const App: React.FC = () => {
       if (b) allItems.push(...b.items);
     });
 
-    const uniqueItems = Array.from(new Map(allItems.map(item => [item.item_name_de, item])).values());
+    const uniqueItems = Array.from(new Map(allItems.map(item => [item.item_name_de.toLowerCase(), item])).values());
     const grouped: Record<string, BundleItem[]> = {};
     const order = ['Vegan', 'Vegetarisch', 'Vegetarian', 'Fish', 'Fisch', 'Meat', 'Fleisch', 'Beef'];
 
@@ -972,7 +977,7 @@ const App: React.FC = () => {
                           </div>
                           <div>
                             <p className="font-black text-[#024930] text-sm">{lang === 'de' ? bundle.name_de : bundle.name_en}</p>
-                            <p className="text-[10px] font-bold text-[#024930]/40 uppercase tracking-wider">{bundle.items.length} items</p>
+                            <p className="text-[10px] font-bold text-[#024930]/40 uppercase tracking-wider">{bundle.items.length} item{bundle.items.length !== 1 ? 's' : ''}</p>
                           </div>
                         </div>
                         <Plus size={20} className="text-[#024930]/20 group-hover:text-[#024930]" />
@@ -1069,7 +1074,7 @@ const App: React.FC = () => {
                           <div key={sel.bundleId} className="flex items-center gap-4 bg-[#F8F7F6] rounded-xl p-4 border border-[#F8F7F6] hover:border-[#FEACCF]/50 transition-colors">
                             <div className="flex-1">
                               <p className="font-bold text-[#024930]">{lang === 'de' ? b.name_de : b.name_en}</p>
-                              <p className="text-[10px] text-[#024930]/50 uppercase font-black tracking-wider">{b.items.length} items</p>
+                              <p className="text-[10px] text-[#024930]/50 uppercase font-black tracking-wider">{b.items.length} item{b.items.length !== 1 ? 's' : ''}</p>
                             </div>
                             <input type="number" min="1" value={sel.quantity} onChange={(e) => setCateringSelections(prev => prev.map(s => s.bundleId === sel.bundleId ? { ...s, quantity: parseInt(e.target.value) || 1 } : s))} className="w-16 bg-white rounded-lg p-2 text-center text-[#024930] font-black border-none shadow-sm focus:ring-2 focus:ring-[#FEACCF]" />
                             <button onClick={() => setCateringSelections(prev => prev.filter(s => s.bundleId !== sel.bundleId))} className="text-[#024930]/20 hover:text-red-400 px-2"><X size={20} /></button>
@@ -1122,7 +1127,7 @@ const App: React.FC = () => {
                   <div className="absolute top-0 right-0 p-8 opacity-[0.03] pointer-events-none">
                     <DatabaseIcon size={400} />
                   </div>
-                  <h2 className="text-3xl font-black mb-8 text-[#024930]">Data Management</h2>
+                  <h2 className="text-3xl font-black mb-8 text-[#024930]">{t.dataManagement}</h2>
                   <div className="grid md:grid-cols-2 gap-6 mb-10 relative z-10">
                     <div onClick={() => {
                       const template = [{ 'type': 'Standard', 'company_name': 'Acme Corp', 'date': '12.12.2025', 'bundle_name_de': 'Brunch Set', 'bundle_name_en': 'Brunch Set', 'item_name_de': 'Croissant', 'item_name_en': 'Croissant', 'allergens_de': 'Gluten, Eier', 'diet_de': 'Vegetarisch' }];
@@ -1146,6 +1151,7 @@ const App: React.FC = () => {
                     <button
                       onClick={async () => {
                         if (confirm("Attempt to migrate data from old Firestore database?")) {
+                          setIsMigrating(true);
                           try {
                             const count = await DataService.migrateFromFirestore();
                             alert(`Migration successful! Moved ${count} bundles.`);
@@ -1158,19 +1164,22 @@ const App: React.FC = () => {
                             } else {
                               alert("Migration failed: " + e.message);
                             }
+                          } finally {
+                            setIsMigrating(false);
                           }
                         }
                       }}
                       className="text-sm bg-[#024930]/5 hover:bg-[#024930]/10 text-[#024930] px-4 py-2 rounded-lg font-bold"
+                      disabled={isMigrating}
                     >
-                      Recover Data from Firestore
+                      {isMigrating ? t.syncing : t.recoverData}
                     </button>
                   </div>
 
                   <div className="space-y-2 max-h-[400px] overflow-y-auto pr-2 relative z-10">
                     {bundles.slice().sort((a, b) => a.name_de.localeCompare(b.name_de)).map(b => (
                       <div key={b.id} className="flex justify-between p-4 bg-white rounded-lg border border-[#F8F7F6] items-center hover:bg-[#F8F7F6] transition-colors shadow-sm">
-                        <span className="font-bold text-[#024930]">{b.name_de}</span>
+                        <span className="font-bold text-[#024930]">{lang === 'de' ? b.name_de : b.name_en}</span>
                         <button onClick={() => moveBundleToTrash(b)} className="text-[#024930]/40 hover:text-red-500 transition-colors"><Trash2 size={18} /></button>
                       </div>
                     ))}

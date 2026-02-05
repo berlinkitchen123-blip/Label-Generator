@@ -194,62 +194,59 @@ const getAllergenIcons = (allergens: string, variant: 'card' | 'menu' = 'card') 
     mollusc: "https://img.icons8.com/color/96/snail.png"
   };
 
-  mollusc: "https://img.icons8.com/color/96/snail.png"
-};
-
-const createIcon = (key: string, url: string, label: string) => {
-  if (variant === 'menu') {
+  const createIcon = (key: string, url: string, label: string) => {
+    if (variant === 'menu') {
+      return (
+        <div key={key} className="w-5 h-5 p-0.5 bg-white rounded-full border border-gray-100 shadow-sm" title={label}>
+          <img src={url} alt={label} className="w-full h-full object-contain" />
+        </div>
+      );
+    }
     return (
-      <div key={key} className="w-5 h-5 p-0.5 bg-white rounded-full border border-gray-100 shadow-sm" title={label}>
-        <img src={url} alt={label} className="w-full h-full object-contain" />
+      <div key={key} className="flex flex-col items-center gap-0.5" title={label}>
+        <div className="flex flex-col items-center justify-center w-10 h-10 rounded-full bg-white shadow-sm border border-slate-100 p-0.5">
+          <img src={url} alt={label} className="w-full h-full object-contain" />
+        </div>
+        <span className="text-[8px] font-bold text-[#024930] uppercase tracking-wide leading-none">{label}</span>
       </div>
     );
-  }
-  return (
-    <div key={key} className="flex flex-col items-center gap-0.5" title={label}>
-      <div className="flex flex-col items-center justify-center w-10 h-10 rounded-full bg-white shadow-sm border border-slate-100 p-0.5">
-        <img src={url} alt={label} className="w-full h-full object-contain" />
-      </div>
-      <span className="text-[8px] font-bold text-[#024930] uppercase tracking-wide leading-none">{label}</span>
-    </div>
-  );
-};
+  };
 
-const foundIcons: React.ReactNode[] = [];
+  const foundIcons: React.ReactNode[] = [];
 
-// Helper to check for multiple terms
-const has = (...terms: string[]) => terms.some(t => list.includes(t));
+  // Helper to check for multiple terms
+  const has = (...terms: string[]) => terms.some(t => t.length === 1 ? new RegExp(`\\b${t}\\b`).test(list) : list.includes(t));
 
-// A: Gluten
-if (has('gluten', 'weizen', 'wheat', 'a')) foundIcons.push(createIcon('gluten', IconUrls.gluten, 'Gluten'));
-// B: Crustaceans
-if (has('krebstier', 'crustacean', 'krebs', 'b')) foundIcons.push(createIcon('crustacean', IconUrls.crustacean, 'Crustaceans'));
-// C: Egg
-if (has('ei', 'egg', 'c')) foundIcons.push(createIcon('egg', IconUrls.egg, 'Egg'));
-// D: Fish
-if (has('fisch', 'fish', 'd')) foundIcons.push(createIcon('fish', IconUrls.fish, 'Fish'));
-// E: Peanut
-if (has('erdnuss', 'peanut', 'e')) foundIcons.push(createIcon('peanut', IconUrls.peanut, 'Peanuts'));
-// F: Soy
-if (has('soja', 'soy', 'f')) foundIcons.push(createIcon('soy', IconUrls.soy, 'Soy'));
-// G: Milk
-if (has('milch', 'milk', 'lactose', 'laktose', 'g')) foundIcons.push(createIcon('milk', IconUrls.milk, 'Milk'));
-// H: Nuts
-if (has('nuss', 'nut', 'mandel', 'haselnuss', 'walnuss', 'h')) foundIcons.push(createIcon('nuts', IconUrls.nuts, 'Nuts'));
-// L: Celery
-if (has('sellerie', 'celery', 'l')) foundIcons.push(createIcon('celery', IconUrls.celery, 'Celery'));
-// M: Mustard
-if (has('senf', 'mustard', 'm')) foundIcons.push(createIcon('mustard', IconUrls.mustard, 'Mustard'));
-// N: Sesame
-if (has('sesam', 'sesame', 'n')) foundIcons.push(createIcon('sesame', IconUrls.sesame, 'Sesame'));
-// O: Sulphites
-if (has('schwefel', 'sulphite', 'sulfite', 'o')) foundIcons.push(createIcon('sulphites', IconUrls.sulphites, 'Sulphites'));
-// P: Lupin
-if (has('lupin', 'p')) foundIcons.push(createIcon('lupin', IconUrls.lupin, 'Lupin'));
-// R: Molluscs
-if (has('weichtier', 'mollusc', 'r')) foundIcons.push(createIcon('mollusc', IconUrls.mollusc, 'Molluscs'));
+  // A: Gluten
+  if (has('gluten', 'weizen', 'wheat', 'a')) foundIcons.push(createIcon('gluten', IconUrls.gluten, 'Gluten'));
+  // B: Crustaceans
+  if (has('krebstier', 'crustacean', 'krebs', 'b')) foundIcons.push(createIcon('crustacean', IconUrls.crustacean, 'Crustaceans'));
+  // C: Egg
+  if (has('ei', 'egg', 'c')) foundIcons.push(createIcon('egg', IconUrls.egg, 'Egg'));
+  // D: Fish
+  if (has('fisch', 'fish', 'd')) foundIcons.push(createIcon('fish', IconUrls.fish, 'Fish'));
+  // E: Peanut
+  if (has('erdnuss', 'peanut', 'e')) foundIcons.push(createIcon('peanut', IconUrls.peanut, 'Peanuts'));
+  // F: Soy
+  if (has('soja', 'soy', 'f')) foundIcons.push(createIcon('soy', IconUrls.soy, 'Soy'));
+  // G: Milk
+  if (has('milch', 'milk', 'lactose', 'laktose', 'g')) foundIcons.push(createIcon('milk', IconUrls.milk, 'Milk'));
+  // H: Nuts
+  if (has('nuss', 'nut', 'mandel', 'haselnuss', 'walnuss', 'h')) foundIcons.push(createIcon('nuts', IconUrls.nuts, 'Nuts'));
+  // L: Celery
+  if (has('sellerie', 'celery', 'l')) foundIcons.push(createIcon('celery', IconUrls.celery, 'Celery'));
+  // M: Mustard
+  if (has('senf', 'mustard', 'm')) foundIcons.push(createIcon('mustard', IconUrls.mustard, 'Mustard'));
+  // N: Sesame
+  if (has('sesam', 'sesame', 'n')) foundIcons.push(createIcon('sesame', IconUrls.sesame, 'Sesame'));
+  // O: Sulphites
+  if (has('schwefel', 'sulphite', 'sulfite', 'o')) foundIcons.push(createIcon('sulphites', IconUrls.sulphites, 'Sulphites'));
+  // P: Lupin
+  if (has('lupin', 'p')) foundIcons.push(createIcon('lupin', IconUrls.lupin, 'Lupin'));
+  // R: Molluscs
+  if (has('weichtier', 'mollusc', 'r')) foundIcons.push(createIcon('mollusc', IconUrls.mollusc, 'Molluscs'));
 
-return foundIcons.length > 0 ? <div className={`flex gap-2 flex-wrap ${variant === 'card' ? 'justify-center' : 'justify-end'}`}>{foundIcons}</div> : null;
+  return foundIcons.length > 0 ? <div className={`flex gap-2 flex-wrap ${variant === 'card' ? 'justify-center' : 'justify-end'}`}>{foundIcons}</div> : null;
 };
 
 // Helper for Diet Icons (Refined)

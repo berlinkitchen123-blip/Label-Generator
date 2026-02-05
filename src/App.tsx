@@ -194,42 +194,62 @@ const getAllergenIcons = (allergens: string, variant: 'card' | 'menu' = 'card') 
     mollusc: "https://img.icons8.com/color/96/snail.png"
   };
 
-  const createIcon = (key: string, url: string, label: string) => {
-    if (variant === 'menu') {
-      return (
-        <div key={key} className="w-5 h-5 p-0.5 bg-white rounded-full border border-gray-100 shadow-sm" title={label}>
-          <img src={url} alt={label} className="w-full h-full object-contain" />
-        </div>
-      );
-    }
+  mollusc: "https://img.icons8.com/color/96/snail.png"
+};
+
+const createIcon = (key: string, url: string, label: string) => {
+  if (variant === 'menu') {
     return (
-      <div key={key} className="flex flex-col items-center gap-0.5" title={label}>
-        <div className="flex flex-col items-center justify-center w-10 h-10 rounded-full bg-white shadow-sm border border-slate-100 p-0.5">
-          <img src={url} alt={label} className="w-full h-full object-contain" />
-        </div>
-        <span className="text-[8px] font-bold text-[#024930] uppercase tracking-wide leading-none">{label}</span>
+      <div key={key} className="w-5 h-5 p-0.5 bg-white rounded-full border border-gray-100 shadow-sm" title={label}>
+        <img src={url} alt={label} className="w-full h-full object-contain" />
       </div>
     );
-  };
+  }
+  return (
+    <div key={key} className="flex flex-col items-center gap-0.5" title={label}>
+      <div className="flex flex-col items-center justify-center w-10 h-10 rounded-full bg-white shadow-sm border border-slate-100 p-0.5">
+        <img src={url} alt={label} className="w-full h-full object-contain" />
+      </div>
+      <span className="text-[8px] font-bold text-[#024930] uppercase tracking-wide leading-none">{label}</span>
+    </div>
+  );
+};
 
-  const foundIcons: React.ReactNode[] = [];
+const foundIcons: React.ReactNode[] = [];
 
-  if (list.includes('gluten') || list.includes('weizen')) foundIcons.push(createIcon('gluten', IconUrls.gluten, 'Gluten'));
-  if (list.includes('krebstier') || list.includes('crustacean')) foundIcons.push(createIcon('crustacean', IconUrls.crustacean, 'Crustaceans'));
-  if (list.includes('ei') || list.includes('egg')) foundIcons.push(createIcon('egg', IconUrls.egg, 'Egg'));
-  if (list.includes('fisch') || list.includes('fish')) foundIcons.push(createIcon('fish', IconUrls.fish, 'Fish'));
-  if (list.includes('erdnuss') || list.includes('peanut')) foundIcons.push(createIcon('peanut', IconUrls.peanut, 'Peanuts'));
-  if (list.includes('soja') || list.includes('soy')) foundIcons.push(createIcon('soy', IconUrls.soy, 'Soy'));
-  if (list.includes('milch') || list.includes('milk') || list.includes('lactose')) foundIcons.push(createIcon('milk', IconUrls.milk, 'Milk'));
-  if (list.includes('nuss') || list.includes('nut') || list.includes('mandel')) foundIcons.push(createIcon('nuts', IconUrls.nuts, 'Nuts'));
-  if (list.includes('sellerie') || list.includes('celery')) foundIcons.push(createIcon('celery', IconUrls.celery, 'Celery'));
-  if (list.includes('senf') || list.includes('mustard')) foundIcons.push(createIcon('mustard', IconUrls.mustard, 'Mustard'));
-  if (list.includes('sesam') || list.includes('sesame')) foundIcons.push(createIcon('sesame', IconUrls.sesame, 'Sesame'));
-  if (list.includes('schwefel') || list.includes('sulphite')) foundIcons.push(createIcon('sulphites', IconUrls.sulphites, 'Sulphites'));
-  if (list.includes('lupin')) foundIcons.push(createIcon('lupin', IconUrls.lupin, 'Lupin'));
-  if (list.includes('weichtier') || list.includes('mollusc')) foundIcons.push(createIcon('mollusc', IconUrls.mollusc, 'Molluscs'));
+// Helper to check for multiple terms
+const has = (...terms: string[]) => terms.some(t => list.includes(t));
 
-  return foundIcons.length > 0 ? <div className={`flex gap-2 flex-wrap ${variant === 'card' ? 'justify-center' : 'justify-end'}`}>{foundIcons}</div> : null;
+// A: Gluten
+if (has('gluten', 'weizen', 'wheat', 'a')) foundIcons.push(createIcon('gluten', IconUrls.gluten, 'Gluten'));
+// B: Crustaceans
+if (has('krebstier', 'crustacean', 'krebs', 'b')) foundIcons.push(createIcon('crustacean', IconUrls.crustacean, 'Crustaceans'));
+// C: Egg
+if (has('ei', 'egg', 'c')) foundIcons.push(createIcon('egg', IconUrls.egg, 'Egg'));
+// D: Fish
+if (has('fisch', 'fish', 'd')) foundIcons.push(createIcon('fish', IconUrls.fish, 'Fish'));
+// E: Peanut
+if (has('erdnuss', 'peanut', 'e')) foundIcons.push(createIcon('peanut', IconUrls.peanut, 'Peanuts'));
+// F: Soy
+if (has('soja', 'soy', 'f')) foundIcons.push(createIcon('soy', IconUrls.soy, 'Soy'));
+// G: Milk
+if (has('milch', 'milk', 'lactose', 'laktose', 'g')) foundIcons.push(createIcon('milk', IconUrls.milk, 'Milk'));
+// H: Nuts
+if (has('nuss', 'nut', 'mandel', 'haselnuss', 'walnuss', 'h')) foundIcons.push(createIcon('nuts', IconUrls.nuts, 'Nuts'));
+// L: Celery
+if (has('sellerie', 'celery', 'l')) foundIcons.push(createIcon('celery', IconUrls.celery, 'Celery'));
+// M: Mustard
+if (has('senf', 'mustard', 'm')) foundIcons.push(createIcon('mustard', IconUrls.mustard, 'Mustard'));
+// N: Sesame
+if (has('sesam', 'sesame', 'n')) foundIcons.push(createIcon('sesame', IconUrls.sesame, 'Sesame'));
+// O: Sulphites
+if (has('schwefel', 'sulphite', 'sulfite', 'o')) foundIcons.push(createIcon('sulphites', IconUrls.sulphites, 'Sulphites'));
+// P: Lupin
+if (has('lupin', 'p')) foundIcons.push(createIcon('lupin', IconUrls.lupin, 'Lupin'));
+// R: Molluscs
+if (has('weichtier', 'mollusc', 'r')) foundIcons.push(createIcon('mollusc', IconUrls.mollusc, 'Molluscs'));
+
+return foundIcons.length > 0 ? <div className={`flex gap-2 flex-wrap ${variant === 'card' ? 'justify-center' : 'justify-end'}`}>{foundIcons}</div> : null;
 };
 
 // Helper for Diet Icons (Refined)
@@ -636,7 +656,7 @@ const App: React.FC = () => {
       try {
         const data = new Uint8Array(event.target?.result as ArrayBuffer);
         const workbook = XLSX.read(data, { type: 'array' });
-        const rows = XLSX.utils.sheet_to_json(workbook.Sheets[workbook.SheetNames[0]]);
+        const rows = XLSX.utils.sheet_to_json(workbook.Sheets[workbook.SheetNames[0]]) as ImportRow[];
         const bundleMap: Record<string, Bundle> = {};
         rows.forEach((row) => {
           const nameDe = String(row.bundle_name_de || 'Unnamed').trim();
@@ -659,6 +679,7 @@ const App: React.FC = () => {
           // CAPTURE METADATA (Company & Date) from the first row that has them
           const rowCompany = String(row.company_name || '').trim();
           const rowDate = String(row.date || '').trim();
+
           if (rowCompany) setCompanyName(rowCompany);
           if (rowDate) setCateringDate(rowDate);
         });

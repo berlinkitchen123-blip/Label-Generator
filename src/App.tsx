@@ -870,7 +870,7 @@ const App: React.FC = () => {
 
   return (
     <>
-      <div className="print-only">
+      <div className="hidden print:block">
         {previewType === 'menu' && activeTab === 'catering' ? (
           <>
             <div style={{ width: '210mm', height: '297mm', pageBreakAfter: 'always' }}>
@@ -934,7 +934,7 @@ const App: React.FC = () => {
           ))}
       </div>
 
-      <div className="no-print min-h-screen flex flex-col bg-[#F8F7F6] text-[#024930]">
+      <div className="print:hidden min-h-screen flex flex-col bg-[#F8F7F6] text-[#024930]">
         <div className="flex flex-1">
           <aside className="w-20 lg:w-64 bg-[#024930] border-r border-[#024930] flex flex-col shadow-2xl z-20">
             <div className="p-6 border-b border-[#F8F7F6]/10 flex items-center gap-3">

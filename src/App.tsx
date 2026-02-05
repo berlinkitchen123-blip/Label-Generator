@@ -1212,7 +1212,7 @@ const App: React.FC = () => {
       {isPreviewing && (
         <React.Fragment>
           {/* Force re-render on lang change or content change */}
-          <div className="no-print fixed inset-0 z-[200] bg-[#024930]/90 backdrop-blur-xl flex items-center justify-center p-8 overflow-y-auto" key={`${lang}-${previewType}-${activeTab}`}>
+          <div className="print:hidden fixed inset-0 z-[200] bg-[#024930]/90 backdrop-blur-xl flex items-center justify-center p-8 overflow-y-auto" key={`${lang}-${previewType}-${activeTab}`}>
             <div className="bg-[#F8F7F6] w-full max-w-6xl h-[90vh] rounded-3xl flex flex-col shadow-2xl overflow-hidden">
               <div className="p-8 border-b border-[#024930]/10 flex justify-between items-center bg-white">
                 <div className="flex items-center gap-4">

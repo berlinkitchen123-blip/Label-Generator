@@ -9,3 +9,11 @@ body {
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
 }
+
+@media print {
+  .no-print { display: none !important; }
+}
+
+@media screen {
+  .print-only { display: none !important; }
+}

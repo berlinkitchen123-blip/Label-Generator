@@ -853,7 +853,7 @@ const App: React.FC = () => {
         {/* QR Code - Custom */}
         <div className="p-0">
           <img
-            src="/review_qr.png"
+            src="./review_qr.png"
             className={qrSize}
             alt="Review QR"
             style={{ mixBlendMode: 'normal' }}

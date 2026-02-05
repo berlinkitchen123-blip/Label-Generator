@@ -271,7 +271,7 @@ const CateringItemLabel: React.FC<{ item: BundleItem, lang: 'de' | 'en', forPrin
     >
       {/* Top: Brand Header */}
       <div className="bg-[#024930] h-20 w-full flex items-center justify-center">
-        <BrandLogo className="h-8 brightness-0 invert" />
+        <BrandLogo className="text-3xl font-black brightness-0 invert" />
       </div>
 
       {/* Middle: Content */}
@@ -282,7 +282,7 @@ const CateringItemLabel: React.FC<{ item: BundleItem, lang: 'de' | 'en', forPrin
         </div>
 
         {/* Dish Name - Maximized */}
-        <h2 className="text-4xl leading-snug font-serif font-bold text-[#024930] uppercase mb-4">
+        <h2 className="text-3xl leading-snug font-serif font-bold text-[#024930] uppercase mb-4">
           {lang === 'de' ? item.item_name_de : item.item_name_en}
         </h2>
 
@@ -292,7 +292,7 @@ const CateringItemLabel: React.FC<{ item: BundleItem, lang: 'de' | 'en', forPrin
       {/* Bottom: Allergens Section (Only if exists) */}
       {hasAllergens && (
         <div className="bg-[#FFF1F6] min-h-[90px] border-t border-[#FEACCF] p-6 flex flex-col items-center justify-center">
-          <span className="text-[9px] uppercase font-bold text-[#024930] tracking-[0.2em] mb-2 opacity-70">Allergens</span>
+          <span className="text-[10px] uppercase font-bold text-[#024930] tracking-[0.2em] mb-2 opacity-70">Allergens</span>
           <div className="flex flex-col items-center gap-1">
             {getAllergenIcons(item.allergens_de, 'card')}
           </div>

@@ -35,7 +35,7 @@ import { getFirestore, collection, getDocs, Firestore } from 'firebase/firestore
 
 import * as XLSX from 'xlsx';
 
-const API_KEY = import.meta.env.VITE_API_KEY || "AIzaSyBlB6j_w_-Mb_ughrrz8BDFdiIJEDNTKGM";
+const API_KEY = (import.meta as any).env.VITE_API_KEY || "AIzaSyBlB6j_w_-Mb_ughrrz8BDFdiIJEDNTKGM";
 
 
 const firebaseConfig = {
@@ -48,7 +48,7 @@ const firebaseConfig = {
   appId: "1:168446433946:web:6536d1d40fb86ee1f61d23"
 };
 
-let app: FirebaseApp;
+let app: FirebaseApp | undefined;
 try {
   app = getApps().length === 0 ? initializeApp(firebaseConfig) : getApp();
 } catch (e) {
@@ -954,8 +954,8 @@ const App: React.FC = () => {
                 <ChefHat size={20} /><span className="hidden lg:block">Special Catering</span>
               </button>
               <button
-                onClick={() => setActiveTab('db')}
-                className={`w-full flex items-center gap-4 px-4 py-3 rounded-xl transition-all font-bold ${activeTab === 'db' ? 'bg-[#FEACCF] text-[#024930] shadow-lg translate-x-1' : 'text-[#F8F7F6]/60 hover:text-white hover:bg-white/5'}`}
+                onClick={() => setActiveTab('database')}
+                className={`w-full flex items-center gap-4 px-4 py-3 rounded-xl transition-all font-bold ${activeTab === 'database' ? 'bg-[#FEACCF] text-[#024930] shadow-lg translate-x-1' : 'text-[#F8F7F6]/60 hover:text-white hover:bg-white/5'}`}
               >
                 <DatabaseIcon size={20} /><span className="hidden lg:block">Database</span>
               </button>

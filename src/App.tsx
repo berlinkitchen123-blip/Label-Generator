@@ -586,7 +586,7 @@ const App: React.FC = () => {
   const [isProcessingImport, setIsProcessingImport] = useState(false);
   const [isMigrating, setIsMigrating] = useState(false);
   const [isPreviewing, setIsPreviewing] = useState(false);
-  const [previewType, setPreviewType] = useState<'labels' | 'menu' | 'review-a4' | 'review-a6'>('labels'); // New state for preview type
+  const [previewType, setPreviewType] = useState<'labels' | 'menu' | 'review-a4' | 'review-a6' | 'explode-a6'>('labels'); // New state for preview type
   const fileInputRef = useRef<HTMLInputElement>(null);
 
   const init = async () => {
@@ -920,6 +920,32 @@ const App: React.FC = () => {
             <ReviewPrint size="A4" />
           ) : previewType === 'review-a6' ? (
             <ReviewPrint size="A6" />
+          ) : previewType === 'explode-a6' ? (
+            // Explode Standard Bundles Logic
+            (() => {
+              const allItems: any[] = selections.flatMap(sel => {
+                const b = bundles.find(x => x.id === sel.bundleId);
+                if (!b) return [];
+                return Array(sel.quantity).fill(b).flatMap(() => b.items);
+              });
+              const pages = [];
+              for (let i = 0; i < allItems.length; i += 4) {
+                pages.push(allItems.slice(i, i + 4));
+              }
+              return (
+                <>
+                  {pages.map((pageItems, pIdx) => (
+                    <div key={pIdx} className="w-[210mm] h-[297mm] bg-white grid grid-cols-2 grid-rows-2" style={{ pageBreakAfter: 'always', margin: 0, padding: 0 }}>
+                      {pageItems.map((item, iIdx) => (
+                        <div key={iIdx} className="w-[105mm] h-[148.5mm] overflow-hidden flex items-center justify-center">
+                          <CateringItemLabel item={item} lang={lang} forPrint />
+                        </div>
+                      ))}
+                    </div>
+                  ))}
+                </>
+              );
+            })()
           ) : (
             // Standard Bundle Labels Preview
             printGroups.map((group, groupIdx) => (
@@ -931,7 +957,8 @@ const App: React.FC = () => {
                 ))}
               </div>
             ))
-          ))}
+
+
       </div>
 
       <div className="print:hidden min-h-screen flex flex-col bg-[#F8F7F6] text-[#024930]">
@@ -1038,6 +1065,12 @@ const App: React.FC = () => {
                         </button>
                         <button onClick={() => window.print()} className="bg-[#024930] text-white font-black px-10 py-4 rounded-xl flex items-center gap-3 shadow-xl hover:shadow-2xl hover:-translate-y-0.5 active:translate-y-0 transition-all uppercase tracking-wider text-xs">
                           <Printer size={20} /> Print A4 Grid
+                        </button>
+                        <button
+                          onClick={() => { setPreviewType('explode-a6'); setIsPreviewing(true); }}
+                          className="bg-[#FEACCF] text-[#024930] font-black px-10 py-4 rounded-xl flex items-center gap-3 shadow-xl hover:shadow-2xl hover:-translate-y-0.5 active:translate-y-0 transition-all uppercase tracking-wider text-xs"
+                        >
+                          <BookOpen size={20} /> Print Items (A6)
                         </button>
                       </div>
                     )}

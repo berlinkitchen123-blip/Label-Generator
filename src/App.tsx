@@ -1322,6 +1322,34 @@ const App: React.FC = () => {
                       </div>
                     );
                   })()
+                ) : previewType === 'explode-a6' ? (
+                  // Separate A6 Item Labels Preview
+                  (() => {
+                    const allItems = selections.flatMap(sel => {
+                      const b = bundles.find(x => x.id === sel.bundleId);
+                      if (!b) return [];
+                      return Array(sel.quantity).fill(b).flatMap(() => b.items);
+                    });
+
+                    const pages = [];
+                    for (let i = 0; i < allItems.length; i += 4) {
+                      pages.push(allItems.slice(i, i + 4));
+                    }
+
+                    return (
+                      <div className="flex flex-col gap-12 pb-12">
+                        {pages.map((pageItems, pIdx) => (
+                          <div key={pIdx} className="bg-white shadow-2xl origin-top scale-[0.6]" style={{ width: '210mm', height: '297mm', display: 'grid', gridTemplateColumns: '105mm 105mm', gridTemplateRows: '148.5mm 148.5mm' }}>
+                            {pageItems.map((item, iIdx) => (
+                              <div key={iIdx} style={{ width: '105mm', height: '148.5mm' }}>
+                                <CateringItemLabel item={item} lang={lang} forPrint />
+                              </div>
+                            ))}
+                          </div>
+                        ))}
+                      </div>
+                    );
+                  })()
                 ) : (
                   // Standard Labels Preview
                   <div className="flex flex-col gap-12">

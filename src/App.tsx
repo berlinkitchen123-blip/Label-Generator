@@ -868,96 +868,96 @@ const App: React.FC = () => {
     );
   };
 
+
+  const renderMainContent = () => {
+    if (previewType === 'menu' && activeTab === 'catering') {
+      return (
+        <>
+          <div style={{ width: '210mm', height: '297mm', pageBreakAfter: 'always' }}>
+            <MenuPrint />
+          </div>
+          <div style={{ width: '210mm', height: '297mm', pageBreakAfter: 'always' }}>
+            <ReviewPrint size="A4" />
+          </div>
+        </>
+      );
+    }
+
+    if (activeTab === 'catering' && previewType === 'labels') {
+      const allItems = cateringSelections.flatMap(sel => {
+        const b = bundles.find(x => x.id === sel.bundleId);
+        if (!b) return [];
+        return Array(sel.quantity).fill(b).flatMap(() => b.items);
+      });
+      const pages = [];
+      for (let i = 0; i < allItems.length; i += 4) pages.push(allItems.slice(i, i + 4));
+
+      return (
+        <>
+          {pages.map((pageItems, pIdx) => (
+            <div key={pIdx} className="w-[210mm] h-[297mm] bg-white grid grid-cols-2 grid-rows-2" style={{ pageBreakAfter: 'always', margin: 0, padding: 0 }}>
+              {pageItems.map((item, iIdx) => (
+                <div key={iIdx} className="w-[105mm] h-[148.5mm] overflow-hidden flex items-center justify-center">
+                  <CateringItemLabel item={item} lang={lang} forPrint />
+                </div>
+              ))}
+            </div>
+          ))}
+        </>
+      );
+    }
+
+    if (previewType === 'review-a4') return <ReviewPrint size="A4" />;
+    if (previewType === 'review-a6') return <ReviewPrint size="A6" />;
+    if (previewType === 'explode-a6') return renderExplodedItems();
+
+    return (
+      <>
+        {printGroups.map((group, groupIdx) => (
+          <div key={groupIdx} className="label-page-group mb-12" style={{ breakAfter: 'always' }}>
+            {group.map((bundle, bIdx) => (
+              <div key={bIdx} className="label-card-container">
+                <Label bundle={bundle} lang={lang} packedOn={packedOn} forPrint variant="standard" />
+              </div>
+            ))}
+          </div>
+        ))}
+      </>
+    );
+  };
+
+  const renderExplodedItems = () => {
+    const allItems = selections.flatMap(sel => {
+      const b = bundles.find(x => x.id === sel.bundleId);
+      if (!b) return [];
+      return Array(sel.quantity).fill(b).flatMap(() => b.items);
+    });
+
+    const pages = [];
+    for (let i = 0; i < allItems.length; i += 4) {
+      pages.push(allItems.slice(i, i + 4));
+    }
+
+    return (
+      <>
+        {pages.map((pageItems, pIdx) => (
+          <div key={pIdx} className="w-[210mm] h-[297mm] bg-white grid grid-cols-2 grid-rows-2" style={{ pageBreakAfter: 'always', margin: 0, padding: 0 }}>
+            {pageItems.map((item, iIdx) => (
+              <div key={iIdx} className="w-[105mm] h-[148.5mm] overflow-hidden flex items-center justify-center">
+                <CateringItemLabel item={item} lang={lang} forPrint />
+              </div>
+            ))}
+          </div>
+        ))}
+      </>
+    );
+  };
+
+
   return (
     <>
       <div className="hidden print:block">
-        {previewType === 'menu' && activeTab === 'catering' ? (
-          <>
-            <div style={{ width: '210mm', height: '297mm', pageBreakAfter: 'always' }}>
-              <MenuPrint />
-            </div>
-            <div style={{ width: '210mm', height: '297mm', pageBreakAfter: 'always' }}>
-              <ReviewPrint size="A4" />
-            </div>
-          </>
-        ) : (
-          // Label View (A6) Logic
-          // If Catering, we Flatten Print Groups per Item
-          activeTab === 'catering' && previewType === 'labels' ? (
-            (() => {
-              // Flatten all items from all selections
-              const allItems: any[] = cateringSelections.flatMap(sel => {
-                const b = bundles.find(x => x.id === sel.bundleId);
-                if (!b) return [];
-                return Array(sel.quantity).fill(b).flatMap(() => b.items);
-              });
-
-              // Add Review Card at the end
-              allItems.push({ isReviewCard: true });
-
-              // 1. Group items into pages of 4
-              const pages = [];
-              for (let i = 0; i < allItems.length; i += 4) {
-                pages.push(allItems.slice(i, i + 4));
-              }
-
-              // 2. Render each A4 page
-              return (
-                <>
-                  {pages.map((pageItems, pIdx) => (
-                    <div key={pIdx} className="w-[210mm] h-[297mm] bg-white grid grid-cols-2 grid-rows-2" style={{ pageBreakAfter: 'always', margin: 0, padding: 0 }}>
-                      {pageItems.map((item, iIdx) => (
-                        <div key={iIdx} className="w-[105mm] h-[148.5mm] overflow-hidden flex items-center justify-center">
-                          {item.isReviewCard ? <ReviewPrint size="A6" /> : <CateringItemLabel item={item} lang={lang} forPrint />}
-                        </div>
-                      ))}
-                    </div>
-                  ))}
-                </>
-              );
-            })()
-          ) : previewType === 'review-a4' ? (
-            <ReviewPrint size="A4" />
-          ) : previewType === 'review-a6' ? (
-            <ReviewPrint size="A6" />
-          ) : previewType === 'explode-a6' ? (
-            // Explode Standard Bundles Logic
-            (() => {
-              const allItems: any[] = selections.flatMap(sel => {
-                const b = bundles.find(x => x.id === sel.bundleId);
-                if (!b) return [];
-                return Array(sel.quantity).fill(b).flatMap(() => b.items);
-              });
-              const pages = [];
-              for (let i = 0; i < allItems.length; i += 4) {
-                pages.push(allItems.slice(i, i + 4));
-              }
-              return (
-                <>
-                  {pages.map((pageItems, pIdx) => (
-                    <div key={pIdx} className="w-[210mm] h-[297mm] bg-white grid grid-cols-2 grid-rows-2" style={{ pageBreakAfter: 'always', margin: 0, padding: 0 }}>
-                      {pageItems.map((item, iIdx) => (
-                        <div key={iIdx} className="w-[105mm] h-[148.5mm] overflow-hidden flex items-center justify-center">
-                          <CateringItemLabel item={item} lang={lang} forPrint />
-                        </div>
-                      ))}
-                    </div>
-                  ))}
-                </>
-              );
-            })()
-          ) : (
-            // Standard Bundle Labels Preview
-            printGroups.map((group, groupIdx) => (
-              <div key={groupIdx} className="label-page-group mb-12" style={{ breakAfter: 'always' }}>
-                {group.map((bundle, bIdx) => (
-                  <div key={bIdx} className="label-card-container">
-                    <Label bundle={bundle} lang={lang} packedOn={packedOn} forPrint variant="standard" />
-                  </div>
-                ))}
-              </div>
-            ))
-          )}
+        {renderMainContent()}
 
 
       </div>

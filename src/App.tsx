@@ -1068,7 +1068,7 @@ const App: React.FC = () => {
                           <Printer size={20} /> Print A4 Grid
                         </button>
                         <button
-                          onClick={() => { setPreviewType('explode-a6'); setIsPreviewing(true); }}
+                          onClick={() => window.print()}
                           className="bg-[#FEACCF] text-[#024930] font-black px-10 py-4 rounded-xl flex items-center gap-3 shadow-xl hover:shadow-2xl hover:-translate-y-0.5 active:translate-y-0 transition-all uppercase tracking-wider text-xs"
                         >
                           <BookOpen size={20} /> Separate A6

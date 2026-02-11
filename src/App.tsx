@@ -764,35 +764,35 @@ const App: React.FC = () => {
         <div className="absolute top-6 right-6 w-16 h-16 border-l border-b border-[#F8F7F6] z-10" />
         <div className="absolute bottom-6 left-6 w-16 h-16 border-r border-t border-[#F8F7F6] z-10" />
         <div className="absolute bottom-6 right-6 w-16 h-16 border-l border-t border-[#F8F7F6] z-10" />
-        <div className="flex flex-col items-center w-full pt-16 pb-6 z-20 px-24">
-          <BrandLogo className="h-[auto] text-7xl mb-8 text-[#024930]" />
+        <div className="flex flex-col items-center w-full pt-10 pb-3 z-20 px-24">
+          <BrandLogo className="h-[auto] text-5xl mb-4 text-[#024930]" />
           {companyName && (
-            <h1 className="text-4xl font-black text-[#024930] uppercase mb-4 tracking-wider text-center" style={{ fontFamily: "'Playfair Display', serif" }}>
+            <h1 className="text-3xl font-black text-[#024930] uppercase mb-2 tracking-wider text-center" style={{ fontFamily: "'Playfair Display', serif" }}>
               {companyName}
             </h1>
           )}
           <div className="flex items-center gap-6 mt-2">
             <span className="h-[1px] w-16 bg-[#024930]/40" />
-            <p className="font-serif text-[#024930] text-xl tracking-[0.1em] uppercase" style={{ fontFamily: "'Playfair Display', serif" }}>
+            <p className="font-serif text-[#024930] text-base tracking-[0.1em] uppercase" style={{ fontFamily: "'Playfair Display', serif" }}>
               {new Date(cateringDate).toLocaleDateString('en-GB', { weekday: 'long', day: 'numeric', month: 'long', year: 'numeric' })}
             </p>
             <span className="h-[1px] w-16 bg-[#024930]/40" />
           </div>
         </div>
         <div className="flex-1 w-full px-24 z-20 flex flex-col items-center justify-center">
-          <div className={`w-full ${isDense ? 'columns-2 gap-16' : 'flex flex-col items-center gap-16'} space-y-12`}>
+          <div className={`w-full ${isDense ? 'columns-2 gap-8' : 'flex flex-col items-center gap-6'} space-y-6`}>
             {sortedGroups.map((groupTitle, idx) => (
-              <div key={idx} className="break-inside-avoid mb-8 w-full">
-                <div className={`flex items-center justify-center mb-8 border-b border-[#024930]/20 pb-4`}>
-                  <h2 className="text-3xl font-bold text-[#024930] uppercase tracking-[0.25em]" style={{ fontFamily: "'Playfair Display', serif" }}>
+              <div key={idx} className="break-inside-avoid mb-4 w-full">
+                <div className={`flex items-center justify-center mb-4 border-b border-[#024930]/20 pb-2`}>
+                  <h2 className="text-2xl font-bold text-[#024930] uppercase tracking-[0.25em]" style={{ fontFamily: "'Playfair Display', serif" }}>
                     {lang === 'de' ? (groupTitle === 'Vegetarian' ? 'Vegetarisch' : groupTitle === 'Meat' ? 'Fleisch' : groupTitle === 'Fish' ? 'Fisch' : groupTitle) : groupTitle}
                   </h2>
                 </div>
-                <div className={`flex flex-col ${isDense ? 'items-start text-left' : 'items-center text-center'} gap-8 flex-grow justify-center`}>
+                <div className={`flex flex-col ${isDense ? 'items-start text-left' : 'items-center text-center'} gap-3 flex-grow justify-center`}>
                   {grouped[groupTitle].map((item, iIdx) => (
-                    <div key={iIdx} className="flex flex-col group w-full py-2">
+                    <div key={iIdx} className="flex flex-col group w-full py-1">
                       <div className="flex items-start justify-between w-full">
-                        <span className="text-3xl font-bold text-[#1a1a1a] leading-tight tracking-wide text-left flex-1" style={{ fontFamily: "'Bona Nova', serif" }}>
+                        <span className="text-2xl font-bold text-[#1a1a1a] leading-tight tracking-wide text-left flex-1" style={{ fontFamily: "'Bona Nova', serif" }}>
                           {lang === 'de' ? item.item_name_de : item.item_name_en}
                         </span>
                         <div className="flex flex-col items-end pl-6 shrink-0 max-w-[35%]">
@@ -810,10 +810,10 @@ const App: React.FC = () => {
             ))}
           </div>
         </div>
-        <div className="w-full text-center pb-12 z-20 mt-auto flex flex-col items-center">
-          <span className="text-4xl text-[#024930]/40 rotate-180 mb-4" style={{ fontFamily: "'Pinyon Script', cursive" }}>❦</span>
-          <p className="text-3xl text-[#024930]" style={{ fontFamily: "'Pinyon Script', cursive" }}>Bon Appétit</p>
-          <p className="text-[9px] font-sans uppercase tracking-[0.25em] text-[#024930]/50 mt-4">Prepared Freshly for You</p>
+        <div className="w-full text-center pb-6 z-20 mt-auto flex flex-col items-center">
+          <span className="text-3xl text-[#024930]/40 rotate-180 mb-2" style={{ fontFamily: "'Pinyon Script', cursive" }}>❦</span>
+          <p className="text-2xl text-[#024930]" style={{ fontFamily: "'Pinyon Script', cursive" }}>Bon Appétit</p>
+          <p className="text-[9px] font-sans uppercase tracking-[0.25em] text-[#024930]/50 mt-2">Prepared Freshly for You</p>
         </div>
         <style>{`
           @media print {

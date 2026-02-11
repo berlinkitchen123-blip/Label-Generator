@@ -255,7 +255,7 @@ const getDietIcons = (diet: string, showLabel = true) => {
   const style = "flex items-center gap-1.5 px-3 py-1 rounded-full border border-current shadow-sm";
 
   if (d.includes('vegan')) return <div className={`${style} text-green-700 bg-green-50`}><Leaf size={16} /><span className="text-[10px] font-bold uppercase tracking-wider">{showLabel && 'Vegan'}</span></div>;
-  if (d.includes('vegetarisch')) return <div className={`${style} text-green-600 bg-green-50`}><Sprout size={16} /><span className="text-[10px] font-bold uppercase tracking-wider">{showLabel && 'Veggie'}</span></div>;
+  if (d.includes('vegetarisch') || d.includes('vegetarian')) return <div className={`${style} text-green-600 bg-green-50`}><Sprout size={16} /><span className="text-[10px] font-bold uppercase tracking-wider">{showLabel && 'Veggie'}</span></div>;
   if (d.includes('fish') || d.includes('fisch')) return <div className={`${style} text-blue-600 bg-blue-50`}><Fish size={16} /><span className="text-[10px] font-bold uppercase tracking-wider">{showLabel && 'Fish'}</span></div>;
   if (d.includes('meat') || d.includes('fleisch') || d.includes('beef')) return <div className={`${style} text-red-800 bg-red-50`}><span className="text-lg leading-none">🥩</span><span className="text-[10px] font-bold uppercase tracking-wider">{showLabel && 'Meat'}</span></div>;
   return null;

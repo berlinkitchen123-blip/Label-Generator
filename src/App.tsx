@@ -370,13 +370,16 @@ const DataService = {
   saveBundles: async (bundles: Bundle[]) => {
     localStorage.setItem(DB_KEY, JSON.stringify(bundles));
 
-    // Batch update object
-    const updates: any = {};
-    bundles.forEach(b => {
-      updates['bundles/' + b.id] = b;
-    });
-
     try {
+      // CRITICAL: First delete ALL existing bundles to ensure complete replacement
+      await remove(ref(db, 'bundles'));
+
+      // Then save the new bundles
+      const updates: any = {};
+      bundles.forEach(b => {
+        updates['bundles/' + b.id] = b;
+      });
+
       await update(ref(db), updates);
     } catch (e) { }
   },

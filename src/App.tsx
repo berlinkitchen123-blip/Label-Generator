@@ -680,12 +680,16 @@ const App: React.FC = () => {
           if (rowCompany) setCompanyName(rowCompany);
           if (rowDate) setCateringDate(rowDate);
         });
-        const updated = [...bundles, ...Object.values(bundleMap)];
+        const updated = Object.values(bundleMap);
         setBundles(updated);
         await DataService.saveBundles(updated);
         alert(t.successImport);
       } catch (err) { alert(t.errorImport); }
-      finally { setIsProcessingImport(false); }
+      finally { 
+        setIsProcessingImport(false);
+        // Reset file input to allow re-uploading the same file
+        if (e.target) e.target.value = '';
+      }
     };
     reader.readAsArrayBuffer(file);
   };

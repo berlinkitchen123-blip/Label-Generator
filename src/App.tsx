@@ -830,12 +830,6 @@ const App: React.FC = () => {
                               <span className="text-lg font-bold text-[#1a1a1a] leading-tight" style={{ fontFamily: "'Bona Nova', serif" }}>
                                 {lang === 'de' ? item.item_name_de : item.item_name_en}
                               </span>
-                              {/* Text-only Allergens - No Icons */}
-                              {item.allergens_de && (
-                                <span className={`text-[10px] text-[#024930]/70 font-sans uppercase tracking-wider ${isDense ? 'ml-2' : 'mt-0.5'}`}>
-                                  ({item.allergens_de})
-                                </span>
-                              )}
                             </div>
                           </div>
                         ))}

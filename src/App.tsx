@@ -807,7 +807,21 @@ const App: React.FC = () => {
                 <div className="flex items-center gap-6">
                   <span className="h-[1px] w-12 bg-[#024930]/30" />
                   <p className="font-serif text-[#024930] text-sm tracking-[0.1em] uppercase">
-                    {new Date(cateringDate).toLocaleDateString('en-GB', { weekday: 'long', day: 'numeric', month: 'long', year: 'numeric' })}
+                    {(() => {
+                      const dStr = cateringDate || new Date().toISOString();
+                      // Hande DD.MM.YYYY or DD/MM/YYYY
+                      if (dStr.match(/^\d{1,2}[./-]\d{1,2}[./-]\d{4}$/)) {
+                        const [d, m, y] = dStr.split(/[./-]/).map(Number);
+                        const date = new Date(y, m - 1, d);
+                        return date.toLocaleDateString('en-GB', { weekday: 'long', day: 'numeric', month: 'long', year: 'numeric' });
+                      }
+                      // Handle valid date string
+                      const date = new Date(dStr);
+                      if (!isNaN(date.getTime())) {
+                        return date.toLocaleDateString('en-GB', { weekday: 'long', day: 'numeric', month: 'long', year: 'numeric' });
+                      }
+                      return dStr; // Fallback to raw string
+                    })()}
                   </p>
                   <span className="h-[1px] w-12 bg-[#024930]/30" />
                 </div>

@@ -730,104 +730,137 @@ const App: React.FC = () => {
 
   // Menu Print Logic (A4) - Premium Redesign
   const MenuPrint = () => {
-    const allItems: BundleItem[] = [];
+    // 1. Group by Service Type (Brunch, Lunch, etc.) based on Bundle Name
+    const services: Record<string, BundleItem[]> = {};
+
     cateringSelections.forEach(s => {
       const b = bundles.find(x => x.id === s.bundleId);
-      if (b) allItems.push(...b.items);
+      if (b) {
+        let serviceType = 'Lunch'; // Default
+        const name = (b.name_de + ' ' + b.name_en).toLowerCase();
+        if (name.includes('brunch') || name.includes('frühstück')) serviceType = 'Brunch';
+        else if (name.includes('dinner') || name.includes('abendessen')) serviceType = 'Dinner';
+        else if (name.includes('snack') || name.includes('fingerfood')) serviceType = 'Snacks';
+
+        if (!services[serviceType]) services[serviceType] = [];
+        services[serviceType].push(...b.items);
+      }
     });
 
-    const uniqueItems = Array.from(new Map(allItems.map(item => [item.item_name_de.toLowerCase(), item])).values());
-    const grouped: Record<string, BundleItem[]> = {};
-    const order = ['Vegan', 'Vegetarisch', 'Vegetarian', 'Fish', 'Fisch', 'Meat', 'Fleisch', 'Beef'];
+    // Helper to group items by Diet within a Service
+    const analyzeService = (items: BundleItem[]) => {
+      const uniqueItems = Array.from(new Map(items.map(item => [item.item_name_de.toLowerCase(), item])).values());
+      const grouped: Record<string, BundleItem[]> = {};
+      const order = ['Vegan', 'Vegetarisch', 'Vegetarian', 'Fish', 'Fisch', 'Meat', 'Fleisch', 'Beef'];
 
-    uniqueItems.forEach(item => {
-      let diet = item.diet_de || 'Other';
-      if (diet.toLowerCase().includes('vegan')) diet = 'Vegan';
-      else if (diet.toLowerCase().includes('vegetarisch')) diet = 'Vegetarian';
-      else if (diet.toLowerCase().includes('fish') || diet.toLowerCase().includes('fisch')) diet = 'Fish';
-      else if (diet.toLowerCase().includes('meat') || diet.toLowerCase().includes('fleisch')) diet = 'Meat';
-      if (!grouped[diet]) grouped[diet] = [];
-      grouped[diet].push(item);
-    });
+      uniqueItems.forEach(item => {
+        let diet = item.diet_de || 'Other';
+        if (diet.toLowerCase().includes('vegan')) diet = 'Vegan';
+        else if (diet.toLowerCase().includes('vegetarisch')) diet = 'Vegetarian';
+        else if (diet.toLowerCase().includes('fish') || diet.toLowerCase().includes('fisch')) diet = 'Fish';
+        else if (diet.toLowerCase().includes('meat') || diet.toLowerCase().includes('fleisch')) diet = 'Meat';
 
-    const sortedGroups = Object.keys(grouped).sort((a, b) => {
-      const idxA = order.indexOf(a);
-      const idxB = order.indexOf(b);
-      return (idxA === -1 ? 99 : idxA) - (idxB === -1 ? 99 : idxB);
-    });
+        if (!grouped[diet]) grouped[diet] = [];
+        grouped[diet].push(item);
+      });
 
-    const isDense = uniqueItems.length > 15;
+      const sortedGroups = Object.keys(grouped).sort((a, b) => {
+        const idxA = order.indexOf(a);
+        const idxB = order.indexOf(b);
+        return (idxA === -1 ? 99 : idxA) - (idxB === -1 ? 99 : idxB);
+      });
+
+      return { grouped, sortedGroups, itemCount: uniqueItems.length };
+    };
 
     return (
-      <div className="w-[210mm] h-[297mm] relative flex flex-col items-center bg-[#F8F7F6] overflow-hidden" style={{ fontFamily: "'Bona Nova', serif" }}>
-        <div className="absolute inset-0 z-0 bg-white/50" />
-        <div className="absolute inset-6 border-[3px] border-[#024930] pointer-events-none" />
-        <div className="absolute inset-0 flex items-center justify-center opacity-[0.03] pointer-events-none z-0">
-          <div style={{ fontFamily: '"Bona Nova", serif' }} className="text-[15rem] font-bold text-[#024930] tracking-wide -rotate-45 whitespace-nowrap">BELLABONA</div>
-        </div>
-        <div className="absolute inset-7 border border-[#024930] pointer-events-none z-10" />
-        <div className="absolute top-6 left-6 w-16 h-16 border-r border-b border-[#F8F7F6] z-10" />
-        <div className="absolute top-6 right-6 w-16 h-16 border-l border-b border-[#F8F7F6] z-10" />
-        <div className="absolute bottom-6 left-6 w-16 h-16 border-r border-t border-[#F8F7F6] z-10" />
-        <div className="absolute bottom-6 right-6 w-16 h-16 border-l border-t border-[#F8F7F6] z-10" />
-        <div className="flex flex-col items-center w-full pt-10 pb-3 z-20 px-24">
-          <BrandLogo className="h-[auto] text-5xl mb-4 text-[#024930]" />
-          {companyName && (
-            <h1 className="text-3xl font-black text-[#024930] uppercase mb-2 tracking-wider text-center" style={{ fontFamily: "'Playfair Display', serif" }}>
-              {companyName}
-            </h1>
-          )}
-          <div className="flex items-center gap-6 mt-2">
-            <span className="h-[1px] w-16 bg-[#024930]/40" />
-            <p className="font-serif text-[#024930] text-base tracking-[0.1em] uppercase" style={{ fontFamily: "'Playfair Display', serif" }}>
-              {new Date(cateringDate).toLocaleDateString('en-GB', { weekday: 'long', day: 'numeric', month: 'long', year: 'numeric' })}
-            </p>
-            <span className="h-[1px] w-16 bg-[#024930]/40" />
-          </div>
-        </div>
-        <div className="flex-1 w-full px-24 z-20 flex flex-col items-center justify-center">
-          <div className={`w-full ${isDense ? 'columns-2 gap-8' : 'flex flex-col items-center gap-6'} space-y-6`}>
-            {sortedGroups.map((groupTitle, idx) => (
-              <div key={idx} className="break-inside-avoid mb-4 w-full">
-                <div className={`flex items-center justify-center mb-4 border-b border-[#024930]/20 pb-2`}>
-                  <h2 className="text-2xl font-bold text-[#024930] uppercase tracking-[0.25em]" style={{ fontFamily: "'Playfair Display', serif" }}>
-                    {lang === 'de' ? (groupTitle === 'Vegetarian' ? 'Vegetarisch' : groupTitle === 'Meat' ? 'Fleisch' : groupTitle === 'Fish' ? 'Fisch' : groupTitle) : groupTitle}
-                  </h2>
+      <>
+        {Object.keys(services).sort().map((service, pageIdx) => {
+          const { grouped, sortedGroups, itemCount } = analyzeService(services[service]);
+          const isDense = itemCount > 12; // Adjusted density threshold
+
+          return (
+            <div key={service} className="w-[210mm] h-[297mm] relative flex flex-col items-center bg-[#F8F7F6] overflow-hidden page-break-after-always" style={{ fontFamily: "'Bona Nova', serif", pageBreakAfter: 'always' }}>
+              {/* Background Decorations */}
+              <div className="absolute inset-0 z-0 bg-white/50" />
+              <div className="absolute inset-6 border-[3px] border-[#024930] pointer-events-none" />
+              <div className="absolute inset-0 flex items-center justify-center opacity-[0.03] pointer-events-none z-0">
+                <div style={{ fontFamily: '"Bona Nova", serif' }} className="text-[15rem] font-bold text-[#024930] tracking-wide -rotate-45 whitespace-nowrap">BELLABONA</div>
+              </div>
+
+              {/* Corner Accents */}
+              <div className="absolute top-6 left-6 w-16 h-16 border-r border-b border-[#F8F7F6] z-10" />
+              <div className="absolute top-6 right-6 w-16 h-16 border-l border-b border-[#F8F7F6] z-10" />
+              <div className="absolute bottom-6 left-6 w-16 h-16 border-r border-t border-[#F8F7F6] z-10" />
+              <div className="absolute bottom-6 right-6 w-16 h-16 border-l border-t border-[#F8F7F6] z-10" />
+
+              {/* Header */}
+              <div className="flex flex-col items-center w-full pt-12 pb-6 z-20 px-20 text-center">
+                <BrandLogo className="h-12 mb-4 text-[#024930]" />
+                {companyName && (
+                  <h1 className="text-3xl font-black text-[#024930] uppercase mb-1 tracking-wider" style={{ fontFamily: "'Playfair Display', serif" }}>
+                    {companyName}
+                  </h1>
+                )}
+                <h2 className="text-xl font-medium text-[#024930]/80 uppercase tracking-[0.2em] mb-4">{service} Menu</h2>
+
+                <div className="flex items-center gap-6">
+                  <span className="h-[1px] w-12 bg-[#024930]/30" />
+                  <p className="font-serif text-[#024930] text-sm tracking-[0.1em] uppercase">
+                    {new Date(cateringDate).toLocaleDateString('en-GB', { weekday: 'long', day: 'numeric', month: 'long', year: 'numeric' })}
+                  </p>
+                  <span className="h-[1px] w-12 bg-[#024930]/30" />
                 </div>
-                <div className={`flex flex-col ${isDense ? 'items-start text-left' : 'items-center text-center'} gap-3 flex-grow justify-center`}>
-                  {grouped[groupTitle].map((item, iIdx) => (
-                    <div key={iIdx} className="flex flex-col group w-full py-1">
-                      <div className="flex items-start justify-between w-full">
-                        <span className="text-2xl font-bold text-[#1a1a1a] leading-tight tracking-wide text-left flex-1" style={{ fontFamily: "'Bona Nova', serif" }}>
-                          {lang === 'de' ? item.item_name_de : item.item_name_en}
-                        </span>
-                        <div className="flex flex-col items-end pl-6 shrink-0 max-w-[35%]">
-                          {item.allergens_de && (
-                            <div className="flex items-center gap-1 justify-end flex-wrap">
-                              {getAllergenIcons(item.allergens_de, 'menu')}
+              </div>
+
+              {/* Menu Content - Flexible container with padding bottom to avoid cut-off */}
+              <div className="flex-1 w-full px-20 z-20 flex flex-col relative pb-24 overflow-hidden">
+                <div className={`w-full ${isDense ? 'columns-2 gap-10' : 'flex flex-col items-center gap-8'} h-full content-center`}>
+                  {sortedGroups.map((groupTitle, idx) => (
+                    <div key={idx} className="break-inside-avoid mb-6 w-full">
+                      <div className={`flex items-center justify-center mb-3 border-b border-[#024930]/20 pb-1`}>
+                        <h3 className="text-xl font-bold text-[#024930] uppercase tracking-[0.15em]" style={{ fontFamily: "'Playfair Display', serif" }}>
+                          {lang === 'de' ? (groupTitle === 'Vegetarian' ? 'Vegetarisch' : groupTitle === 'Meat' ? 'Fleisch' : groupTitle === 'Fish' ? 'Fisch' : groupTitle) : groupTitle}
+                        </h3>
+                      </div>
+                      <div className={`flex flex-col ${isDense ? 'items-start text-left' : 'items-center text-center'} gap-2`}>
+                        {grouped[groupTitle].map((item, iIdx) => (
+                          <div key={iIdx} className="w-full py-0.5">
+                            <div className={`flex ${isDense ? 'items-baseline justify-between' : 'flex-col items-center'} w-full`}>
+                              <span className="text-lg font-bold text-[#1a1a1a] leading-tight" style={{ fontFamily: "'Bona Nova', serif" }}>
+                                {lang === 'de' ? item.item_name_de : item.item_name_en}
+                              </span>
+                              {/* Text-only Allergens - No Icons */}
+                              {item.allergens_de && (
+                                <span className={`text-[10px] text-[#024930]/70 font-sans uppercase tracking-wider ${isDense ? 'ml-2' : 'mt-0.5'}`}>
+                                  ({item.allergens_de})
+                                </span>
+                              )}
                             </div>
-                          )}
-                        </div>
+                          </div>
+                        ))}
                       </div>
                     </div>
                   ))}
                 </div>
               </div>
-            ))}
-          </div>
-        </div>
-        <div className="w-full text-center pb-6 z-20 mt-auto flex flex-col items-center">
-          <span className="text-3xl text-[#024930]/40 rotate-180 mb-2" style={{ fontFamily: "'Pinyon Script', cursive" }}>❦</span>
-          <p className="text-2xl text-[#024930]" style={{ fontFamily: "'Pinyon Script', cursive" }}>Bon Appétit</p>
-          <p className="text-[9px] font-sans uppercase tracking-[0.25em] text-[#024930]/50 mt-2">Prepared Freshly for You</p>
-        </div>
-        <style>{`
-          @media print {
-            @page { size: A4; margin: 0; }
-            body { print-color-adjust: exact; -webkit-print-color-adjust: exact; }
-          }
-        `}</style>
-      </div>
+
+              {/* Footer */}
+              <div className="absolute bottom-0 w-full text-center pb-8 z-20 pt-10 bg-gradient-to-t from-[#F8F7F6] to-transparent">
+                <p className="text-xl text-[#024930]" style={{ fontFamily: "'Pinyon Script', cursive" }}>Bon Appétit</p>
+              </div>
+
+              <style>{`
+                @media print {
+                  @page { size: A4; margin: 0; }
+                  body { print-color-adjust: exact; -webkit-print-color-adjust: exact; }
+                  .page-break-after-always { page-break-after: always !important; }
+                }
+              `}</style>
+            </div>
+          );
+        })}
+      </>
     );
   };
 

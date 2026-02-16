@@ -666,11 +666,10 @@ const App: React.FC = () => {
             allergens_de: String(row.allergens_de || '').trim(),
             diet_de: String(row.diet_de || '').trim()
           });
+          // Set bundle type: 'catering' only if explicitly specified, otherwise 'standard' (Generator tab)
           if (!bundleMap[nameDe].type) {
-            bundleMap[nameDe].type = String(row.type || 'standard').toLowerCase().includes('catering') ? 'catering' : 'standard';
-          }
-          if (!bundleMap[nameDe].type) {
-            bundleMap[nameDe].type = String(row.type || 'standard').toLowerCase().includes('catering') ? 'catering' : 'standard';
+            const typeValue = String(row.type || '').trim().toLowerCase();
+            bundleMap[nameDe].type = typeValue.includes('catering') ? 'catering' : 'standard';
           }
 
           // CAPTURE METADATA (Company & Date) from the first row that has them
@@ -685,7 +684,7 @@ const App: React.FC = () => {
         await DataService.saveBundles(updated);
         alert(t.successImport);
       } catch (err) { alert(t.errorImport); }
-      finally { 
+      finally {
         setIsProcessingImport(false);
         // Reset file input to allow re-uploading the same file
         if (e.target) e.target.value = '';
@@ -1229,6 +1228,24 @@ const App: React.FC = () => {
                       disabled={isMigrating}
                     >
                       {isMigrating ? t.syncing : t.recoverData}
+                    </button>
+                    <button
+                      onClick={async () => {
+                        if (!confirm(`⚠️ CLEAR ALL BUNDLES?\n\nThis will permanently delete ALL ${bundles.length} bundles from the database.\n\nThis action CANNOT be undone!\n\nAre you absolutely sure?`)) return;
+                        try {
+                          // Delete from Firebase RTDB
+                          await remove(ref(db, 'bundles'));
+                          // Clear local state
+                          setBundles([]);
+                          localStorage.removeItem('bb_label_db_v7_perfect');
+                          alert('✅ All bundles have been cleared!');
+                        } catch (e: any) {
+                          alert('❌ Error clearing bundles: ' + e.message);
+                        }
+                      }}
+                      className="text-sm bg-red-50 hover:bg-red-100 text-red-600 px-4 py-2 rounded-lg font-bold ml-2"
+                    >
+                      🗑️ Clear All Bundles
                     </button>
                   </div>
 

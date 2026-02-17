@@ -675,11 +675,16 @@ const App: React.FC = () => {
             bundleMap[nameDe].type = typeValue.includes('catering') ? 'catering' : 'standard';
           }
 
-          // CAPTURE METADATA (Company & Date) from the first row that has them
-          const rowCompany = String(row.company_name || '').trim();
-          const rowDate = String(row.date || '').trim();
+          // CAPTURE METADATA (Company & Date) - Robust Key Search
+          // Search for any key containing 'company', 'firma', 'customer', 'kunde' (case-insensitive)
+          const keys = Object.keys(row);
+          const compKey = keys.find(k => /company|firma|customer|kunde/i.test(k));
+          const dateKey = keys.find(k => /date|datum|day/i.test(k));
 
-          if (rowCompany) setCompanyName(rowCompany);
+          const rowCompany = compKey ? String((row as any)[compKey] || '').trim() : '';
+          const rowDate = dateKey ? String((row as any)[dateKey] || '').trim() : '';
+
+          if (rowCompany && rowCompany.length > 2) setCompanyName(rowCompany);
           if (rowDate) setCateringDate(rowDate);
         });
         const updated = Object.values(bundleMap);

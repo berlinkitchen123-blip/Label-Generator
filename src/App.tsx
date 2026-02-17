@@ -777,36 +777,22 @@ const App: React.FC = () => {
       <>
         {Object.keys(services).sort().map((service, pageIdx) => {
           const { grouped, sortedGroups, itemCount } = analyzeService(services[service]);
-          // Adaptive Styling Logic
-          let titleSize = 'text-xl';
-          let itemSize = 'text-lg';
-          let itemGap = 'gap-4';
-          let mb = 'mb-10';
-          let colGap = 'gap-16';
-          let contentJustify = 'justify-center'; // Center vertically by default
+          // Dynamic Layout Calculation - Ratio Based
+          const clamp = (min: number, val: number, max: number) => Math.min(Math.max(min, val), max);
 
-          if (itemCount < 15) { // Sparse - Big & Spacious
-            titleSize = 'text-3xl';
-            itemSize = 'text-xl';
-            itemGap = 'gap-8';
-            mb = 'mb-20'; // Huge spacing
-            colGap = 'gap-20';
-            contentJustify = 'justify-center';
-          } else if (itemCount < 30) { // Normal - Balanced
-            titleSize = 'text-2xl';
-            itemSize = 'text-lg';
-            itemGap = 'gap-6';
-            mb = 'mb-16';
-            colGap = 'gap-16';
-            contentJustify = 'justify-center';
-          } else { // Dense - Top Aligned
-            titleSize = 'text-lg';
-            itemSize = 'text-base';
-            itemGap = 'gap-3';
-            mb = 'mb-8';
-            colGap = 'gap-10';
-            contentJustify = 'justify-start';
-          }
+          // Continuous scaling based on item count
+          const baseSize = clamp(14, 52 - (itemCount * 1.0), 32);
+          const gapSize = clamp(4, baseSize * 0.6, 24);
+          const colGapVal = clamp(32, baseSize * 4, 100);
+          const mbVal = clamp(24, baseSize * 3.5, 120);
+
+          const titleStyle = { fontSize: `${baseSize * 1.3}px`, lineHeight: '1.2' };
+          const itemStyle = { fontSize: `${baseSize}px`, lineHeight: '1.3' };
+          const listStyle = { gap: `${gapSize}px` };
+          const groupStyle = { marginBottom: `${mbVal}px`, breakInside: "avoid" as const };
+          const columnsStyle = { columnGap: `${colGapVal}px` };
+
+          const contentJustify = itemCount < 30 ? 'justify-center' : 'justify-start';
 
           return (
             <div key={service} className="w-[210mm] h-[297mm] relative flex flex-col bg-white overflow-hidden page-break-after-always" style={{ fontFamily: "'Bona Nova', serif", pageBreakAfter: 'always' }}>
@@ -815,54 +801,36 @@ const App: React.FC = () => {
               <div className="absolute inset-4 border-4 border-double border-[#024930] pointer-events-none z-10" />
 
               {/* Header */}
-              <div className={`flex flex-col items-center w-full pt-14 pb-6 z-20 px-16 text-center border-b border-[#024930]/10 mx-auto max-w-[85%]`}>
-                <BrandLogo className="h-10 mb-2 text-[#024930]" />
+              {/* Header - Minimalist & Grand */}
+              <div className="flex flex-col items-center w-full pt-16 pb-8 z-20 px-16 text-center mx-auto max-w-[90%]">
+                <BrandLogo className="h-16 mb-4 text-[#024930]" />
                 {companyName && (
-                  <h1 className="text-3xl font-black text-[#024930] uppercase mb-1 tracking-widest" style={{ fontFamily: "'Playfair Display', serif" }}>
+                  <h1 className="text-7xl font-black text-[#024930] uppercase tracking-widest leading-none" style={{ fontFamily: "'Playfair Display', serif" }}>
                     {companyName}
                   </h1>
                 )}
-                <div className="flex items-center gap-4 mt-2 mb-2">
-                  <span className="h-[1px] w-8 bg-[#024930]" />
-                  <h2 className="text-lg font-medium text-[#024930] uppercase tracking-[0.2em]">{service} Menu</h2>
-                  <span className="h-[1px] w-8 bg-[#024930]" />
-                </div>
-
-                <p className="font-serif text-[#024930]/80 text-sm tracking-widest uppercase mt-1">
-                  {(() => {
-                    const dStr = cateringDate || new Date().toISOString();
-                    if (dStr.match(/^\d{1,2}[./-]\d{1,2}[./-]\d{4}$/)) {
-                      const [d, m, y] = dStr.split(/[./-]/).map(Number);
-                      const date = new Date(y, m - 1, d);
-                      return date.toLocaleDateString('en-GB', { weekday: 'long', day: 'numeric', month: 'long', year: 'numeric' });
-                    }
-                    const date = new Date(dStr);
-                    if (!isNaN(date.getTime())) {
-                      return date.toLocaleDateString('en-GB', { weekday: 'long', day: 'numeric', month: 'long', year: 'numeric' });
-                    }
-                    return dStr;
-                  })()}
-                </p>
+                <div className="w-24 h-1 bg-[#024930] mt-6 mb-2"></div>
               </div>
 
               {/* Menu Content - 2 Column Clean Layout */}
               <div className={`flex-1 w-full px-16 py-10 z-20 relative overflow-hidden flex flex-col ${contentJustify}`}>
-                <div className={`w-full columns-2 ${colGap}`}>
+                <div className="w-full columns-2 h-auto" style={columnsStyle}>
                   {sortedGroups.map((groupTitle, idx) => (
-                    <div key={idx} className={`break-inside-avoid ${mb} w-full`}>
+                    <div key={idx} className="w-full" style={groupStyle}>
                       {/* Section Header */}
                       <div className="flex items-center mb-4 border-b-2 border-[#024930]/20 pb-1">
-                        <h3 className={`${titleSize} font-bold text-[#024930] uppercase tracking-widest`} style={{ fontFamily: "'Playfair Display', serif" }}>
+                        <h3 className="font-bold text-[#024930] uppercase tracking-widest" style={{ ...titleStyle, fontFamily: "'Playfair Display', serif" }}>
                           {lang === 'de' ? (groupTitle === 'Vegetarian' ? 'Vegetarisch' : groupTitle === 'Meat' ? 'Fleisch' : groupTitle === 'Fish' ? 'Fisch' : groupTitle) : groupTitle}
                         </h3>
                       </div>
 
                       {/* Items List */}
-                      <div className={`flex flex-col items-start ${itemGap}`}>
+                      <div className="flex flex-col items-start" style={listStyle}>
                         {grouped[groupTitle].map((item, iIdx) => (
-                          <div key={iIdx} className="w-full flex items-baseline gap-2 group">
-                            <div className="w-1.5 h-1.5 rounded-full bg-[#024930]/40 mt-1.5 shrink-0 group-hover:bg-[#024930] transition-colors" />
-                            <span className={`${itemSize} font-bold text-[#1a1a1a] leading-tight text-left`}>
+                          <div key={iIdx} className="w-full flex items-baseline gap-3 group">
+                            {/* Scaled Bullet based on font size */}
+                            <div className="rounded-full bg-[#024930]/40 shrink-0 group-hover:bg-[#024930] transition-colors" style={{ width: `${baseSize * 0.25}px`, height: `${baseSize * 0.25}px`, marginTop: `${baseSize * 0.5}px` }} />
+                            <span className="font-bold text-[#1a1a1a] text-left" style={itemStyle}>
                               {lang === 'de' ? item.item_name_de : item.item_name_en}
                             </span>
                           </div>

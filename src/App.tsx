@@ -777,7 +777,32 @@ const App: React.FC = () => {
       <>
         {Object.keys(services).sort().map((service, pageIdx) => {
           const { grouped, sortedGroups, itemCount } = analyzeService(services[service]);
-          const isDense = itemCount > 12; // Adjusted density threshold
+          // Adaptive Styling Logic
+          let titleSize = 'text-xl';
+          let itemSize = 'text-lg';
+          let itemGap = 'gap-4';
+          let mb = 'mb-8';
+          let colGap = 'gap-12';
+
+          if (itemCount < 15) { // Sparse - Big & Spacious
+            titleSize = 'text-2xl';
+            itemSize = 'text-xl';
+            itemGap = 'gap-6';
+            mb = 'mb-12';
+            colGap = 'gap-16';
+          } else if (itemCount < 25) { // Normal - Readable
+            titleSize = 'text-xl';
+            itemSize = 'text-lg';
+            itemGap = 'gap-4';
+            mb = 'mb-8';
+            colGap = 'gap-12';
+          } else { // Dense - Compact but legible
+            titleSize = 'text-lg';
+            itemSize = 'text-base'; // Min 16px
+            itemGap = 'gap-2';
+            mb = 'mb-6';
+            colGap = 'gap-8';
+          }
 
           return (
             <div key={service} className="w-[210mm] h-[297mm] relative flex flex-col bg-white overflow-hidden page-break-after-always" style={{ fontFamily: "'Bona Nova', serif", pageBreakAfter: 'always' }}>
@@ -786,7 +811,7 @@ const App: React.FC = () => {
               <div className="absolute inset-4 border-4 border-double border-[#024930] pointer-events-none z-10" />
 
               {/* Header */}
-              <div className="flex flex-col items-center w-full pt-12 pb-4 z-20 px-16 text-center border-b border-[#024930]/10 mx-auto max-w-[90%]">
+              <div className={`flex flex-col items-center w-full pt-14 pb-6 z-20 px-16 text-center border-b border-[#024930]/10 mx-auto max-w-[85%]`}>
                 <BrandLogo className="h-10 mb-2 text-[#024930]" />
                 {companyName && (
                   <h1 className="text-3xl font-black text-[#024930] uppercase mb-1 tracking-widest" style={{ fontFamily: "'Playfair Display', serif" }}>
@@ -818,22 +843,22 @@ const App: React.FC = () => {
 
               {/* Menu Content - 2 Column Clean Layout */}
               <div className="flex-1 w-full px-16 py-8 z-20 relative overflow-hidden">
-                <div className={`w-full columns-2 gap-12 h-full`}>
+                <div className={`w-full columns-2 ${colGap} h-full`}>
                   {sortedGroups.map((groupTitle, idx) => (
-                    <div key={idx} className="break-inside-avoid mb-8 w-full">
+                    <div key={idx} className={`break-inside-avoid ${mb} w-full`}>
                       {/* Section Header */}
                       <div className="flex items-center mb-4 border-b-2 border-[#024930]/20 pb-1">
-                        <h3 className="text-lg font-bold text-[#024930] uppercase tracking-widest" style={{ fontFamily: "'Playfair Display', serif" }}>
+                        <h3 className={`${titleSize} font-bold text-[#024930] uppercase tracking-widest`} style={{ fontFamily: "'Playfair Display', serif" }}>
                           {lang === 'de' ? (groupTitle === 'Vegetarian' ? 'Vegetarisch' : groupTitle === 'Meat' ? 'Fleisch' : groupTitle === 'Fish' ? 'Fisch' : groupTitle) : groupTitle}
                         </h3>
                       </div>
 
-                      {/* Items List - Left Aligned with Bullets */}
-                      <div className="flex flex-col items-start gap-3">
+                      {/* Items List */}
+                      <div className={`flex flex-col items-start ${itemGap}`}>
                         {grouped[groupTitle].map((item, iIdx) => (
                           <div key={iIdx} className="w-full flex items-baseline gap-2 group">
                             <div className="w-1.5 h-1.5 rounded-full bg-[#024930]/40 mt-1.5 shrink-0 group-hover:bg-[#024930] transition-colors" />
-                            <span className={`${isDense ? (itemCount > 25 ? 'text-sm' : 'text-base') : 'text-lg'} font-bold text-[#1a1a1a] leading-tight text-left`}>
+                            <span className={`${itemSize} font-bold text-[#1a1a1a] leading-tight text-left`}>
                               {lang === 'de' ? item.item_name_de : item.item_name_en}
                             </span>
                           </div>

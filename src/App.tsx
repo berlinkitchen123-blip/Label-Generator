@@ -678,7 +678,7 @@ const App: React.FC = () => {
           // CAPTURE METADATA (Company & Date) - Robust Key Search
           // Search for any key containing 'company', 'firma', 'customer', 'kunde' (case-insensitive)
           const keys = Object.keys(row);
-          const compKey = keys.find(k => /company|firma|customer|kunde/i.test(k));
+          const compKey = keys.find(k => /company|firma|customer|kunde|client|partner|business|paypal/i.test(k));
           const dateKey = keys.find(k => /date|datum|day/i.test(k));
 
           const rowCompany = compKey ? String((row as any)[compKey] || '').trim() : '';

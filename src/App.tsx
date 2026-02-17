@@ -803,13 +803,14 @@ const App: React.FC = () => {
               {/* Header */}
               {/* Header - Minimalist & Grand */}
               <div className="flex flex-col items-center w-full pt-16 pb-8 z-20 px-16 text-center mx-auto max-w-[90%]">
-                <BrandLogo className="h-16 mb-4 text-[#024930]" />
+                {/* Brand Logo - Doubled Size */}
+                <BrandLogo className="h-32 mb-6 text-[#024930]" />
                 {companyName && (
-                  <h1 className="text-7xl font-black text-[#024930] uppercase tracking-widest leading-none" style={{ fontFamily: "'Playfair Display', serif" }}>
+                  <h1 className="text-8xl font-black text-[#024930] uppercase tracking-widest leading-none" style={{ fontFamily: "'Playfair Display', serif" }}>
                     {companyName}
                   </h1>
                 )}
-                <div className="w-24 h-1 bg-[#024930] mt-6 mb-2"></div>
+                <div className="w-32 h-1.5 bg-[#024930] mt-4 mb-2"></div>
               </div>
 
               {/* Menu Content - 2 Column Clean Layout */}

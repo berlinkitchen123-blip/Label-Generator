@@ -781,27 +781,31 @@ const App: React.FC = () => {
           let titleSize = 'text-xl';
           let itemSize = 'text-lg';
           let itemGap = 'gap-4';
-          let mb = 'mb-8';
-          let colGap = 'gap-12';
+          let mb = 'mb-10';
+          let colGap = 'gap-16';
+          let contentJustify = 'justify-center'; // Center vertically by default
 
           if (itemCount < 15) { // Sparse - Big & Spacious
-            titleSize = 'text-2xl';
+            titleSize = 'text-3xl';
             itemSize = 'text-xl';
-            itemGap = 'gap-6';
-            mb = 'mb-12';
-            colGap = 'gap-16';
-          } else if (itemCount < 25) { // Normal - Readable
-            titleSize = 'text-xl';
+            itemGap = 'gap-8';
+            mb = 'mb-20'; // Huge spacing
+            colGap = 'gap-20';
+            contentJustify = 'justify-center';
+          } else if (itemCount < 30) { // Normal - Balanced
+            titleSize = 'text-2xl';
             itemSize = 'text-lg';
-            itemGap = 'gap-4';
-            mb = 'mb-8';
-            colGap = 'gap-12';
-          } else { // Dense - Compact but legible
+            itemGap = 'gap-6';
+            mb = 'mb-16';
+            colGap = 'gap-16';
+            contentJustify = 'justify-center';
+          } else { // Dense - Top Aligned
             titleSize = 'text-lg';
-            itemSize = 'text-base'; // Min 16px
-            itemGap = 'gap-2';
-            mb = 'mb-6';
-            colGap = 'gap-8';
+            itemSize = 'text-base';
+            itemGap = 'gap-3';
+            mb = 'mb-8';
+            colGap = 'gap-10';
+            contentJustify = 'justify-start';
           }
 
           return (
@@ -842,7 +846,7 @@ const App: React.FC = () => {
               </div>
 
               {/* Menu Content - 2 Column Clean Layout */}
-              <div className="flex-1 w-full px-16 py-8 z-20 relative overflow-hidden">
+              <div className={`flex-1 w-full px-16 py-10 z-20 relative overflow-hidden flex flex-col ${contentJustify}`}>
                 <div className={`w-full columns-2 ${colGap} h-full`}>
                   {sortedGroups.map((groupTitle, idx) => (
                     <div key={idx} className={`break-inside-avoid ${mb} w-full`}>

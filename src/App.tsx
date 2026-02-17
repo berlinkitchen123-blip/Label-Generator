@@ -847,7 +847,7 @@ const App: React.FC = () => {
 
               {/* Menu Content - 2 Column Clean Layout */}
               <div className={`flex-1 w-full px-16 py-10 z-20 relative overflow-hidden flex flex-col ${contentJustify}`}>
-                <div className={`w-full columns-2 ${colGap} h-full`}>
+                <div className={`w-full columns-2 ${colGap}`}>
                   {sortedGroups.map((groupTitle, idx) => (
                     <div key={idx} className={`break-inside-avoid ${mb} w-full`}>
                       {/* Section Header */}

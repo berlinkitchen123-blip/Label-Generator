@@ -780,8 +780,8 @@ const App: React.FC = () => {
           // Dynamic Layout Calculation - Ratio Based
           const clamp = (min: number, val: number, max: number) => Math.min(Math.max(min, val), max);
 
-          // Continuous scaling based on item count
-          const baseSize = clamp(14, 52 - (itemCount * 1.0), 32);
+          // Continuous Ratio Scaling (Fixed to 24px as requested)
+          const baseSize = 24;
           const gapSize = clamp(4, baseSize * 0.6, 24);
           const colGapVal = clamp(32, baseSize * 4, 100);
           const mbVal = clamp(24, baseSize * 3.5, 120);

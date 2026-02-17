@@ -803,8 +803,8 @@ const App: React.FC = () => {
               {/* Header */}
               {/* Header - Minimalist & Grand */}
               <div className="flex flex-col items-center w-full pt-16 pb-8 z-20 px-16 text-center mx-auto max-w-[90%]">
-                {/* Brand Logo - Doubled Size */}
-                <BrandLogo className="h-32 mb-6 text-[#024930]" />
+                {/* Brand Logo - Doubled Size (Text Based) */}
+                <BrandLogo className="text-8xl mb-6 text-[#024930] leading-none" />
                 {companyName && (
                   <h1 className="text-8xl font-black text-[#024930] uppercase tracking-widest leading-none" style={{ fontFamily: "'Playfair Display', serif" }}>
                     {companyName}

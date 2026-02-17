@@ -1,0 +1,4 @@
+bundle_name_de,bundle_name_en,item_name_de,item_name_en,allergens_de,diet_de,type
+Test Bundle 1,Test Bundle 1,Pasta with Tomato Sauce,Pasta with Tomato Sauce,Gluten,Vegetarisch,standard
+Test Bundle 1,Test Bundle 1,Green Salad,Green Salad,None,Vegan,standard
+Test Bundle 2,Test Bundle 2,Grilled Chicken,Grilled Chicken,None,Meat,standard

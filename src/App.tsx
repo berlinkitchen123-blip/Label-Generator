@@ -881,11 +881,11 @@ const App: React.FC = () => {
 
     return (
       <div
-        className="flex flex-col items-center text-center bg-[#C1E1C1] relative font-sans p-10 overflow-hidden"
+        className="flex flex-col items-center text-center bg-[#FEACCF] relative font-sans p-10 overflow-hidden"
         style={{ width: dim.w, height: dim.h }}
       >
-        {/* Company Name Header (PayPal) - Black */}
-        <h1 className={`${titleSize} font-black text-black uppercase mt-10 tracking-wide`}>
+        {/* Company Name Header */}
+        <h1 className={`${titleSize} font-black text-[#024930] uppercase mt-10 tracking-wide`}>
           {companyName || 'COMPANY NAME'}
         </h1>
 
@@ -904,13 +904,14 @@ const App: React.FC = () => {
           />
         </div>
 
-        {/* Footer Brand - Pink */}
-        <div className={`mt-auto font-black ${logoSize} text-[#E91E63] uppercase tracking-tighter mb-4`}>
+        {/* Footer Brand */}
+        <div className={`mt-auto font-black ${logoSize} text-[#024930] uppercase tracking-tighter mb-4`}>
           BELLABONA
         </div>
       </div>
     );
   };
+
 
   const renderMainContent = () => {
     if (previewType === 'menu' && activeTab === 'catering') {

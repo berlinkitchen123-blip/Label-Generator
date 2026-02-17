@@ -780,71 +780,62 @@ const App: React.FC = () => {
           const isDense = itemCount > 12; // Adjusted density threshold
 
           return (
-            <div key={service} className="w-[210mm] h-[297mm] relative flex flex-col items-center bg-[#F8F7F6] overflow-hidden page-break-after-always" style={{ fontFamily: "'Bona Nova', serif", pageBreakAfter: 'always' }}>
-              {/* Background Decorations */}
-              <div className="absolute inset-0 z-0 bg-white/50" />
-              <div className="absolute inset-6 border-[3px] border-[#024930] pointer-events-none" />
-              <div className="absolute inset-0 flex items-center justify-center opacity-[0.03] pointer-events-none z-0">
-                <div style={{ fontFamily: '"Bona Nova", serif' }} className="text-[15rem] font-bold text-[#024930] tracking-wide -rotate-45 whitespace-nowrap">BELLABONA</div>
-              </div>
+            <div key={service} className="w-[210mm] h-[297mm] relative flex flex-col bg-white overflow-hidden page-break-after-always" style={{ fontFamily: "'Bona Nova', serif", pageBreakAfter: 'always' }}>
 
-              {/* Corner Accents */}
-              <div className="absolute top-6 left-6 w-16 h-16 border-r border-b border-[#F8F7F6] z-10" />
-              <div className="absolute top-6 right-6 w-16 h-16 border-l border-b border-[#F8F7F6] z-10" />
-              <div className="absolute bottom-6 left-6 w-16 h-16 border-r border-t border-[#F8F7F6] z-10" />
-              <div className="absolute bottom-6 right-6 w-16 h-16 border-l border-t border-[#F8F7F6] z-10" />
+              {/* Professional Double Border */}
+              <div className="absolute inset-4 border-4 border-double border-[#024930] pointer-events-none z-10" />
 
               {/* Header */}
-              <div className="flex flex-col items-center w-full pt-10 pb-4 z-20 px-14 text-center">
-                <BrandLogo className="h-10 mb-3 text-[#024930]" />
+              <div className="flex flex-col items-center w-full pt-12 pb-4 z-20 px-16 text-center border-b border-[#024930]/10 mx-auto max-w-[90%]">
+                <BrandLogo className="h-10 mb-2 text-[#024930]" />
                 {companyName && (
-                  <h1 className="text-2xl font-black text-[#024930] uppercase mb-1 tracking-wider" style={{ fontFamily: "'Playfair Display', serif" }}>
+                  <h1 className="text-3xl font-black text-[#024930] uppercase mb-1 tracking-widest" style={{ fontFamily: "'Playfair Display', serif" }}>
                     {companyName}
                   </h1>
                 )}
-                <h2 className="text-lg font-medium text-[#024930]/80 uppercase tracking-[0.2em] mb-3">{service} Menu</h2>
-
-                <div className="flex items-center gap-6">
-                  <span className="h-[1px] w-12 bg-[#024930]/30" />
-                  <p className="font-serif text-[#024930] text-sm tracking-[0.1em] uppercase">
-                    {(() => {
-                      const dStr = cateringDate || new Date().toISOString();
-                      // Hande DD.MM.YYYY or DD/MM/YYYY
-                      if (dStr.match(/^\d{1,2}[./-]\d{1,2}[./-]\d{4}$/)) {
-                        const [d, m, y] = dStr.split(/[./-]/).map(Number);
-                        const date = new Date(y, m - 1, d);
-                        return date.toLocaleDateString('en-GB', { weekday: 'long', day: 'numeric', month: 'long', year: 'numeric' });
-                      }
-                      // Handle valid date string
-                      const date = new Date(dStr);
-                      if (!isNaN(date.getTime())) {
-                        return date.toLocaleDateString('en-GB', { weekday: 'long', day: 'numeric', month: 'long', year: 'numeric' });
-                      }
-                      return dStr; // Fallback to raw string
-                    })()}
-                  </p>
-                  <span className="h-[1px] w-12 bg-[#024930]/30" />
+                <div className="flex items-center gap-4 mt-2 mb-2">
+                  <span className="h-[1px] w-8 bg-[#024930]" />
+                  <h2 className="text-lg font-medium text-[#024930] uppercase tracking-[0.2em]">{service} Menu</h2>
+                  <span className="h-[1px] w-8 bg-[#024930]" />
                 </div>
+
+                <p className="font-serif text-[#024930]/80 text-sm tracking-widest uppercase mt-1">
+                  {(() => {
+                    const dStr = cateringDate || new Date().toISOString();
+                    if (dStr.match(/^\d{1,2}[./-]\d{1,2}[./-]\d{4}$/)) {
+                      const [d, m, y] = dStr.split(/[./-]/).map(Number);
+                      const date = new Date(y, m - 1, d);
+                      return date.toLocaleDateString('en-GB', { weekday: 'long', day: 'numeric', month: 'long', year: 'numeric' });
+                    }
+                    const date = new Date(dStr);
+                    if (!isNaN(date.getTime())) {
+                      return date.toLocaleDateString('en-GB', { weekday: 'long', day: 'numeric', month: 'long', year: 'numeric' });
+                    }
+                    return dStr;
+                  })()}
+                </p>
               </div>
 
-              {/* Menu Content - maximized space with safe margins */}
-              <div className="flex-1 w-full px-14 z-20 flex flex-col relative pb-16 overflow-hidden">
-                <div className={`w-full ${isDense ? 'columns-2 gap-8' : 'flex flex-col items-center gap-6'} h-full content-center`}>
+              {/* Menu Content - 2 Column Clean Layout */}
+              <div className="flex-1 w-full px-16 py-8 z-20 relative overflow-hidden">
+                <div className={`w-full columns-2 gap-12 h-full`}>
                   {sortedGroups.map((groupTitle, idx) => (
-                    <div key={idx} className="break-inside-avoid mb-5 w-full">
-                      <div className={`flex items-center justify-center mb-2 border-b border-[#024930]/20 pb-1`}>
-                        <h3 className="text-lg font-bold text-[#024930] uppercase tracking-[0.15em]" style={{ fontFamily: "'Playfair Display', serif" }}>
+                    <div key={idx} className="break-inside-avoid mb-8 w-full">
+                      {/* Section Header */}
+                      <div className="flex items-center mb-4 border-b-2 border-[#024930]/20 pb-1">
+                        <h3 className="text-lg font-bold text-[#024930] uppercase tracking-widest" style={{ fontFamily: "'Playfair Display', serif" }}>
                           {lang === 'de' ? (groupTitle === 'Vegetarian' ? 'Vegetarisch' : groupTitle === 'Meat' ? 'Fleisch' : groupTitle === 'Fish' ? 'Fisch' : groupTitle) : groupTitle}
                         </h3>
                       </div>
-                      <div className={`flex flex-col ${isDense ? 'items-start text-left' : 'items-center text-center'} gap-1.5`}>
+
+                      {/* Items List - Left Aligned with Bullets */}
+                      <div className="flex flex-col items-start gap-3">
                         {grouped[groupTitle].map((item, iIdx) => (
-                          <div key={iIdx} className="w-full py-0.5">
-                            <div className={`flex ${isDense ? 'items-baseline justify-between' : 'flex-col items-center'} w-full`}>
-                              <span className={`${itemCount > 20 ? 'text-sm' : isDense ? 'text-base' : 'text-lg'} font-bold text-[#1a1a1a] leading-tight`} style={{ fontFamily: "'Bona Nova', serif" }}>
-                                {lang === 'de' ? item.item_name_de : item.item_name_en}
-                              </span>
-                            </div>
+                          <div key={iIdx} className="w-full flex items-baseline gap-2 group">
+                            <div className="w-1.5 h-1.5 rounded-full bg-[#024930]/40 mt-1.5 shrink-0 group-hover:bg-[#024930] transition-colors" />
+                            <span className={`${isDense ? (itemCount > 25 ? 'text-sm' : 'text-base') : 'text-lg'} font-bold text-[#1a1a1a] leading-tight text-left`}>
+                              {lang === 'de' ? item.item_name_de : item.item_name_en}
+                            </span>
                           </div>
                         ))}
                       </div>
@@ -853,9 +844,9 @@ const App: React.FC = () => {
                 </div>
               </div>
 
-              {/* Footer */}
-              <div className="absolute bottom-0 w-full text-center pb-6 z-20 pt-6 bg-gradient-to-t from-[#F8F7F6] to-transparent">
-                <p className="text-lg text-[#024930]" style={{ fontFamily: "'Pinyon Script', cursive" }}>Bon Appétit</p>
+              {/* Minimal Footer */}
+              <div className="absolute bottom-6 w-full text-center z-20">
+                <p className="text-sm text-[#024930]/60 uppercase tracking-widest" style={{ fontFamily: "'Bona Nova', serif" }}>Bellabona • Berlin Kitchen</p>
               </div>
 
               <style>{`

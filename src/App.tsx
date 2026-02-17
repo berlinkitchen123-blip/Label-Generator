@@ -795,14 +795,14 @@ const App: React.FC = () => {
               <div className="absolute bottom-6 right-6 w-16 h-16 border-l border-t border-[#F8F7F6] z-10" />
 
               {/* Header */}
-              <div className="flex flex-col items-center w-full pt-12 pb-6 z-20 px-20 text-center">
-                <BrandLogo className="h-12 mb-4 text-[#024930]" />
+              <div className="flex flex-col items-center w-full pt-10 pb-4 z-20 px-14 text-center">
+                <BrandLogo className="h-10 mb-3 text-[#024930]" />
                 {companyName && (
-                  <h1 className="text-3xl font-black text-[#024930] uppercase mb-1 tracking-wider" style={{ fontFamily: "'Playfair Display', serif" }}>
+                  <h1 className="text-2xl font-black text-[#024930] uppercase mb-1 tracking-wider" style={{ fontFamily: "'Playfair Display', serif" }}>
                     {companyName}
                   </h1>
                 )}
-                <h2 className="text-xl font-medium text-[#024930]/80 uppercase tracking-[0.2em] mb-4">{service} Menu</h2>
+                <h2 className="text-lg font-medium text-[#024930]/80 uppercase tracking-[0.2em] mb-3">{service} Menu</h2>
 
                 <div className="flex items-center gap-6">
                   <span className="h-[1px] w-12 bg-[#024930]/30" />
@@ -827,21 +827,21 @@ const App: React.FC = () => {
                 </div>
               </div>
 
-              {/* Menu Content - Flexible container with padding bottom to avoid cut-off */}
-              <div className="flex-1 w-full px-20 z-20 flex flex-col relative pb-24 overflow-hidden">
-                <div className={`w-full ${isDense ? 'columns-2 gap-10' : 'flex flex-col items-center gap-8'} h-full content-center`}>
+              {/* Menu Content - maximized space with safe margins */}
+              <div className="flex-1 w-full px-14 z-20 flex flex-col relative pb-16 overflow-hidden">
+                <div className={`w-full ${isDense ? 'columns-2 gap-8' : 'flex flex-col items-center gap-6'} h-full content-center`}>
                   {sortedGroups.map((groupTitle, idx) => (
-                    <div key={idx} className="break-inside-avoid mb-6 w-full">
-                      <div className={`flex items-center justify-center mb-3 border-b border-[#024930]/20 pb-1`}>
-                        <h3 className="text-xl font-bold text-[#024930] uppercase tracking-[0.15em]" style={{ fontFamily: "'Playfair Display', serif" }}>
+                    <div key={idx} className="break-inside-avoid mb-5 w-full">
+                      <div className={`flex items-center justify-center mb-2 border-b border-[#024930]/20 pb-1`}>
+                        <h3 className="text-lg font-bold text-[#024930] uppercase tracking-[0.15em]" style={{ fontFamily: "'Playfair Display', serif" }}>
                           {lang === 'de' ? (groupTitle === 'Vegetarian' ? 'Vegetarisch' : groupTitle === 'Meat' ? 'Fleisch' : groupTitle === 'Fish' ? 'Fisch' : groupTitle) : groupTitle}
                         </h3>
                       </div>
-                      <div className={`flex flex-col ${isDense ? 'items-start text-left' : 'items-center text-center'} gap-2`}>
+                      <div className={`flex flex-col ${isDense ? 'items-start text-left' : 'items-center text-center'} gap-1.5`}>
                         {grouped[groupTitle].map((item, iIdx) => (
                           <div key={iIdx} className="w-full py-0.5">
                             <div className={`flex ${isDense ? 'items-baseline justify-between' : 'flex-col items-center'} w-full`}>
-                              <span className="text-lg font-bold text-[#1a1a1a] leading-tight" style={{ fontFamily: "'Bona Nova', serif" }}>
+                              <span className={`${itemCount > 20 ? 'text-sm' : isDense ? 'text-base' : 'text-lg'} font-bold text-[#1a1a1a] leading-tight`} style={{ fontFamily: "'Bona Nova', serif" }}>
                                 {lang === 'de' ? item.item_name_de : item.item_name_en}
                               </span>
                             </div>
@@ -854,8 +854,8 @@ const App: React.FC = () => {
               </div>
 
               {/* Footer */}
-              <div className="absolute bottom-0 w-full text-center pb-8 z-20 pt-10 bg-gradient-to-t from-[#F8F7F6] to-transparent">
-                <p className="text-xl text-[#024930]" style={{ fontFamily: "'Pinyon Script', cursive" }}>Bon Appétit</p>
+              <div className="absolute bottom-0 w-full text-center pb-6 z-20 pt-6 bg-gradient-to-t from-[#F8F7F6] to-transparent">
+                <p className="text-lg text-[#024930]" style={{ fontFamily: "'Pinyon Script', cursive" }}>Bon Appétit</p>
               </div>
 
               <style>{`

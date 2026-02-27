@@ -951,7 +951,7 @@ const App: React.FC = () => {
       if (!b) return [];
       // Respect quantity: multiply items by quantity
       return Array(s.quantity).fill(b).flatMap(() => b.items);
-    });
+    }).filter(item => (item.item_name_de || item.item_name_en)); // Skip ghost items with no name
 
     const totalItems = allItems.length;
 
@@ -982,21 +982,21 @@ const App: React.FC = () => {
     const spacingCategory = isCrowded ? 'mb-4' : (isMany ? 'mb-6' : 'mb-8');
     const spacingItem = isCrowded ? 'py-1.5' : (isMany ? 'py-2.5' : 'py-4');
     const categoryPadding = isCrowded ? 'py-2' : 'py-3';
-    const containerPadding = isCrowded ? 'p-8 pb-4' : 'p-14';
+    const containerPadding = isCrowded ? 'p-10 pb-6' : 'p-14';
 
     return (
       <div className={`w-[210mm] h-[297mm] bg-[#FEACCF] relative flex flex-col ${containerPadding} text-[#024930] box-border overflow-hidden`} style={{ fontFamily: "'Inter', sans-serif" }}>
-        <div className="text-center mb-6 shrink-0">
+        <div className="text-center mb-8 shrink-0">
           <h1 className="text-4xl font-black tracking-tighter uppercase leading-none">MENU SUMMARY</h1>
           <p className="text-lg font-bold opacity-70 uppercase tracking-widest">{companyName || 'GetYourGuide'}</p>
         </div>
 
-        <div className={`flex-1 flex flex-col ${totalItems < 5 ? 'justify-evenly' : 'justify-start space-y-2'} overflow-hidden`}>
+        <div className={`flex-1 flex flex-col ${totalItems < 5 ? 'justify-around' : 'justify-start space-y-4'} overflow-hidden`}>
           {Object.entries(categories).map(([catName, items]) => {
             if (items.length === 0) return null;
             return (
-              <div key={catName} className={`w-full max-w-4xl mx-auto shrink min-h-0 ${spacingCategory}`}>
-                <div className={`border-t-[3px] border-b-[3px] border-[#024930] ${categoryPadding} mb-3`}>
+              <div key={catName} className={`w-full max-w-4xl mx-auto ${spacingCategory}`}>
+                <div className={`border-t-[3px] border-b-[3px] border-[#024930] ${categoryPadding} mb-4`}>
                   <h2 className={`${fontSizeTitle} font-black text-center tracking-[0.5em] uppercase`}>{catName}</h2>
                 </div>
                 <div className="space-y-4 px-8">
@@ -1005,7 +1005,7 @@ const App: React.FC = () => {
                       <div className="flex flex-col flex-1 pr-10">
                         <span className="text-[10px] font-black opacity-70 mb-0.5">{item.diet_de.toUpperCase()}</span>
                         <h3 className={`${fontSizeItem} font-black tracking-tight uppercase leading-tight`}>
-                          {lang === 'de' ? item.item_name_de : item.item_name_en}
+                          {lang === 'de' ? (item.item_name_de || item.item_name_en) : (item.item_name_en || item.item_name_de)}
                         </h3>
                       </div>
                       <div className="text-right max-w-[280px] shrink-0">
@@ -1022,9 +1022,9 @@ const App: React.FC = () => {
           })}
         </div>
 
-        {/* Safe Footer Branding - Fixed Position to Prevent Overlap */}
-        <div className="mt-4 pt-4 border-t border-[#024930]/10 flex justify-end shrink-0">
-          <span className="text-3xl font-black tracking-tighter opacity-80">BELLABONA</span>
+        {/* Safer Footer Branding */}
+        <div className="mt-6 pt-6 border-t border-[#024930]/20 flex justify-end shrink-0">
+          <span className="text-4xl font-black tracking-tighter">BELLABONA</span>
         </div>
       </div>
     );

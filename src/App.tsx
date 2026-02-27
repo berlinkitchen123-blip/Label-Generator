@@ -717,9 +717,23 @@ const App: React.FC = () => {
           else if (serviceVal.includes('LUNCH') || serviceVal.includes('MITTAGESSEN')) setServiceType('LUNCH');
           else if (serviceVal.includes('DINNER') || serviceVal.includes('ABENDESSEN')) setServiceType('DINNER');
         });
-        const updated = Object.values(bundleMap);
-        setBundles(updated);
-        await DataService.saveBundles(updated);
+        const newBundles = Object.values(bundleMap);
+
+        // Merge with existing bundles instead of replacing
+        const mergedBundles = [...bundles];
+        newBundles.forEach(nb => {
+          const idx = mergedBundles.findIndex(b => b.name_de.trim().toLowerCase() === nb.name_de.trim().toLowerCase());
+          if (idx >= 0) {
+            // Update existing bundle
+            mergedBundles[idx] = { ...nb, id: mergedBundles[idx].id }; // Keep the old ID for stability
+          } else {
+            // Add as new bundle
+            mergedBundles.push(nb);
+          }
+        });
+
+        setBundles(mergedBundles);
+        await DataService.saveBundles(mergedBundles);
         alert(t.successImport);
       } catch (err) { alert(t.errorImport); }
       finally {

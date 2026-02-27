@@ -990,18 +990,26 @@ const App: React.FC = () => {
 
     const uniqueItems = Array.from(new Map(allItems.map(item => [item.item_name_de.toLowerCase(), item])).values());
 
+    // Curated color palette for variety and readability
+    const palette = [
+      { bg: '#FEACCF', text: '#024930' }, // Signature Pink + Teal
+      { bg: '#024930', text: '#FEACCF' }, // Teal + Pink
+      { bg: '#FFD700', text: '#024930' }, // Yellow + Teal
+      { bg: '#FF7F50', text: '#FFFFFF' }, // Coral + White
+      { bg: '#4682B4', text: '#FFFFFF' }, // SteelBlue + White
+    ];
+
     return (
       <>
-        {uniqueItems.map((item, idx) => {
-          const isVegan = item.diet_de.toLowerCase().includes('vegan');
-          // Uniform background color (Pink) with Teal text for everything
-          // Using a slightly more robust container style to fix white borders
-          const bgColor = '#FEACCF';
-          const textColor = '#024930';
+        {uniqueItems.map((item: BundleItem, idx: number) => {
+          // Simple deterministic "random" based on index
+          const colorPair = palette[idx % palette.length];
+          const bgColor = colorPair.bg;
+          const textColor = colorPair.text;
           const dietDisplay = item.diet_de.toUpperCase();
 
           return (
-            <div key={idx} className="w-[210mm] h-[297mm] relative flex flex-col items-center justify-center p-20 text-[#024930] box-border overflow-hidden page-break-after-always" style={{ backgroundColor: bgColor, color: textColor, fontFamily: "'Inter', sans-serif" }}>
+            <div key={idx} className="w-[210mm] h-[297mm] relative flex flex-col items-center justify-center p-20 box-border overflow-hidden page-break-after-always" style={{ backgroundColor: bgColor, color: textColor, fontFamily: "'Inter', sans-serif" }}>
               <div className="absolute top-24 w-full px-20">
                 <div className="border-t-[4px] border-b-[4px] py-8" style={{ borderColor: textColor }}>
                   <h2 className="text-5xl font-black text-center tracking-[0.3em] uppercase">
@@ -1025,8 +1033,8 @@ const App: React.FC = () => {
                 </div>
               </div>
 
-              <div className="absolute bottom-24 right-24">
-                <span className="text-6xl font-black tracking-tighter">BELLABONA</span>
+              <div className="absolute bottom-16 right-16">
+                <span className="text-4xl font-black tracking-tighter opacity-80">BELLABONA</span>
               </div>
             </div>
           );

@@ -939,6 +939,7 @@ const App: React.FC = () => {
     });
 
     const uniqueItems = Array.from(new Map(allItems.map(item => [item.item_name_de.toLowerCase(), item])).values());
+    const totalItems = uniqueItems.length;
 
     const categories: Record<string, BundleItem[]> = {
       'MAIN DISHES': [],
@@ -957,33 +958,45 @@ const App: React.FC = () => {
       }
     });
 
+    // Dynamic Scaling Factors based on item count
+    const isMany = totalItems > 6;
+    const isCrowded = totalItems > 9;
+
+    const fontSizeTitle = isCrowded ? 'text-xl' : (isMany ? 'text-2xl' : 'text-3xl');
+    const fontSizeItem = isCrowded ? 'text-lg' : (isMany ? 'text-xl' : 'text-2xl');
+    const fontSizeAllergen = isCrowded ? 'text-[10px]' : (isMany ? 'text-[11px]' : 'text-[13px]');
+    const spacingCategory = isCrowded ? 'mb-4' : (isMany ? 'mb-6' : 'mb-8');
+    const spacingItem = isCrowded ? 'py-1.5' : (isMany ? 'py-2.5' : 'py-4');
+    const categoryPadding = isCrowded ? 'py-2' : 'py-3';
+    const containerPadding = isCrowded ? 'p-8 pb-4' : 'p-14';
+
     return (
-      <div className="w-[210mm] h-[297mm] bg-[#FEACCF] relative flex flex-col p-14 text-[#024930] box-border overflow-hidden" style={{ fontFamily: "'Inter', sans-serif" }}>
-        <div className="text-center mb-8">
+      <div className={`w-[210mm] h-[297mm] bg-[#FEACCF] relative flex flex-col ${containerPadding} text-[#024930] box-border overflow-hidden`} style={{ fontFamily: "'Inter', sans-serif" }}>
+        <div className="text-center mb-6 shrink-0">
           <h1 className="text-4xl font-black tracking-tighter uppercase leading-none">MENU SUMMARY</h1>
           <p className="text-lg font-bold opacity-70 uppercase tracking-widest">{companyName || 'GetYourGuide'}</p>
         </div>
 
-        <div className="flex-1 flex flex-col justify-evenly py-10">
+        <div className={`flex-1 flex flex-col ${totalItems < 5 ? 'justify-evenly' : 'justify-start space-y-2'} overflow-hidden`}>
           {Object.entries(categories).map(([catName, items]) => {
             if (items.length === 0) return null;
             return (
-              <div key={catName} className="w-full max-w-4xl mx-auto">
-                <div className="border-t-[4px] border-b-[4px] border-[#024930] py-3 mb-6">
-                  <h2 className="text-3xl font-black text-center tracking-[0.6em] uppercase">{catName}</h2>
+              <div key={catName} className={`w-full max-w-4xl mx-auto shrink min-h-0 ${spacingCategory}`}>
+                <div className={`border-t-[3px] border-b-[3px] border-[#024930] ${categoryPadding} mb-3`}>
+                  <h2 className={`${fontSizeTitle} font-black text-center tracking-[0.5em] uppercase`}>{catName}</h2>
                 </div>
-                <div className="space-y-6 px-12">
+                <div className="space-y-4 px-8">
                   {items.map((item, idx) => (
-                    <div key={idx} className="flex justify-between items-start border-b border-[#024930]/20 pb-4 last:border-0 px-4 rounded-lg">
-                      <div className="flex flex-col flex-1">
-                        <span className="text-[12px] font-black opacity-70 mb-1">{item.diet_de.toUpperCase()}</span>
-                        <h3 className="text-2xl font-black tracking-tight uppercase leading-tight">
+                    <div key={idx} className={`flex justify-between items-start border-b border-[#024930]/15 ${spacingItem} last:border-0 px-4`}>
+                      <div className="flex flex-col flex-1 pr-10">
+                        <span className="text-[10px] font-black opacity-70 mb-0.5">{item.diet_de.toUpperCase()}</span>
+                        <h3 className={`${fontSizeItem} font-black tracking-tight uppercase leading-tight`}>
                           {lang === 'de' ? item.item_name_de : item.item_name_en}
                         </h3>
                       </div>
-                      <div className="text-right ml-10 max-w-[300px]">
-                        <p className="text-[10px] font-black uppercase mb-1 leading-none opacity-60">Allergens:</p>
-                        <p className="text-[13px] font-bold opacity-90 leading-tight uppercase tracking-wide">
+                      <div className="text-right max-w-[280px] shrink-0">
+                        <p className="text-[9px] font-black uppercase mb-0.5 leading-none opacity-50">Allergens:</p>
+                        <p className={`${fontSizeAllergen} font-bold opacity-90 leading-tight uppercase tracking-wide`}>
                           {item.allergens_de || 'None'}
                         </p>
                       </div>
@@ -995,8 +1008,9 @@ const App: React.FC = () => {
           })}
         </div>
 
-        <div className="absolute bottom-10 right-14">
-          <span className="text-4xl font-black tracking-tighter opacity-80">BELLABONA</span>
+        {/* Safe Footer Branding - Fixed Position to Prevent Overlap */}
+        <div className="mt-4 pt-4 border-t border-[#024930]/10 flex justify-end shrink-0">
+          <span className="text-3xl font-black tracking-tighter opacity-80">BELLABONA</span>
         </div>
       </div>
     );

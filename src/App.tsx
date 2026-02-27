@@ -682,7 +682,6 @@ const App: React.FC = () => {
           }
 
           // CAPTURE METADATA (Company & Date) - Robust Key Search
-          // Prioritize 'company_name' explicitly
           const keys = Object.keys(row);
           let compKey = keys.find(k => k.trim() === 'company_name');
           if (!compKey) {
@@ -691,7 +690,19 @@ const App: React.FC = () => {
           const dateKey = keys.find(k => /date|datum|day/i.test(k));
 
           const rowCompany = compKey ? String((row as any)[compKey] || '').trim() : '';
-          const rowDate = dateKey ? String((row as any)[dateKey] || '').trim() : '';
+          let rowDateRaw = dateKey ? (row as any)[dateKey] : '';
+
+          // Handle Excel Numeric Date
+          let rowDate = '';
+          if (rowDateRaw) {
+            if (typeof rowDateRaw === 'number') {
+              // Excel date serial number to DD.MM.YYYY
+              const date = new Date(Math.round((rowDateRaw - 25569) * 864e5));
+              rowDate = date.toLocaleDateString('de-DE');
+            } else {
+              rowDate = String(rowDateRaw).trim();
+            }
+          }
 
           if (rowCompany && rowCompany.length > 2) {
             setCompanyName(rowCompany);
@@ -935,7 +946,9 @@ const App: React.FC = () => {
           <div className="flex items-center gap-6 justify-center">
             <span className="text-4xl font-black tracking-widest">{service}</span>
             <span className="text-4xl font-light opacity-40">|</span>
-            <span className="text-4xl font-black tracking-widest">{cateringDate.split('.').slice(0, 2).join('.')}</span>
+            <span className="text-4xl font-black tracking-widest">
+              {cateringDate.includes('.') ? cateringDate.split('.').slice(0, 2).join('.') : cateringDate}
+            </span>
           </div>
         </div>
 
@@ -1022,7 +1035,8 @@ const App: React.FC = () => {
         </div>
 
         {/* Cleaner Footer Branding */}
-        <div className={`mt-4 ${isPacked ? 'pt-2' : 'pt-4'} border-t border-[#024930]/10 flex justify-end shrink-0`}>
+        <div className={`mt-4 ${isPacked ? 'pt-2' : 'pt-4'} border-t border-[#024930]/10 flex justify-between items-center shrink-0`}>
+          <span className="text-xl font-bold opacity-60 tracking-wider font-sans">{cateringDate}</span>
           <span className="text-3xl font-black tracking-tighter opacity-80">BELLABONA</span>
         </div>
       </div>

@@ -148,9 +148,12 @@ interface ImportRow {
   item_name_en?: string;
   allergens_de?: string;
   diet_de?: string;
+  service?: string;
   type?: string;
-  company_name?: string;
-  date?: string;
+  meal?: string;
+  D?: string;
+  __EMPTY_1?: string;
+  __EMPTY_3?: string;
 }
 
 // --- BRANDING ---
@@ -583,6 +586,7 @@ const App: React.FC = () => {
   const [cateringSelections, setCateringSelections] = useState<Selection[]>([]);
   const [companyName, setCompanyName] = useState('');
   const [cateringDate, setCateringDate] = useState(new Date().toLocaleDateString('en-GB'));
+  const [serviceType, setServiceType] = useState('LUNCH');
 
   const [searchTerm, setSearchTerm] = useState('');
   const [packedOn, setPackedOn] = useState(new Date().toLocaleDateString('en-GB'));
@@ -696,6 +700,22 @@ const App: React.FC = () => {
             }
           }
           if (rowDate) setCateringDate(rowDate);
+
+          // SERVICE TYPE DETECTION (Column D logic - checking multiple potential keys)
+          const serviceVal = String(
+            (row as any).service ||
+            (row as any).meal ||
+            (row as any).type ||
+            (row as any).D ||
+            (row as any).__EMPTY_1 || // Sometimes it's the 2nd column
+            (row as any).__EMPTY_3 || // Or the 4th
+            ''
+          ).toUpperCase();
+
+          if (serviceVal.includes('BREAKFAST') || serviceVal.includes('FRÜHSTÜCK')) setServiceType('BREAKFAST');
+          else if (serviceVal.includes('BRUNCH')) setServiceType('BRUNCH');
+          else if (serviceVal.includes('LUNCH') || serviceVal.includes('MITTAGESSEN')) setServiceType('LUNCH');
+          else if (serviceVal.includes('DINNER') || serviceVal.includes('ABENDESSEN')) setServiceType('DINNER');
         });
         const updated = Object.values(bundleMap);
         setBundles(updated);
@@ -879,9 +899,9 @@ const App: React.FC = () => {
   // --- GYG PRINT SYSTEM (Strict adherence to images) ---
 
   const GYGCoverPage = () => {
-    // Extract service type from the first bundle name if possible
-    let service = 'LUNCH';
-    if (cateringSelections.length > 0) {
+    // Priority: 1. Detected from Excel, 2. Extracted from Bundle Name
+    let service = serviceType || 'LUNCH';
+    if (service === 'LUNCH' && cateringSelections.length > 0) {
       const b = bundles.find((x: Bundle) => x.id === cateringSelections[0].bundleId);
       if (b) {
         const name = (b.name_de + ' ' + b.name_en).toLowerCase();
@@ -905,8 +925,8 @@ const App: React.FC = () => {
           </div>
         </div>
 
-        <div className="absolute bottom-20 right-20">
-          <span className="text-6xl font-black tracking-tighter">BELLABONA</span>
+        <div className="absolute bottom-12 right-12">
+          <span className="text-4xl font-black tracking-tighter opacity-80 text-[#024930]">BELLABONA</span>
         </div>
       </div>
     );
@@ -938,31 +958,32 @@ const App: React.FC = () => {
     });
 
     return (
-      <div className="w-[210mm] h-[297mm] bg-[#FEACCF] relative flex flex-col p-10 text-[#024930] box-border overflow-hidden" style={{ fontFamily: "'Inter', sans-serif" }}>
-        <div className="space-y-4">
-          <div className="text-center mb-2">
-            <h1 className="text-4xl font-black tracking-tighter uppercase leading-none">MENU SUMMARY</h1>
-            <p className="text-lg font-bold opacity-70 uppercase tracking-widest">{companyName || 'GetYourGuide'}</p>
-          </div>
+      <div className="w-[210mm] h-[297mm] bg-[#FEACCF] relative flex flex-col p-14 text-[#024930] box-border overflow-hidden" style={{ fontFamily: "'Inter', sans-serif" }}>
+        <div className="text-center mb-8">
+          <h1 className="text-4xl font-black tracking-tighter uppercase leading-none">MENU SUMMARY</h1>
+          <p className="text-lg font-bold opacity-70 uppercase tracking-widest">{companyName || 'GetYourGuide'}</p>
+        </div>
+
+        <div className="flex-1 flex flex-col justify-evenly py-10">
           {Object.entries(categories).map(([catName, items]) => {
             if (items.length === 0) return null;
             return (
-              <div key={catName} className="mb-2">
-                <div className="border-t-[4px] border-b-[4px] border-[#024930] py-1.5 mb-2">
-                  <h2 className="text-2xl font-black text-center tracking-[0.4em] uppercase">{catName}</h2>
+              <div key={catName} className="w-full max-w-4xl mx-auto">
+                <div className="border-t-[4px] border-b-[4px] border-[#024930] py-3 mb-6">
+                  <h2 className="text-3xl font-black text-center tracking-[0.6em] uppercase">{catName}</h2>
                 </div>
-                <div className="space-y-2 px-6">
+                <div className="space-y-6 px-12">
                   {items.map((item, idx) => (
-                    <div key={idx} className="flex justify-between items-start border-b border-[#024930]/10 pb-1 last:border-0">
+                    <div key={idx} className="flex justify-between items-start border-b border-[#024930]/20 pb-4 last:border-0 px-4 rounded-lg">
                       <div className="flex flex-col flex-1">
-                        <span className="text-[10px] font-black opacity-60 mb-0">{item.diet_de.toUpperCase()}</span>
-                        <h3 className="text-xl font-black tracking-tight uppercase leading-[1.1]">
+                        <span className="text-[12px] font-black opacity-70 mb-1">{item.diet_de.toUpperCase()}</span>
+                        <h3 className="text-2xl font-black tracking-tight uppercase leading-tight">
                           {lang === 'de' ? item.item_name_de : item.item_name_en}
                         </h3>
                       </div>
-                      <div className="text-right ml-4 max-w-[200px]">
-                        <p className="text-[9px] font-black uppercase mb-0 leading-none">Allergens:</p>
-                        <p className="text-[11px] font-bold opacity-90 leading-tight uppercase">
+                      <div className="text-right ml-10 max-w-[300px]">
+                        <p className="text-[10px] font-black uppercase mb-1 leading-none opacity-60">Allergens:</p>
+                        <p className="text-[13px] font-bold opacity-90 leading-tight uppercase tracking-wide">
                           {item.allergens_de || 'None'}
                         </p>
                       </div>
@@ -974,8 +995,8 @@ const App: React.FC = () => {
           })}
         </div>
 
-        <div className="mt-auto flex justify-end p-6">
-          <span className="text-5xl font-black tracking-tighter">BELLABONA</span>
+        <div className="absolute bottom-10 right-14">
+          <span className="text-4xl font-black tracking-tighter opacity-80">BELLABONA</span>
         </div>
       </div>
     );
@@ -992,11 +1013,18 @@ const App: React.FC = () => {
 
     // Curated color palette for variety and readability
     const palette = [
-      { bg: '#FEACCF', text: '#024930' }, // Signature Pink + Teal
-      { bg: '#024930', text: '#FEACCF' }, // Teal + Pink
-      { bg: '#FFD700', text: '#024930' }, // Yellow + Teal
-      { bg: '#FF7F50', text: '#FFFFFF' }, // Coral + White
-      { bg: '#4682B4', text: '#FFFFFF' }, // SteelBlue + White
+      { bg: '#FEACCF', text: '#024930' }, // Signature Pink
+      { bg: '#024930', text: '#FEACCF' }, // Teal
+      { bg: '#FFD700', text: '#024930' }, // Yellow
+      { bg: '#FF7F50', text: '#FFFFFF' }, // Coral
+      { bg: '#4682B4', text: '#FFFFFF' }, // SteelBlue
+      { bg: '#2E8B57', text: '#F0FFF0' }, // SeaGreen
+      { bg: '#8B4513', text: '#FFFFFF' }, // SaddleBrown
+      { bg: '#CD5C5C', text: '#FFFFFF' }, // IndianRed
+      { bg: '#DAA520', text: '#FDF5E6' }, // Goldenrod
+      { bg: '#483D8B', text: '#E6E6FA' }, // DarkSlateBlue
+      { bg: '#BC8F8F', text: '#2F4F4F' }, // RosyBrown
+      { bg: '#DDA0DD', text: '#4B0082' }, // Plum
     ];
 
     return (

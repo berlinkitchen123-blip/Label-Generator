@@ -891,16 +891,17 @@ const App: React.FC = () => {
     }
 
     return (
-      <div className="w-[210mm] h-[297mm] bg-[#FEACCF] relative flex flex-col items-center justify-center p-20 text-[#024930]" style={{ fontFamily: "'Inter', sans-serif" }}>
+      <div className="w-[210mm] h-[297mm] bg-[#FEACCF] relative flex flex-col items-center justify-center p-20 text-[#024930] box-border" style={{ fontFamily: "'Inter', sans-serif" }}>
+        <style>{`@page { margin: 0; size: A4; }`}</style>
         <div className="text-center">
-          <h1 className="text-8xl font-black mb-2 tracking-tighter leading-none">
+          <h1 className="text-7xl font-black mb-2 tracking-tighter leading-none uppercase">
             {companyName || 'GetYourGuide'}
           </h1>
-          <p className="text-4xl font-bold mb-8 opacity-90 tracking-tight">Deutschland</p>
+          <p className="text-3xl font-bold mb-6 opacity-90 tracking-tight uppercase">Deutschland</p>
           <div className="flex items-center gap-6 justify-center">
-            <span className="text-5xl font-black tracking-widest">{service}</span>
-            <span className="text-5xl font-light opacity-40">|</span>
-            <span className="text-5xl font-black tracking-widest">{cateringDate.split('.').slice(0, 2).join('.')}</span>
+            <span className="text-4xl font-black tracking-widest">{service}</span>
+            <span className="text-4xl font-light opacity-40">|</span>
+            <span className="text-4xl font-black tracking-widest">{cateringDate.split('.').slice(0, 2).join('.')}</span>
           </div>
         </div>
 
@@ -910,7 +911,6 @@ const App: React.FC = () => {
       </div>
     );
   };
-
   const GYGMenuPrint = () => {
     const allItems: BundleItem[] = [];
     cateringSelections.forEach((s: Selection) => {
@@ -920,7 +920,6 @@ const App: React.FC = () => {
 
     const uniqueItems = Array.from(new Map(allItems.map(item => [item.item_name_de.toLowerCase(), item])).values());
 
-    // Heuristic categorization
     const categories: Record<string, BundleItem[]> = {
       'MAIN DISHES': [],
       'SIDE': [],
@@ -939,27 +938,31 @@ const App: React.FC = () => {
     });
 
     return (
-      <div className="w-[210mm] h-[297mm] bg-[#FEACCF] relative flex flex-col p-16 text-[#024930]" style={{ fontFamily: "'Inter', sans-serif" }}>
-        <div className="space-y-10">
+      <div className="w-[210mm] h-[297mm] bg-[#FEACCF] relative flex flex-col p-10 text-[#024930] box-border overflow-hidden" style={{ fontFamily: "'Inter', sans-serif" }}>
+        <div className="space-y-4">
+          <div className="text-center mb-2">
+            <h1 className="text-4xl font-black tracking-tighter uppercase leading-none">MENU SUMMARY</h1>
+            <p className="text-lg font-bold opacity-70 uppercase tracking-widest">{companyName || 'GetYourGuide'}</p>
+          </div>
           {Object.entries(categories).map(([catName, items]) => {
             if (items.length === 0) return null;
             return (
-              <div key={catName}>
-                <div className="border-t-4 border-b-4 border-[#024930] py-4 mb-6">
-                  <h2 className="text-5xl font-black text-center tracking-[0.2em]">{catName}</h2>
+              <div key={catName} className="mb-2">
+                <div className="border-t-[4px] border-b-[4px] border-[#024930] py-1.5 mb-2">
+                  <h2 className="text-2xl font-black text-center tracking-[0.4em] uppercase">{catName}</h2>
                 </div>
-                <div className="space-y-6">
+                <div className="space-y-2 px-6">
                   {items.map((item, idx) => (
-                    <div key={idx} className="flex justify-between items-start">
-                      <div className="flex flex-col">
-                        <span className="text-2xl font-medium opacity-70 mb-1">{item.diet_de}</span>
-                        <h3 className="text-4xl font-black tracking-tighter">
+                    <div key={idx} className="flex justify-between items-start border-b border-[#024930]/10 pb-1 last:border-0">
+                      <div className="flex flex-col flex-1">
+                        <span className="text-[10px] font-black opacity-60 mb-0">{item.diet_de.toUpperCase()}</span>
+                        <h3 className="text-xl font-black tracking-tight uppercase leading-[1.1]">
                           {lang === 'de' ? item.item_name_de : item.item_name_en}
                         </h3>
                       </div>
-                      <div className="text-right mt-1">
-                        <p className="text-xl font-black whitespace-nowrap">Allergens | Contains:</p>
-                        <p className="text-xl font-medium opacity-90 max-w-[300px] leading-tight">
+                      <div className="text-right ml-4 max-w-[200px]">
+                        <p className="text-[9px] font-black uppercase mb-0 leading-none">Allergens:</p>
+                        <p className="text-[11px] font-bold opacity-90 leading-tight uppercase">
                           {item.allergens_de || 'None'}
                         </p>
                       </div>
@@ -971,8 +974,8 @@ const App: React.FC = () => {
           })}
         </div>
 
-        <div className="mt-auto flex justify-end">
-          <span className="text-7xl font-black tracking-tighter">BELLABONA</span>
+        <div className="mt-auto flex justify-end p-6">
+          <span className="text-5xl font-black tracking-tighter">BELLABONA</span>
         </div>
       </div>
     );
@@ -991,32 +994,39 @@ const App: React.FC = () => {
       <>
         {uniqueItems.map((item, idx) => {
           const isVegan = item.diet_de.toLowerCase().includes('vegan');
-          const bgColor = isVegan ? '#024930' : '#FEACCF';
-          const textColor = isVegan ? '#FFFFFF' : '#024930';
+          // Uniform background color (Pink) with Teal text for everything
+          // Using a slightly more robust container style to fix white borders
+          const bgColor = '#FEACCF';
+          const textColor = '#024930';
           const dietDisplay = item.diet_de.toUpperCase();
 
           return (
-            <div key={idx} className="w-[210mm] h-[297mm] relative flex flex-col items-center justify-center p-20 page-break-after-always" style={{ backgroundColor: bgColor, color: textColor, fontFamily: "'Inter', sans-serif", pageBreakAfter: 'always' }}>
+            <div key={idx} className="w-[210mm] h-[297mm] relative flex flex-col items-center justify-center p-20 text-[#024930] box-border overflow-hidden page-break-after-always" style={{ backgroundColor: bgColor, color: textColor, fontFamily: "'Inter', sans-serif" }}>
               <div className="absolute top-24 w-full px-20">
-                <div className="border-t-2 border-b-2 py-6" style={{ borderColor: textColor }}>
-                  <h2 className="text-5xl font-black text-center tracking-[0.2em] uppercase">
+                <div className="border-t-[4px] border-b-[4px] py-8" style={{ borderColor: textColor }}>
+                  <h2 className="text-5xl font-black text-center tracking-[0.3em] uppercase">
                     {dietDisplay.includes('MEAT') ? 'MEAT MAIN' : (dietDisplay.includes('VEGAN') ? 'VEGAN' : dietDisplay)}
                   </h2>
                 </div>
               </div>
-              <div className="text-center w-full max-w-[90%] space-y-12">
-                <div className="border-b-4 pb-4 inline-block px-10" style={{ borderColor: textColor }}>
-                  <h1 className="text-8xl font-black uppercase tracking-tighter leading-[1.1]">
+
+              <div className="text-center w-full max-w-[95%] flex flex-col items-center mt-12">
+                <div className="inline-block px-12 border-b-[6px] pb-6 mb-12" style={{ borderColor: textColor }}>
+                  <h1 className="text-6xl font-black uppercase tracking-tighter leading-[1.1]">
                     {lang === 'de' ? item.item_name_de : item.item_name_en}
                   </h1>
                 </div>
-                <div className="space-y-2">
-                  <p className="text-3xl font-black tracking-tight">Allergens | Contains:</p>
-                  <p className="text-3xl font-medium opacity-90">{item.allergens_de || 'None'}</p>
+
+                <div className="space-y-3">
+                  <p className="text-2xl font-black tracking-tight uppercase">Allergens | Contains:</p>
+                  <p className="text-2xl font-bold opacity-80 uppercase max-w-2xl mx-auto leading-tight">
+                    {item.allergens_de || 'None'}
+                  </p>
                 </div>
               </div>
-              <div className="absolute bottom-20 right-20">
-                <span className="text-7xl font-black tracking-tighter">BELLABONA</span>
+
+              <div className="absolute bottom-24 right-24">
+                <span className="text-6xl font-black tracking-tighter">BELLABONA</span>
               </div>
             </div>
           );
@@ -1098,8 +1108,8 @@ const App: React.FC = () => {
     }
 
     if ((activeTab === 'catering' || activeTab === 'gyg') && previewType === 'labels') {
-      const allItems = cateringSelections.flatMap(sel => {
-        const b = bundles.find(x => x.id === sel.bundleId);
+      const allItems = cateringSelections.flatMap((sel: Selection) => {
+        const b = bundles.find((x: Bundle) => x.id === sel.bundleId);
         if (!b) return [];
         return Array(sel.quantity).fill(b).flatMap(() => b.items);
       });
@@ -1108,9 +1118,9 @@ const App: React.FC = () => {
 
       return (
         <>
-          {pages.map((pageItems, pIdx) => (
+          {pages.map((pageItems: BundleItem[], pIdx: number) => (
             <div key={pIdx} className="w-[210mm] h-[297mm] bg-white grid grid-cols-2 grid-rows-2" style={{ pageBreakAfter: 'always', margin: 0, padding: 0 }}>
-              {pageItems.map((item, iIdx) => (
+              {pageItems.map((item: BundleItem, iIdx: number) => (
                 <div key={iIdx} className="w-[105mm] h-[148.5mm] overflow-hidden flex items-center justify-center">
                   <CateringItemLabel item={item} lang={lang} forPrint />
                 </div>
@@ -1127,9 +1137,9 @@ const App: React.FC = () => {
 
     return (
       <>
-        {printGroups.map((group, groupIdx) => (
+        {printGroups.map((group: Bundle[], groupIdx: number) => (
           <div key={groupIdx} className="label-page-group mb-12" style={{ breakAfter: 'always' }}>
-            {group.map((bundle, bIdx) => (
+            {group.map((bundle: Bundle, bIdx: number) => (
               <div key={bIdx} className="label-card-container">
                 <Label bundle={bundle} lang={lang} packedOn={packedOn} forPrint variant="standard" />
               </div>
@@ -1154,9 +1164,9 @@ const App: React.FC = () => {
 
     return (
       <>
-        {pages.map((pageItems, pIdx) => (
+        {pages.map((pageItems: BundleItem[], pIdx: number) => (
           <div key={pIdx} className="w-[210mm] h-[297mm] bg-white grid grid-cols-2 grid-rows-2" style={{ pageBreakAfter: 'always', margin: 0, padding: 0 }}>
-            {pageItems.map((item, iIdx) => (
+            {pageItems.map((item: BundleItem, iIdx: number) => (
               <div key={iIdx} className="w-[105mm] h-[148.5mm] overflow-hidden flex items-center justify-center">
                 <CateringItemLabel item={item} lang={lang} forPrint />
               </div>

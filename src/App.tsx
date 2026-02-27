@@ -932,14 +932,14 @@ const App: React.FC = () => {
     );
   };
   const GYGMenuPrint = () => {
-    const allItems: BundleItem[] = [];
-    cateringSelections.forEach((s: Selection) => {
+    const allItems: BundleItem[] = cateringSelections.flatMap((s: Selection) => {
       const b = bundles.find((x: Bundle) => x.id === s.bundleId);
-      if (b) allItems.push(...b.items);
+      if (!b) return [];
+      // Respect quantity: multiply items by quantity
+      return Array(s.quantity).fill(b).flatMap(() => b.items);
     });
 
-    const uniqueItems = Array.from(new Map(allItems.map(item => [item.item_name_de.toLowerCase(), item])).values());
-    const totalItems = uniqueItems.length;
+    const totalItems = allItems.length;
 
     const categories: Record<string, BundleItem[]> = {
       'MAIN DISHES': [],
@@ -947,7 +947,7 @@ const App: React.FC = () => {
       'DESSERTS': []
     };
 
-    uniqueItems.forEach(item => {
+    allItems.forEach(item => {
       const name = (item.item_name_de + ' ' + item.item_name_en).toLowerCase();
       if (name.includes('baklava') || name.includes('fruit') || name.includes('dessert') || name.includes('cake') || name.includes('pudding')) {
         categories['DESSERTS'].push(item);
@@ -1017,13 +1017,12 @@ const App: React.FC = () => {
   };
 
   const GYGItemLabels = () => {
-    const allItems: BundleItem[] = [];
-    cateringSelections.forEach((s: Selection) => {
+    const allItems: BundleItem[] = cateringSelections.flatMap((s: Selection) => {
       const b = bundles.find((x: Bundle) => x.id === s.bundleId);
-      if (b) allItems.push(...b.items);
+      if (!b) return [];
+      // Respect quantity for labels as well
+      return Array(s.quantity).fill(b).flatMap(() => b.items);
     });
-
-    const uniqueItems = Array.from(new Map(allItems.map(item => [item.item_name_de.toLowerCase(), item])).values());
 
     // Curated color palette for variety and readability
     const palette = [
@@ -1043,7 +1042,7 @@ const App: React.FC = () => {
 
     return (
       <>
-        {uniqueItems.map((item: BundleItem, idx: number) => {
+        {allItems.map((item: BundleItem, idx: number) => {
           // Simple deterministic "random" based on index
           const colorPair = palette[idx % palette.length];
           const bgColor = colorPair.bg;

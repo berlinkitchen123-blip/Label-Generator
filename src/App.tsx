@@ -134,6 +134,7 @@ interface Bundle {
   type?: 'standard' | 'catering';
   company_name?: string; // Metadata from Excel
   date?: string;         // Metadata from Excel
+  service_type?: string;  // Metadata from Excel
 }
 
 interface Selection {
@@ -585,7 +586,7 @@ const App: React.FC = () => {
   // Catering State
   const [cateringSelections, setCateringSelections] = useState<Selection[]>([]);
   const [companyName, setCompanyName] = useState('');
-  const [cateringDate, setCateringDate] = useState(new Date().toLocaleDateString('en-GB'));
+  const [cateringDate, setCateringDate] = useState(new Date().toLocaleDateString('de-DE'));
   const [serviceType, setServiceType] = useState('LUNCH');
 
   const [searchTerm, setSearchTerm] = useState('');
@@ -625,6 +626,16 @@ const App: React.FC = () => {
       if (existing) return prev.map(s => s.bundleId === bundleId ? { ...s, quantity: s.quantity + 1 } : s);
       return [...prev, { bundleId, quantity: 1 }];
     });
+
+    // Auto-update global metadata when selecting for Catering/GYG
+    if (isCatering) {
+      const b = bundles.find(x => x.id === bundleId);
+      if (b) {
+        if (b.date) setCateringDate(b.date);
+        if (b.company_name) setCompanyName(b.company_name);
+        if (b.service_type) setServiceType(b.service_type as any);
+      }
+    }
   };
 
   const moveBundleToTrash = async (bundle: Bundle) => {
@@ -661,13 +672,51 @@ const App: React.FC = () => {
     reader.onload = async (event) => {
       try {
         const data = new Uint8Array(event.target?.result as ArrayBuffer);
-        const workbook = XLSX.read(data, { type: 'array' });
-        const rows = XLSX.utils.sheet_to_json(workbook.Sheets[workbook.SheetNames[0]]) as ImportRow[];
+        const workbook = XLSX.read(data, { type: 'array', cellDates: true });
+        const sheet = workbook.Sheets[workbook.SheetNames[0]];
+        const rows = XLSX.utils.sheet_to_json(sheet) as ImportRow[];
+
+        // Deep search for date/company in ALL cells (in case they're not headers)
+        let foundDate = '';
+        let foundCompany = '';
+        let foundService = '';
+
+        const allCells = XLSX.utils.sheet_to_json(sheet, { header: 1 }) as any[][];
+        allCells.forEach(rowArr => {
+          rowArr.forEach(cell => {
+            const val = String(cell || '').trim();
+            // Look for Date formats or keywords
+            if (!foundDate && (val.match(/\d{2}\.\d{2}\.\d{4}/) || val.match(/\d{2}\/\d{2}\/\d{4}/))) {
+              foundDate = val;
+            }
+            if (!foundCompany && (val.toLowerCase().includes('getyourguide') || val.toLowerCase().includes('gyg'))) {
+              foundCompany = val;
+            }
+            if (!foundService) {
+              const u = val.toUpperCase();
+              if (u.includes('LUNCH') || u.includes('MITTAG')) foundService = 'LUNCH';
+              else if (u.includes('BRUNCH')) foundService = 'BRUNCH';
+              else if (u.includes('BREAKFAST') || u.includes('FRÜHST')) foundService = 'BREAKFAST';
+              else if (u.includes('DINNER') || u.includes('ABEND')) foundService = 'DINNER';
+            }
+          });
+        });
+
         const bundleMap: Record<string, Bundle> = {};
         rows.forEach((row) => {
           const nameDe = String(row.bundle_name_de || 'Unnamed').trim();
           const nameEn = String(row.bundle_name_en || nameDe).trim();
-          if (!bundleMap[nameDe]) bundleMap[nameDe] = { id: generateSafeId(), name_de: nameDe, name_en: nameEn, items: [] };
+          if (!bundleMap[nameDe]) {
+            bundleMap[nameDe] = {
+              id: generateSafeId(),
+              name_de: nameDe,
+              name_en: nameEn,
+              items: [],
+              date: foundDate,
+              company_name: foundCompany || 'GetYourGuide',
+              service_type: foundService || 'LUNCH'
+            };
+          }
           bundleMap[nameDe].items.push({
             id: generateSafeId(),
             item_name_de: String(row.item_name_de || '').trim(),
@@ -675,59 +724,39 @@ const App: React.FC = () => {
             allergens_de: String(row.allergens_de || '').trim(),
             diet_de: String(row.diet_de || '').trim()
           });
-          // Set bundle type: 'catering' only if explicitly specified, otherwise 'standard' (Generator tab)
+
+          // Row-level refinement if available
+          const keys = Object.keys(row);
+          const dateKey = keys.find(k => /date|datum|day/i.test(k));
+          if (dateKey) {
+            const raw = (row as any)[dateKey];
+            if (raw instanceof Date) bundleMap[nameDe].date = raw.toLocaleDateString('de-DE');
+            else if (raw) bundleMap[nameDe].date = String(raw).trim();
+          }
+
+          const compKey = keys.find(k => /company|firma|kunde/i.test(k));
+          if (compKey && (row as any)[compKey]) bundleMap[nameDe].company_name = String((row as any)[compKey]).trim();
+
+          const serviceVal = String((row as any).service || (row as any).meal || (row as any).D || '').toUpperCase();
+          if (serviceVal.includes('BREAKFAST')) bundleMap[nameDe].service_type = 'BREAKFAST';
+          else if (serviceVal.includes('BRUNCH')) bundleMap[nameDe].service_type = 'BRUNCH';
+          else if (serviceVal.includes('LUNCH')) bundleMap[nameDe].service_type = 'LUNCH';
+          else if (serviceVal.includes('DINNER')) bundleMap[nameDe].service_type = 'DINNER';
+
           if (!bundleMap[nameDe].type) {
             const typeValue = String(row.type || '').trim().toLowerCase();
             bundleMap[nameDe].type = typeValue.includes('catering') ? 'catering' : 'standard';
           }
-
-          // CAPTURE METADATA (Company & Date) - Robust Key Search
-          const keys = Object.keys(row);
-          let compKey = keys.find(k => k.trim() === 'company_name');
-          if (!compKey) {
-            compKey = keys.find(k => /company|firma|customer|kunde|client|partner|business|paypal/i.test(k));
-          }
-          const dateKey = keys.find(k => /date|datum|day/i.test(k));
-
-          const rowCompany = compKey ? String((row as any)[compKey] || '').trim() : '';
-          let rowDateRaw = dateKey ? (row as any)[dateKey] : '';
-
-          // Handle Excel Numeric Date
-          let rowDate = '';
-          if (rowDateRaw) {
-            if (typeof rowDateRaw === 'number') {
-              // Excel date serial number to DD.MM.YYYY
-              const date = new Date(Math.round((rowDateRaw - 25569) * 864e5));
-              rowDate = date.toLocaleDateString('de-DE');
-            } else {
-              rowDate = String(rowDateRaw).trim();
-            }
-          }
-
-          if (rowCompany && rowCompany.length > 2) {
-            setCompanyName(rowCompany);
-            if (rowCompany.toLowerCase().includes('getyourguide') || rowCompany.toLowerCase().includes('gyg')) {
-              setActiveTab('gyg');
-            }
-          }
-          if (rowDate) setCateringDate(rowDate);
-
-          // SERVICE TYPE DETECTION (Column D logic - checking multiple potential keys)
-          const serviceVal = String(
-            (row as any).service ||
-            (row as any).meal ||
-            (row as any).type ||
-            (row as any).D ||
-            (row as any).__EMPTY_1 || // Sometimes it's the 2nd column
-            (row as any).__EMPTY_3 || // Or the 4th
-            ''
-          ).toUpperCase();
-
-          if (serviceVal.includes('BREAKFAST') || serviceVal.includes('FRÜHSTÜCK')) setServiceType('BREAKFAST');
-          else if (serviceVal.includes('BRUNCH')) setServiceType('BRUNCH');
-          else if (serviceVal.includes('LUNCH') || serviceVal.includes('MITTAGESSEN')) setServiceType('LUNCH');
-          else if (serviceVal.includes('DINNER') || serviceVal.includes('ABENDESSEN')) setServiceType('DINNER');
         });
+
+        // Set globals to the last bundle's info for immediate feedback
+        const lastBundle = Object.values(bundleMap).pop();
+        if (lastBundle) {
+          if (lastBundle.date) setCateringDate(lastBundle.date);
+          if (lastBundle.company_name) setCompanyName(lastBundle.company_name);
+          if (lastBundle.service_type) setServiceType(lastBundle.service_type as any);
+          if (lastBundle.company_name?.toLowerCase().includes('gyg')) setActiveTab('gyg');
+        }
         const newBundles = Object.values(bundleMap);
 
         // Merge with existing bundles instead of replacing

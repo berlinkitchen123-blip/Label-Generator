@@ -951,7 +951,7 @@ const App: React.FC = () => {
       if (!b) return [];
       // Respect quantity: multiply items by quantity
       return Array(s.quantity).fill(b).flatMap(() => b.items);
-    }).filter(item => (item.item_name_de || item.item_name_en)); // Skip ghost items with no name
+    }).filter(item => (item.item_name_de || item.item_name_en));
 
     const totalItems = allItems.length;
 
@@ -972,45 +972,44 @@ const App: React.FC = () => {
       }
     });
 
-    // Dynamic Scaling Factors based on item count
-    const isMany = totalItems > 6;
-    const isCrowded = totalItems > 9;
+    // More aggressive scaling for 10+ items
+    const isMany = totalItems > 7;
+    const isCrowded = totalItems > 10;
+    const isPacked = totalItems > 12;
 
-    const fontSizeTitle = isCrowded ? 'text-xl' : (isMany ? 'text-2xl' : 'text-3xl');
-    const fontSizeItem = isCrowded ? 'text-lg' : (isMany ? 'text-xl' : 'text-2xl');
-    const fontSizeAllergen = isCrowded ? 'text-[10px]' : (isMany ? 'text-[11px]' : 'text-[13px]');
-    const spacingCategory = isCrowded ? 'mb-4' : (isMany ? 'mb-6' : 'mb-8');
-    const spacingItem = isCrowded ? 'py-1.5' : (isMany ? 'py-2.5' : 'py-4');
-    const categoryPadding = isCrowded ? 'py-2' : 'py-3';
-    const containerPadding = isCrowded ? 'p-10 pb-6' : 'p-14';
+    const fontSizeTitle = isPacked ? 'text-lg' : (isCrowded ? 'text-xl' : 'text-2xl');
+    const fontSizeItem = isPacked ? 'text-base' : (isCrowded ? 'text-lg' : 'text-xl');
+    const fontSizeAllergen = isPacked ? 'text-[9px]' : (isCrowded ? 'text-[10px]' : 'text-[12px]');
+
+    const spacingCategory = isPacked ? 'mb-2' : (isCrowded ? 'mb-4' : 'mb-8');
+    const spacingItem = isPacked ? 'py-1' : (isCrowded ? 'py-1.5' : 'py-3');
+    const categoryPadding = isPacked ? 'py-1' : 'py-2';
+    const containerPadding = isPacked ? 'p-8 pb-4' : 'p-12';
 
     return (
       <div className={`w-[210mm] h-[297mm] bg-[#FEACCF] relative flex flex-col ${containerPadding} text-[#024930] box-border overflow-hidden`} style={{ fontFamily: "'Inter', sans-serif" }}>
-        <div className="text-center mb-8 shrink-0">
-          <h1 className="text-4xl font-black tracking-tighter uppercase leading-none">MENU SUMMARY</h1>
-          <p className="text-lg font-bold opacity-70 uppercase tracking-widest">{companyName || 'GetYourGuide'}</p>
-        </div>
+        {/* Header Removed as requested to save space */}
 
-        <div className={`flex-1 flex flex-col ${totalItems < 5 ? 'justify-around' : 'justify-start space-y-4'} overflow-hidden`}>
+        <div className={`flex-1 flex flex-col ${totalItems < 6 ? 'justify-around' : 'justify-start space-y-2'} overflow-hidden mt-4`}>
           {Object.entries(categories).map(([catName, items]) => {
             if (items.length === 0) return null;
             return (
               <div key={catName} className={`w-full max-w-4xl mx-auto ${spacingCategory}`}>
-                <div className={`border-t-[3px] border-b-[3px] border-[#024930] ${categoryPadding} mb-4`}>
-                  <h2 className={`${fontSizeTitle} font-black text-center tracking-[0.5em] uppercase`}>{catName}</h2>
+                <div className={`border-t-[2px] border-b-[2px] border-[#024930] ${categoryPadding} mb-3`}>
+                  <h2 className={`${fontSizeTitle} font-black text-center tracking-[0.4em] uppercase`}>{catName}</h2>
                 </div>
-                <div className="space-y-4 px-8">
+                <div className={`${isPacked ? 'space-y-1' : 'space-y-3'} px-6`}>
                   {items.map((item, idx) => (
-                    <div key={idx} className={`flex justify-between items-start border-b border-[#024930]/15 ${spacingItem} last:border-0 px-4`}>
-                      <div className="flex flex-col flex-1 pr-10">
-                        <span className="text-[10px] font-black opacity-70 mb-0.5">{item.diet_de.toUpperCase()}</span>
+                    <div key={idx} className={`flex justify-between items-start border-b border-[#024930]/10 ${spacingItem} last:border-0 px-4`}>
+                      <div className="flex flex-col flex-1 pr-6">
+                        <span className="text-[9px] font-black opacity-70 leading-none mb-0.5">{item.diet_de.toUpperCase()}</span>
                         <h3 className={`${fontSizeItem} font-black tracking-tight uppercase leading-tight`}>
                           {lang === 'de' ? (item.item_name_de || item.item_name_en) : (item.item_name_en || item.item_name_de)}
                         </h3>
                       </div>
-                      <div className="text-right max-w-[280px] shrink-0">
-                        <p className="text-[9px] font-black uppercase mb-0.5 leading-none opacity-50">Allergens:</p>
-                        <p className={`${fontSizeAllergen} font-bold opacity-90 leading-tight uppercase tracking-wide`}>
+                      <div className="text-right max-w-[250px] shrink-0">
+                        <p className="text-[8px] font-black uppercase mb-0.5 leading-none opacity-50">Allergens:</p>
+                        <p className={`${fontSizeAllergen} font-bold opacity-90 leading-tight uppercase`}>
                           {item.allergens_de || 'None'}
                         </p>
                       </div>
@@ -1022,9 +1021,9 @@ const App: React.FC = () => {
           })}
         </div>
 
-        {/* Safer Footer Branding */}
-        <div className="mt-6 pt-6 border-t border-[#024930]/20 flex justify-end shrink-0">
-          <span className="text-4xl font-black tracking-tighter">BELLABONA</span>
+        {/* Cleaner Footer Branding */}
+        <div className={`mt-4 ${isPacked ? 'pt-2' : 'pt-4'} border-t border-[#024930]/10 flex justify-end shrink-0`}>
+          <span className="text-3xl font-black tracking-tighter opacity-80">BELLABONA</span>
         </div>
       </div>
     );

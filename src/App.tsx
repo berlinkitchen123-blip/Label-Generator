@@ -966,7 +966,9 @@ const App: React.FC = () => {
       return Array(s.quantity).fill(b).flatMap(() => b.items);
     }).filter(item => (item.item_name_de || item.item_name_en));
 
-    const totalItems = allItems.length;
+    // Deduplicate for Menu Summary only
+    const menuItems = Array.from(new Map(allItems.map(item => [item.item_name_de.toLowerCase().trim(), item])).values());
+    const totalItems = menuItems.length;
 
     const categories: Record<string, BundleItem[]> = {
       'MAIN DISHES': [],
@@ -974,7 +976,7 @@ const App: React.FC = () => {
       'DESSERTS': []
     };
 
-    allItems.forEach(item => {
+    menuItems.forEach(item => {
       const name = (item.item_name_de + ' ' + item.item_name_en).toLowerCase();
       if (name.includes('baklava') || name.includes('fruit') || name.includes('dessert') || name.includes('cake') || name.includes('pudding')) {
         categories['DESSERTS'].push(item);

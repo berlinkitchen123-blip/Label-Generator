@@ -112,7 +112,8 @@ const TEXT = {
     syncing: 'Syncing...',
     synced: 'Cloud data loaded',
     dataManagement: 'Data Management',
-    recoverData: 'Recover Data from Firestore'
+    recoverData: 'Recover Data from Firestore',
+    gygTab: 'GYG'
   }
 };
 
@@ -585,7 +586,7 @@ const App: React.FC = () => {
 
   const [searchTerm, setSearchTerm] = useState('');
   const [packedOn, setPackedOn] = useState(new Date().toLocaleDateString('en-GB'));
-  const [activeTab, setActiveTab] = useState<'generator' | 'database' | 'catering' | 'trash'>('generator');
+  const [activeTab, setActiveTab] = useState<'generator' | 'database' | 'catering' | 'trash' | 'gyg'>('generator');
   const [isProcessingImport, setIsProcessingImport] = useState(false);
   const [isMigrating, setIsMigrating] = useState(false);
   const [isPreviewing, setIsPreviewing] = useState(false);
@@ -608,6 +609,7 @@ const App: React.FC = () => {
         b.name_en.toLowerCase().includes(searchTerm.toLowerCase());
       const isCatering = b.type === 'catering';
       if (activeTab === 'catering') return matchesSearch && isCatering;
+      if (activeTab === 'gyg') return matchesSearch && isCatering;
       if (activeTab === 'generator') return matchesSearch && !isCatering;
       return matchesSearch;
     }), [bundles, searchTerm, activeTab]);
@@ -687,7 +689,12 @@ const App: React.FC = () => {
           const rowCompany = compKey ? String((row as any)[compKey] || '').trim() : '';
           const rowDate = dateKey ? String((row as any)[dateKey] || '').trim() : '';
 
-          if (rowCompany && rowCompany.length > 2) setCompanyName(rowCompany);
+          if (rowCompany && rowCompany.length > 2) {
+            setCompanyName(rowCompany);
+            if (rowCompany.toLowerCase().includes('getyourguide') || rowCompany.toLowerCase().includes('gyg')) {
+              setActiveTab('gyg');
+            }
+          }
           if (rowDate) setCateringDate(rowDate);
         });
         const updated = Object.values(bundleMap);
@@ -869,6 +876,79 @@ const App: React.FC = () => {
     );
   };
 
+  // GYG Specific Menu Design (Simpler version)
+  const GYGMenuPrint = () => {
+    const allItems: BundleItem[] = [];
+    cateringSelections.forEach(s => {
+      const b = bundles.find(x => x.id === s.bundleId);
+      if (b) allItems.push(...b.items);
+    });
+
+    const uniqueItems = Array.from(new Map(allItems.map(item => [item.item_name_de.toLowerCase(), item])).values());
+
+    return (
+      <div className="w-[210mm] h-[297mm] bg-white relative flex flex-col items-center p-20 text-[#024930]" style={{ fontFamily: "'Inter', sans-serif" }}>
+        {/* Simple Header */}
+        <div className="w-full flex justify-between items-start mb-20">
+          <BrandLogo className="text-6xl h-auto" />
+          <div className="text-right">
+            <h1 className="text-4xl font-black uppercase tracking-tighter mb-1">Weekly Menu</h1>
+            <p className="text-xl font-bold opacity-40 uppercase tracking-widest">{companyName || 'GetYourGuide'}</p>
+          </div>
+        </div>
+
+        {/* Thick Divider */}
+        <div className="w-full h-2 bg-[#024930] mb-16" />
+
+        {/* Simplified List */}
+        <div className="w-full space-y-12">
+          {uniqueItems.map((item, idx) => (
+            <div key={idx} className="flex items-center justify-between border-b-2 border-[#024930]/10 pb-8">
+              <div className="flex-1">
+                <h3 className="text-3xl font-black uppercase tracking-tight mb-2">
+                  {lang === 'de' ? item.item_name_de : item.item_name_en}
+                </h3>
+                <div className="flex gap-2">
+                  {item.allergens_de.split(',').map((alg, i) => (
+                    <span key={i} className="text-xs font-bold uppercase tracking-widest opacity-60 bg-[#024930]/5 px-2 py-1 rounded">
+                      {alg.trim()}
+                    </span>
+                  ))}
+                </div>
+              </div>
+              <div className="flex flex-col items-end gap-2">
+                <div className="flex gap-2">
+                  {/* Reuse existing icon logic if possible, but let's just inline simple ones for GYG style */}
+                  <span className="text-sm font-black uppercase tracking-widest px-4 py-2 bg-[#FEACCF] text-[#024930] rounded-full shadow-sm">
+                    {item.diet_de}
+                  </span>
+                </div>
+              </div>
+            </div>
+          ))}
+        </div>
+
+        {/* Simple Footer */}
+        <div className="mt-auto w-full flex justify-between items-end border-t-2 border-[#024930] pt-8">
+          <div>
+            <p className="text-sm font-black uppercase tracking-widest mb-1">Berlin Kitchen</p>
+            <p className="text-xs font-bold opacity-40">bellabona.com</p>
+          </div>
+          <div className="text-right">
+            <p className="text-4xl font-black">ENJOY!</p>
+          </div>
+        </div>
+
+        <style>{`
+          @media print {
+            @page { size: A4; margin: 0; }
+            body { print-color-adjust: exact; -webkit-print-color-adjust: exact; }
+          }
+        `}</style>
+      </div>
+    );
+  };
+
   // Review Print Component
   const ReviewPrint: React.FC<{ size: 'A4' | 'A6' }> = ({ size }) => {
     // A4: 210mm x 297mm
@@ -914,11 +994,11 @@ const App: React.FC = () => {
 
 
   const renderMainContent = () => {
-    if (previewType === 'menu' && activeTab === 'catering') {
+    if (previewType === 'menu' && (activeTab === 'catering' || activeTab === 'gyg')) {
       return (
         <>
           <div style={{ width: '210mm', height: '297mm', pageBreakAfter: 'always' }}>
-            <MenuPrint />
+            {activeTab === 'gyg' ? <GYGMenuPrint /> : <MenuPrint />}
           </div>
           <div style={{ width: '210mm', height: '297mm', pageBreakAfter: 'always' }}>
             <ReviewPrint size="A4" />
@@ -927,7 +1007,7 @@ const App: React.FC = () => {
       );
     }
 
-    if (activeTab === 'catering' && previewType === 'labels') {
+    if ((activeTab === 'catering' || activeTab === 'gyg') && previewType === 'labels') {
       const allItems = cateringSelections.flatMap(sel => {
         const b = bundles.find(x => x.id === sel.bundleId);
         if (!b) return [];
@@ -1030,6 +1110,13 @@ const App: React.FC = () => {
                 className={`w-full flex items-center gap-4 px-4 py-3 rounded-xl transition-all font-bold ${activeTab === 'database' ? 'bg-[#FEACCF] text-[#024930] shadow-lg translate-x-1' : 'text-[#F8F7F6]/60 hover:text-white hover:bg-white/5'}`}
               >
                 <DatabaseIcon size={20} /><span className="hidden lg:block">Database</span>
+              </button>
+              <button
+                onClick={() => setActiveTab('gyg')}
+                className={`w-full flex items-center gap-4 px-4 py-3 rounded-xl transition-all font-bold ${activeTab === 'gyg' ? 'bg-[#pink] text-[#024930] shadow-lg translate-x-1' : 'text-[#F8F7F6]/60 hover:text-white hover:bg-white/5'}`}
+                style={{ backgroundColor: activeTab === 'gyg' ? '#FEACCF' : '' }}
+              >
+                <FileSpreadsheet size={20} /><span className="hidden lg:block">GYG Menu</span>
               </button>
             </nav>
 
@@ -1199,6 +1286,88 @@ const App: React.FC = () => {
                   </section>
                 </div>
               </div>
+            ) : activeTab === 'gyg' ? (
+              <div className="grid grid-cols-1 xl:grid-cols-12 gap-10">
+                <div className="xl:col-span-12 mb-6">
+                  <div className="bg-[#FEACCF]/20 p-6 rounded-3xl border border-[#FEACCF]/30 flex items-center justify-between">
+                    <div className="flex items-center gap-6">
+                      <div className="w-16 h-16 rounded-2xl bg-[#024930] flex items-center justify-center shadow-xl">
+                        <BookOpen size={32} className="text-[#FEACCF]" />
+                      </div>
+                      <div>
+                        <h2 className="text-3xl font-black text-[#024930]">GYG Portal</h2>
+                        <p className="text-[#024930]/60 font-bold uppercase tracking-widest text-xs mt-1">Getyourguide Specialized Menu System</p>
+                      </div>
+                    </div>
+                    <div className="text-right">
+                      <p className="text-sm font-black text-[#024930]">{companyName || "GetYourGuide"}</p>
+                      <p className="text-[10px] font-bold text-[#024930]/40 uppercase tracking-[0.2em]">{cateringDate}</p>
+                    </div>
+                  </div>
+                </div>
+
+                <div className="xl:col-span-5 space-y-8">
+                  <div className="relative">
+                    <Search className="absolute left-5 top-1/2 -translate-y-1/2 text-[#024930]/40" size={20} />
+                    <input type="text" placeholder="Search GYG items..." value={searchTerm} onChange={(e) => setSearchTerm(e.target.value)} className="w-full bg-white rounded-2xl pl-14 pr-6 py-4 text-sm text-[#024930] border-none focus:ring-2 focus:ring-[#FEACCF] shadow-xl placeholder:text-[#024930]/20" />
+                  </div>
+                  <div className="space-y-4 max-h-[50vh] overflow-y-auto pr-3">
+                    {filteredBundles.map(bundle => (
+                      <div key={bundle.id} onClick={() => addSelection(bundle.id, true)} className="bg-white rounded-2xl p-5 flex items-center justify-between cursor-pointer group hover:ring-2 hover:ring-[#FEACCF] transition-all shadow-sm hover:shadow-lg">
+                        <div className="flex items-center gap-4">
+                          <div className="w-10 h-10 rounded-full bg-[#F8F7F6] flex items-center justify-center group-hover:bg-[#FEACCF] transition-colors">
+                            <Utensils size={20} className="text-[#024930]" />
+                          </div>
+                          <div>
+                            <p className="font-black text-[#024930] text-sm">{lang === 'de' ? bundle.name_de : bundle.name_en}</p>
+                          </div>
+                        </div>
+                        <Plus size={20} className="text-[#024930]/20 group-hover:text-[#024930]" />
+                      </div>
+                    ))}
+                  </div>
+                </div>
+
+                <div className="xl:col-span-7">
+                  <section className="bg-white rounded-3xl p-8 flex flex-col min-h-[500px] shadow-2xl relative overflow-hidden">
+                    <div className="absolute top-0 right-0 p-4 opacity-[0.03] pointer-events-none">
+                      <BookOpen size={300} />
+                    </div>
+                    <div className="flex justify-between mb-10 relative z-10">
+                      <h2 className="text-2xl font-black text-[#024930]">Selected Items <span className="text-[#FEACCF]">({cateringSelections.length})</span></h2>
+                      {cateringSelections.length > 0 && <button onClick={() => setCateringSelections([])} className="text-red-400 font-bold uppercase text-[10px] tracking-widest hover:text-red-500">Clear Menu</button>}
+                    </div>
+
+                    <div className="flex-1 space-y-4 relative z-10">
+                      {cateringSelections.map(sel => {
+                        const b = bundles.find(x => x.id === sel.bundleId);
+                        if (!b) return null;
+                        return (
+                          <div key={sel.bundleId} className="flex items-center gap-4 bg-[#F8F7F6] rounded-xl p-4 border border-[#F8F7F6]">
+                            <div className="flex-1 text-[#024930] font-bold">{lang === 'de' ? b.name_de : b.name_en}</div>
+                            <input type="number" min="1" value={sel.quantity} onChange={(e) => setCateringSelections(prev => prev.map(s => s.bundleId === sel.bundleId ? { ...s, quantity: parseInt(e.target.value) || 1 } : s))} className="w-16 bg-white rounded-lg p-2 text-center text-[#024930] font-black border-none shadow-sm" />
+                            <button onClick={() => setCateringSelections(prev => prev.filter(s => s.bundleId !== sel.bundleId))} className="text-[#024930]/20 hover:text-red-400"><X size={20} /></button>
+                          </div>
+                        );
+                      })}
+                      {cateringSelections.length === 0 && (
+                        <div className="h-full flex flex-col items-center justify-center opacity-10 text-[#024930] mt-20">
+                          <BookOpen size={64} className="mb-4" />
+                          <p className="font-bold uppercase tracking-widest text-center">Your GYG selections will appear here</p>
+                        </div>
+                      )}
+                    </div>
+
+                    {cateringSelections.length > 0 && (
+                      <div className="mt-8 pt-8 border-t border-[#024930]/10 flex justify-end relative z-10">
+                        <button onClick={() => { setPreviewType('menu'); setIsPreviewing(true); }} className="bg-[#024930] text-white font-black px-12 py-5 rounded-2xl flex items-center gap-3 shadow-xl hover:shadow-2xl hover:-translate-y-1 transition-all uppercase tracking-widest text-sm">
+                          <Printer size={24} /> Print GYG Menu
+                        </button>
+                      </div>
+                    )}
+                  </section>
+                </div>
+              </div>
             ) : activeTab === 'trash' ? (
               <div className="max-w-4xl mx-auto space-y-8">
                 <section className="bg-white p-10 rounded-3xl shadow-2xl relative overflow-hidden">
@@ -1346,10 +1515,10 @@ const App: React.FC = () => {
 
               <div className="flex-1 overflow-auto bg-[#F8F7F6] p-8 flex justify-center items-start">
                 {/* Render Correct Preview */}
-                {previewType === 'menu' && activeTab === 'catering' ? (
+                {previewType === 'menu' && (activeTab === 'catering' || activeTab === 'gyg') ? (
                   <div className="flex flex-col gap-12">
                     <div className="bg-white shadow-2xl scale-[0.6] origin-top" style={{ width: '210mm', height: '297mm' }}>
-                      <MenuPrint />
+                      {activeTab === 'gyg' ? <GYGMenuPrint /> : <MenuPrint />}
                     </div>
                     <div className="bg-white shadow-2xl scale-[0.6] origin-top" style={{ width: '210mm', height: '297mm' }}>
                       <ReviewPrint size="A4" />

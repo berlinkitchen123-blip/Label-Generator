@@ -876,81 +876,157 @@ const App: React.FC = () => {
     );
   };
 
-  // GYG Specific Menu Design (Simpler version)
+  // --- GYG PRINT SYSTEM (Strict adherence to images) ---
+
+  const GYGCoverPage = () => {
+    // Extract service type from the first bundle name if possible
+    let service = 'LUNCH';
+    if (cateringSelections.length > 0) {
+      const b = bundles.find((x: Bundle) => x.id === cateringSelections[0].bundleId);
+      if (b) {
+        const name = (b.name_de + ' ' + b.name_en).toLowerCase();
+        if (name.includes('brunch')) service = 'BRUNCH';
+        if (name.includes('breakfast')) service = 'BREAKFAST';
+      }
+    }
+
+    return (
+      <div className="w-[210mm] h-[297mm] bg-[#FEACCF] relative flex flex-col items-center justify-center p-20 text-[#024930]" style={{ fontFamily: "'Inter', sans-serif" }}>
+        <div className="text-center">
+          <h1 className="text-8xl font-black mb-2 tracking-tighter leading-none">
+            {companyName || 'GetYourGuide'}
+          </h1>
+          <p className="text-4xl font-bold mb-8 opacity-90 tracking-tight">Deutschland</p>
+          <div className="flex items-center gap-6 justify-center">
+            <span className="text-5xl font-black tracking-widest">{service}</span>
+            <span className="text-5xl font-light opacity-40">|</span>
+            <span className="text-5xl font-black tracking-widest">{cateringDate.split('.').slice(0, 2).join('.')}</span>
+          </div>
+        </div>
+
+        <div className="absolute bottom-20 right-20">
+          <span className="text-6xl font-black tracking-tighter">BELLABONA</span>
+        </div>
+      </div>
+    );
+  };
+
   const GYGMenuPrint = () => {
     const allItems: BundleItem[] = [];
-    cateringSelections.forEach(s => {
-      const b = bundles.find(x => x.id === s.bundleId);
+    cateringSelections.forEach((s: Selection) => {
+      const b = bundles.find((x: Bundle) => x.id === s.bundleId);
+      if (b) allItems.push(...b.items);
+    });
+
+    const uniqueItems = Array.from(new Map(allItems.map(item => [item.item_name_de.toLowerCase(), item])).values());
+
+    // Heuristic categorization
+    const categories: Record<string, BundleItem[]> = {
+      'MAIN DISHES': [],
+      'SIDE': [],
+      'DESSERTS': []
+    };
+
+    uniqueItems.forEach(item => {
+      const name = (item.item_name_de + ' ' + item.item_name_en).toLowerCase();
+      if (name.includes('baklava') || name.includes('fruit') || name.includes('dessert') || name.includes('cake') || name.includes('pudding')) {
+        categories['DESSERTS'].push(item);
+      } else if (name.includes('salad') || name.includes('farro') || name.includes('side') || name.includes('rice') || name.includes('pita') || name.includes('couscous')) {
+        categories['SIDE'].push(item);
+      } else {
+        categories['MAIN DISHES'].push(item);
+      }
+    });
+
+    return (
+      <div className="w-[210mm] h-[297mm] bg-[#FEACCF] relative flex flex-col p-16 text-[#024930]" style={{ fontFamily: "'Inter', sans-serif" }}>
+        <div className="space-y-10">
+          {Object.entries(categories).map(([catName, items]) => {
+            if (items.length === 0) return null;
+            return (
+              <div key={catName}>
+                <div className="border-t-4 border-b-4 border-[#024930] py-4 mb-6">
+                  <h2 className="text-5xl font-black text-center tracking-[0.2em]">{catName}</h2>
+                </div>
+                <div className="space-y-6">
+                  {items.map((item, idx) => (
+                    <div key={idx} className="flex justify-between items-start">
+                      <div className="flex flex-col">
+                        <span className="text-2xl font-medium opacity-70 mb-1">{item.diet_de}</span>
+                        <h3 className="text-4xl font-black tracking-tighter">
+                          {lang === 'de' ? item.item_name_de : item.item_name_en}
+                        </h3>
+                      </div>
+                      <div className="text-right mt-1">
+                        <p className="text-xl font-black whitespace-nowrap">Allergens | Contains:</p>
+                        <p className="text-xl font-medium opacity-90 max-w-[300px] leading-tight">
+                          {item.allergens_de || 'None'}
+                        </p>
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              </div>
+            );
+          })}
+        </div>
+
+        <div className="mt-auto flex justify-end">
+          <span className="text-7xl font-black tracking-tighter">BELLABONA</span>
+        </div>
+      </div>
+    );
+  };
+
+  const GYGItemLabels = () => {
+    const allItems: BundleItem[] = [];
+    cateringSelections.forEach((s: Selection) => {
+      const b = bundles.find((x: Bundle) => x.id === s.bundleId);
       if (b) allItems.push(...b.items);
     });
 
     const uniqueItems = Array.from(new Map(allItems.map(item => [item.item_name_de.toLowerCase(), item])).values());
 
     return (
-      <div className="w-[210mm] h-[297mm] bg-white relative flex flex-col items-center p-20 text-[#024930]" style={{ fontFamily: "'Inter', sans-serif" }}>
-        {/* Simple Header */}
-        <div className="w-full flex justify-between items-start mb-20">
-          <BrandLogo className="text-6xl h-auto" />
-          <div className="text-right">
-            <h1 className="text-4xl font-black uppercase tracking-tighter mb-1">Weekly Menu</h1>
-            <p className="text-xl font-bold opacity-40 uppercase tracking-widest">{companyName || 'GetYourGuide'}</p>
-          </div>
-        </div>
+      <>
+        {uniqueItems.map((item, idx) => {
+          const isVegan = item.diet_de.toLowerCase().includes('vegan');
+          const bgColor = isVegan ? '#024930' : '#FEACCF';
+          const textColor = isVegan ? '#FFFFFF' : '#024930';
+          const dietDisplay = item.diet_de.toUpperCase();
 
-        {/* Thick Divider */}
-        <div className="w-full h-2 bg-[#024930] mb-16" />
-
-        {/* Simplified List */}
-        <div className="w-full space-y-12">
-          {uniqueItems.map((item, idx) => (
-            <div key={idx} className="flex items-center justify-between border-b-2 border-[#024930]/10 pb-8">
-              <div className="flex-1">
-                <h3 className="text-3xl font-black uppercase tracking-tight mb-2">
-                  {lang === 'de' ? item.item_name_de : item.item_name_en}
-                </h3>
-                <div className="flex gap-2">
-                  {item.allergens_de.split(',').map((alg, i) => (
-                    <span key={i} className="text-xs font-bold uppercase tracking-widest opacity-60 bg-[#024930]/5 px-2 py-1 rounded">
-                      {alg.trim()}
-                    </span>
-                  ))}
+          return (
+            <div key={idx} className="w-[210mm] h-[297mm] relative flex flex-col items-center justify-center p-20 page-break-after-always" style={{ backgroundColor: bgColor, color: textColor, fontFamily: "'Inter', sans-serif", pageBreakAfter: 'always' }}>
+              <div className="absolute top-24 w-full px-20">
+                <div className="border-t-2 border-b-2 py-6" style={{ borderColor: textColor }}>
+                  <h2 className="text-5xl font-black text-center tracking-[0.2em] uppercase">
+                    {dietDisplay.includes('MEAT') ? 'MEAT MAIN' : (dietDisplay.includes('VEGAN') ? 'VEGAN' : dietDisplay)}
+                  </h2>
                 </div>
               </div>
-              <div className="flex flex-col items-end gap-2">
-                <div className="flex gap-2">
-                  {/* Reuse existing icon logic if possible, but let's just inline simple ones for GYG style */}
-                  <span className="text-sm font-black uppercase tracking-widest px-4 py-2 bg-[#FEACCF] text-[#024930] rounded-full shadow-sm">
-                    {item.diet_de}
-                  </span>
+              <div className="text-center w-full max-w-[90%] space-y-12">
+                <div className="border-b-4 pb-4 inline-block px-10" style={{ borderColor: textColor }}>
+                  <h1 className="text-8xl font-black uppercase tracking-tighter leading-[1.1]">
+                    {lang === 'de' ? item.item_name_de : item.item_name_en}
+                  </h1>
                 </div>
+                <div className="space-y-2">
+                  <p className="text-3xl font-black tracking-tight">Allergens | Contains:</p>
+                  <p className="text-3xl font-medium opacity-90">{item.allergens_de || 'None'}</p>
+                </div>
+              </div>
+              <div className="absolute bottom-20 right-20">
+                <span className="text-7xl font-black tracking-tighter">BELLABONA</span>
               </div>
             </div>
-          ))}
-        </div>
-
-        {/* Simple Footer */}
-        <div className="mt-auto w-full flex justify-between items-end border-t-2 border-[#024930] pt-8">
-          <div>
-            <p className="text-sm font-black uppercase tracking-widest mb-1">Berlin Kitchen</p>
-            <p className="text-xs font-bold opacity-40">bellabona.com</p>
-          </div>
-          <div className="text-right">
-            <p className="text-4xl font-black">ENJOY!</p>
-          </div>
-        </div>
-
-        <style>{`
-          @media print {
-            @page { size: A4; margin: 0; }
-            body { print-color-adjust: exact; -webkit-print-color-adjust: exact; }
-          }
-        `}</style>
-      </div>
+          );
+        })}
+      </>
     );
   };
 
   // Review Print Component
-  const ReviewPrint: React.FC<{ size: 'A4' | 'A6' }> = ({ size }) => {
+  const ReviewPrint: React.FC<{ size: 'A4' | 'A6' }> = ({ size }: { size: 'A4' | 'A6' }) => {
     // A4: 210mm x 297mm
     // A6: 105mm x 148.5mm
     const dim = size === 'A4' ? { w: '210mm', h: '297mm' } : { w: '105mm', h: '148.5mm' };
@@ -997,12 +1073,26 @@ const App: React.FC = () => {
     if (previewType === 'menu' && (activeTab === 'catering' || activeTab === 'gyg')) {
       return (
         <>
-          <div style={{ width: '210mm', height: '297mm', pageBreakAfter: 'always' }}>
-            {activeTab === 'gyg' ? <GYGMenuPrint /> : <MenuPrint />}
-          </div>
-          <div style={{ width: '210mm', height: '297mm', pageBreakAfter: 'always' }}>
-            <ReviewPrint size="A4" />
-          </div>
+          {activeTab === 'gyg' ? (
+            <>
+              <div style={{ width: '210mm', height: '297mm', pageBreakAfter: 'always' }}>
+                <GYGCoverPage />
+              </div>
+              <div style={{ width: '210mm', height: '297mm', pageBreakAfter: 'always' }}>
+                <GYGMenuPrint />
+              </div>
+              <GYGItemLabels />
+            </>
+          ) : (
+            <>
+              <div style={{ width: '210mm', height: '297mm', pageBreakAfter: 'always' }}>
+                <MenuPrint />
+              </div>
+              <div style={{ width: '210mm', height: '297mm', pageBreakAfter: 'always' }}>
+                <ReviewPrint size="A4" />
+              </div>
+            </>
+          )}
         </>
       );
     }
@@ -1051,8 +1141,8 @@ const App: React.FC = () => {
   };
 
   const renderExplodedItems = () => {
-    const allItems = selections.flatMap(sel => {
-      const b = bundles.find(x => x.id === sel.bundleId);
+    const allItems = selections.flatMap((sel: Selection) => {
+      const b = bundles.find((x: Bundle) => x.id === sel.bundleId);
       if (!b) return [];
       return Array(sel.quantity).fill(b).flatMap(() => b.items);
     });
@@ -1517,12 +1607,28 @@ const App: React.FC = () => {
                 {/* Render Correct Preview */}
                 {previewType === 'menu' && (activeTab === 'catering' || activeTab === 'gyg') ? (
                   <div className="flex flex-col gap-12">
-                    <div className="bg-white shadow-2xl scale-[0.6] origin-top" style={{ width: '210mm', height: '297mm' }}>
-                      {activeTab === 'gyg' ? <GYGMenuPrint /> : <MenuPrint />}
-                    </div>
-                    <div className="bg-white shadow-2xl scale-[0.6] origin-top" style={{ width: '210mm', height: '297mm' }}>
-                      <ReviewPrint size="A4" />
-                    </div>
+                    {activeTab === 'gyg' ? (
+                      <>
+                        <div className="bg-white shadow-2xl scale-[0.6] origin-top" style={{ width: '210mm', height: '297mm' }}>
+                          <GYGCoverPage />
+                        </div>
+                        <div className="bg-white shadow-2xl scale-[0.6] origin-top" style={{ width: '210mm', height: '297mm' }}>
+                          <GYGMenuPrint />
+                        </div>
+                        <div className="bg-white shadow-2xl scale-[0.6] origin-top" style={{ width: '210mm', height: 'auto' }}>
+                          <GYGItemLabels />
+                        </div>
+                      </>
+                    ) : (
+                      <>
+                        <div className="bg-white shadow-2xl scale-[0.6] origin-top" style={{ width: '210mm', height: '297mm' }}>
+                          <MenuPrint />
+                        </div>
+                        <div className="bg-white shadow-2xl scale-[0.6] origin-top" style={{ width: '210mm', height: '297mm' }}>
+                          <ReviewPrint size="A4" />
+                        </div>
+                      </>
+                    )}
                   </div>
                 ) : activeTab === 'catering' ? (
                   // Catering Previews (Labels + Review Card)

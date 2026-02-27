@@ -1074,6 +1074,44 @@ const App: React.FC = () => {
     );
   };
 
+  const GYGRatingPage = () => {
+    let service = serviceType || 'LUNCH';
+    if (service === 'LUNCH' && cateringSelections.length > 0) {
+      const b = bundles.find((x: Bundle) => x.id === cateringSelections[0].bundleId);
+      if (b) {
+        const name = (b.name_de + ' ' + b.name_en).toLowerCase();
+        if (name.includes('brunch')) service = 'BRUNCH';
+        if (name.includes('breakfast')) service = 'BREAKFAST';
+      }
+    }
+
+    return (
+      <div className="w-[210mm] h-[297mm] bg-[#FEACCF] relative flex flex-col items-center justify-center p-24 text-[#024930] box-border overflow-hidden" style={{ fontFamily: "'Inter', sans-serif" }}>
+        <div className="absolute top-20 text-center">
+          <h1 className="text-[80px] font-black tracking-[-0.05em] leading-none uppercase">GetYourGuide</h1>
+        </div>
+
+        <div className="text-center flex flex-col items-center gap-20">
+          <h2 className="text-[72px] font-black tracking-tight leading-[0.95] uppercase max-w-4xl text-center">
+            RATE YOUR {service}<br />WITH US
+          </h2>
+
+          <div className="bg-white p-12 rounded-sm shadow-[0_20px_50px_rgba(0,0,0,0.1)]">
+            <img
+              src={`https://api.qrserver.com/v1/create-qr-code/?size=400x400&data=https://bellabona.com/feedback&bgcolor=ffffff&color=024930`}
+              alt="Feedback QR"
+              className="w-72 h-72"
+            />
+          </div>
+        </div>
+
+        <div className="absolute bottom-16 right-16">
+          <span className="text-5xl font-black tracking-tighter opacity-100">BELLABONA</span>
+        </div>
+      </div>
+    );
+  };
+
   const GYGItemLabels = () => {
     const allItems: BundleItem[] = cateringSelections.flatMap((s: Selection) => {
       const b = bundles.find((x: Bundle) => x.id === s.bundleId);
@@ -1197,6 +1235,9 @@ const App: React.FC = () => {
               </div>
               <div style={{ width: '210mm', height: '297mm', pageBreakAfter: 'always' }}>
                 <GYGMenuPrint />
+              </div>
+              <div style={{ width: '210mm', height: '297mm', pageBreakAfter: 'always' }}>
+                <GYGRatingPage />
               </div>
               <GYGItemLabels />
             </>
@@ -1731,6 +1772,9 @@ const App: React.FC = () => {
                         </div>
                         <div className="bg-white shadow-2xl scale-[0.6] origin-top" style={{ width: '210mm', height: '297mm' }}>
                           <GYGMenuPrint />
+                        </div>
+                        <div className="bg-white shadow-2xl scale-[0.6] origin-top" style={{ width: '210mm', height: '297mm' }}>
+                          <GYGRatingPage />
                         </div>
                         <div className="bg-white shadow-2xl scale-[0.6] origin-top" style={{ width: '210mm', height: 'auto' }}>
                           <GYGItemLabels />

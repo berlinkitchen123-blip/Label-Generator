@@ -606,7 +606,33 @@ const App: React.FC = () => {
     } catch (e) { }
   };
 
-  useEffect(() => { init(); }, []);
+  useEffect(() => {
+    init();
+
+    // Recover Catering Session
+    const saved = localStorage.getItem('bb_catering_session');
+    if (saved) {
+      try {
+        const session = JSON.parse(saved);
+        if (session.cateringSelections) setCateringSelections(session.cateringSelections);
+        if (session.companyName) setCompanyName(session.companyName);
+        if (session.cateringDate) setCateringDate(session.cateringDate);
+        if (session.serviceType) setServiceType(session.serviceType);
+        if (session.activeTab) setActiveTab(session.activeTab);
+      } catch (e) { }
+    }
+  }, []);
+
+  useEffect(() => {
+    const session = {
+      cateringSelections,
+      companyName,
+      cateringDate,
+      serviceType,
+      activeTab
+    };
+    localStorage.setItem('bb_catering_session', JSON.stringify(session));
+  }, [cateringSelections, companyName, cateringDate, serviceType, activeTab]);
 
   const filteredBundles = useMemo(() =>
     bundles.filter(b => {
@@ -675,17 +701,16 @@ const App: React.FC = () => {
         const workbook = XLSX.read(data, { type: 'array', cellDates: true });
         const sheet = workbook.Sheets[workbook.SheetNames[0]];
         const rows = XLSX.utils.sheet_to_json(sheet) as ImportRow[];
+        const allCells = XLSX.utils.sheet_to_json(sheet, { header: 1 }) as any[][];
 
-        // Deep search for date/company in ALL cells (in case they're not headers)
         let foundDate = '';
         let foundCompany = '';
         let foundService = '';
 
-        const allCells = XLSX.utils.sheet_to_json(sheet, { header: 1 }) as any[][];
+        // 1. Deep search for metadata
         allCells.forEach(rowArr => {
           rowArr.forEach(cell => {
             const val = String(cell || '').trim();
-            // Look for Date formats or keywords
             if (!foundDate && (val.match(/\d{2}\.\d{2}\.\d{4}/) || val.match(/\d{2}\/\d{2}\/\d{4}/))) {
               foundDate = val;
             }
@@ -702,10 +727,44 @@ const App: React.FC = () => {
           });
         });
 
+        // 2. Map Column Indices Robustly
+        let colMap = { nameDe: -1, nameEn: -1, itemDe: -1, itemEn: -1, allergens: -1, diet: -1, type: -1 };
+        let headerRowIdx = -1;
+        for (let i = 0; i < Math.min(allCells.length, 20); i++) {
+          const row = allCells[i];
+          const rowStr = JSON.stringify(row).toLowerCase();
+          if ((rowStr.includes('item') || rowStr.includes('bundle')) && (rowStr.includes('de') || rowStr.includes('en'))) {
+            headerRowIdx = i;
+            row.forEach((cell, cIdx) => {
+              const v = String(cell || '').toLowerCase().trim();
+              if (v.includes('bundle') && v.includes('de')) colMap.nameDe = cIdx;
+              else if (v.includes('bundle') && v.includes('en')) colMap.nameEn = cIdx;
+              else if (v.includes('item') && v.includes('de')) colMap.itemDe = cIdx;
+              else if (v.includes('item') && v.includes('en')) colMap.itemEn = cIdx;
+              else if (v.includes('allergen')) colMap.allergens = cIdx;
+              else if (v.includes('diet') || v.includes('ernährung') || v.includes('veg')) colMap.diet = cIdx;
+              else if (v.includes('type') || v.includes('art')) colMap.type = cIdx;
+            });
+            break;
+          }
+        }
+
+        // Fallback to standard sheet_to_json if manual mapping failed
         const bundleMap: Record<string, Bundle> = {};
-        rows.forEach((row) => {
-          const nameDe = String(row.bundle_name_de || 'Unnamed').trim();
-          const nameEn = String(row.bundle_name_en || nameDe).trim();
+        const processRow = (row: any, isArray: boolean) => {
+          const getValue = (keyArray: number[], keyProp: string) => {
+            if (isArray) {
+              for (const idx of keyArray) if (idx >= 0 && row[idx]) return String(row[idx]).trim();
+              return '';
+            }
+            return String(row[keyProp] || '').trim();
+          };
+
+          const nameDe = getValue([colMap.nameDe], 'bundle_name_de') || 'Unnamed';
+          const nameEn = getValue([colMap.nameEn], 'bundle_name_en') || nameDe;
+          const itemDe = getValue([colMap.itemDe], 'item_name_de');
+          if (!nameDe || !itemDe) return;
+
           if (!bundleMap[nameDe]) {
             bundleMap[nameDe] = {
               id: generateSafeId(),
@@ -717,46 +776,25 @@ const App: React.FC = () => {
               service_type: foundService || 'LUNCH'
             };
           }
+
           bundleMap[nameDe].items.push({
             id: generateSafeId(),
-            item_name_de: String(row.item_name_de || '').trim(),
-            item_name_en: String(row.item_name_en || row.item_name_de || '').trim(),
-            allergens_de: String(row.allergens_de || '').trim(),
-            diet_de: String(row.diet_de || '').trim()
+            item_name_de: itemDe,
+            item_name_en: getValue([colMap.itemEn], 'item_name_en') || itemDe,
+            allergens_de: getValue([colMap.allergens], 'allergens_de'),
+            diet_de: getValue([colMap.diet], 'diet_de')
           });
 
-          // Row-level refinement if available
-          const keys = Object.keys(row);
-          const dateKey = keys.find(k => /date|datum|day/i.test(k));
-          if (dateKey) {
-            const raw = (row as any)[dateKey];
-            if (raw instanceof Date) bundleMap[nameDe].date = raw.toLocaleDateString('de-DE');
-            else if (raw) bundleMap[nameDe].date = String(raw).trim();
-          }
+          const typeVal = getValue([colMap.type], 'type').toLowerCase();
+          if (typeVal.includes('catering')) bundleMap[nameDe].type = 'catering';
+        };
 
-          const compKey = keys.find(k => /company|firma|kunde/i.test(k));
-          if (compKey && (row as any)[compKey]) bundleMap[nameDe].company_name = String((row as any)[compKey]).trim();
-
-          const serviceVal = String((row as any).service || (row as any).meal || (row as any).D || '').toUpperCase();
-          if (serviceVal.includes('BREAKFAST')) bundleMap[nameDe].service_type = 'BREAKFAST';
-          else if (serviceVal.includes('BRUNCH')) bundleMap[nameDe].service_type = 'BRUNCH';
-          else if (serviceVal.includes('LUNCH')) bundleMap[nameDe].service_type = 'LUNCH';
-          else if (serviceVal.includes('DINNER')) bundleMap[nameDe].service_type = 'DINNER';
-
-          if (!bundleMap[nameDe].type) {
-            const typeValue = String(row.type || '').trim().toLowerCase();
-            bundleMap[nameDe].type = typeValue.includes('catering') ? 'catering' : 'standard';
-          }
-        });
-
-        // Set globals to the last bundle's info for immediate feedback
-        const lastBundle = Object.values(bundleMap).pop();
-        if (lastBundle) {
-          if (lastBundle.date) setCateringDate(lastBundle.date);
-          if (lastBundle.company_name) setCompanyName(lastBundle.company_name);
-          if (lastBundle.service_type) setServiceType(lastBundle.service_type as any);
-          if (lastBundle.company_name?.toLowerCase().includes('gyg')) setActiveTab('gyg');
+        if (headerRowIdx >= 0) {
+          allCells.slice(headerRowIdx + 1).forEach(r => processRow(r, true));
+        } else {
+          rows.forEach(r => processRow(r, false));
         }
+
         const newBundles = Object.values(bundleMap);
 
         // Merge with existing bundles instead of replacing
@@ -975,9 +1013,7 @@ const App: React.FC = () => {
           <div className="flex items-center gap-6 justify-center">
             <span className="text-4xl font-black tracking-widest">{service}</span>
             <span className="text-4xl font-light opacity-40">|</span>
-            <span className="text-4xl font-black tracking-widest">
-              {cateringDate.includes('.') ? cateringDate.split('.').slice(0, 2).join('.') : cateringDate}
-            </span>
+            <span className="text-4xl font-black tracking-widest">{cateringDate}</span>
           </div>
         </div>
 

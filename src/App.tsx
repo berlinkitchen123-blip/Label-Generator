@@ -638,9 +638,11 @@ const App: React.FC = () => {
     bundles.filter(b => {
       const matchesSearch = b.name_de.toLowerCase().includes(searchTerm.toLowerCase()) ||
         b.name_en.toLowerCase().includes(searchTerm.toLowerCase());
-      const isCatering = b.type === 'catering';
-      if (activeTab === 'catering') return matchesSearch && isCatering;
-      if (activeTab === 'gyg') return matchesSearch && isCatering;
+
+      // Robust check for catering: either explicit type, or has metadata (common in old Firestore data)
+      const isCatering = b.type === 'catering' || !!b.company_name || !!b.date;
+
+      if (activeTab === 'catering' || activeTab === 'gyg') return matchesSearch && isCatering;
       if (activeTab === 'generator') return matchesSearch && !isCatering;
       return matchesSearch;
     }), [bundles, searchTerm, activeTab]);
@@ -1397,8 +1399,7 @@ const App: React.FC = () => {
               </button>
               <button
                 onClick={() => setActiveTab('gyg')}
-                className={`w-full flex items-center gap-4 px-4 py-3 rounded-xl transition-all font-bold ${activeTab === 'gyg' ? 'bg-[#pink] text-[#024930] shadow-lg translate-x-1' : 'text-[#F8F7F6]/60 hover:text-white hover:bg-white/5'}`}
-                style={{ backgroundColor: activeTab === 'gyg' ? '#FEACCF' : '' }}
+                className={`w-full flex items-center gap-4 px-4 py-3 rounded-xl transition-all font-bold ${activeTab === 'gyg' ? 'bg-[#FEACCF] text-[#024930] shadow-lg translate-x-1' : 'text-[#F8F7F6]/60 hover:text-white hover:bg-white/5'}`}
               >
                 <FileSpreadsheet size={20} /><span className="hidden lg:block">GYG Menu</span>
               </button>
@@ -1699,29 +1700,31 @@ const App: React.FC = () => {
                   <div className="mb-10 text-center">
                     <button
                       onClick={async () => {
-                        if (confirm("Attempt to migrate data from old Firestore database?")) {
+                        if (confirm("⚠️ SYNC OLD DATA?\n\nThis will look for your old data in Firestore and safely merge it with your current database.\n\nContinue?")) {
                           setIsMigrating(true);
                           try {
                             const count = await DataService.migrateFromFirestore();
-                            alert(`Migration successful! Moved ${count} bundles.`);
-                            window.location.reload();
+                            alert(`Success! Successfully merged ${count} bundles from your old database.`);
+                            // Explicitly trigger a re-fetch of bundles
+                            await init();
                           } catch (e: any) {
                             console.error("Migration error", e);
                             if (e.message && e.message.includes("Missing or insufficient permissions")) {
-                              alert("BLOCKED BY FIREBASE RULES! \n\nYou must allow read access to your old database.\n\n1. Go to Firebase Console > Firestore > Rules\n2. Set: allow read, write: if true;\n3. Publish\n\nI will open the page for you now.");
+                              alert("BLOCKED BY FIREBASE RULES! \n\nYou must allow read access to your old database.\n\n1. Go to Firebase Console > Firestore > Rules\n2. Set: allow read: if true;\n3. Publish\n\nI will open the rules page for you now.");
                               window.open("https://console.firebase.google.com/u/0/project/label-c61eb/firestore/rules", "_blank");
                             } else {
-                              alert("Migration failed: " + e.message);
+                              alert("Sync failed: " + e.message);
                             }
                           } finally {
                             setIsMigrating(false);
                           }
                         }
                       }}
-                      className="text-sm bg-[#024930]/5 hover:bg-[#024930]/10 text-[#024930] px-4 py-2 rounded-lg font-bold"
+                      className="bg-[#024930] text-white px-8 py-4 rounded-xl font-black uppercase tracking-widest shadow-lg hover:shadow-xl hover:-translate-y-0.5 transition-all text-sm flex items-center gap-3"
                       disabled={isMigrating}
                     >
-                      {isMigrating ? t.syncing : t.recoverData}
+                      {isMigrating ? <Loader2 className="animate-spin" /> : <DatabaseIcon size={20} />}
+                      {isMigrating ? "Syncing..." : "Recover & Merge Old Data"}
                     </button>
                     <button
                       onClick={async () => {

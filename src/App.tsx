@@ -639,11 +639,15 @@ const App: React.FC = () => {
       const matchesSearch = b.name_de.toLowerCase().includes(searchTerm.toLowerCase()) ||
         b.name_en.toLowerCase().includes(searchTerm.toLowerCase());
 
-      // Robust check for catering: either explicit type, or has metadata (common in old Firestore data)
-      const isCatering = b.type === 'catering' || !!b.company_name || !!b.date;
+      // 1. Explicit Bundle Type (Generator Tab ONLY)
+      if (b.type === 'standard' || !b.company_name) {
+        return activeTab === 'generator' && matchesSearch;
+      }
 
+      // 2. Explicit Catering/GYG Type (Catering/GYG Tabs)
+      const isCatering = b.type === 'catering' || !!b.company_name || !!b.date;
       if (activeTab === 'catering' || activeTab === 'gyg') return matchesSearch && isCatering;
-      if (activeTab === 'generator') return matchesSearch && !isCatering;
+
       return matchesSearch;
     }), [bundles, searchTerm, activeTab]);
 
@@ -762,10 +766,10 @@ const App: React.FC = () => {
             return String(row[keyProp] || '').trim();
           };
 
-          const nameDe = getValue([colMap.nameDe], 'bundle_name_de') || 'Unnamed';
+          const nameDe = getValue([colMap.nameDe, 0], 'bundle_name_de') || 'Unnamed Bundle';
           const nameEn = getValue([colMap.nameEn], 'bundle_name_en') || nameDe;
           const itemDe = getValue([colMap.itemDe], 'item_name_de');
-          if (!nameDe || !itemDe) return;
+          if (!itemDe) return;
 
           if (!bundleMap[nameDe]) {
             bundleMap[nameDe] = {
@@ -787,8 +791,14 @@ const App: React.FC = () => {
             diet_de: getValue([colMap.diet], 'diet_de')
           });
 
-          const typeVal = getValue([colMap.type], 'type').toLowerCase();
-          if (typeVal.includes('catering')) bundleMap[nameDe].type = 'catering';
+          const typeVal = getValue([colMap.type, 0], 'type').toLowerCase();
+          if (typeVal.includes('bundle')) {
+            bundleMap[nameDe].type = 'standard';
+            bundleMap[nameDe].company_name = ''; // Clear metadata for standard bundles
+            bundleMap[nameDe].date = '';
+          } else if (typeVal.includes('catering')) {
+            bundleMap[nameDe].type = 'catering';
+          }
         };
 
         if (headerRowIdx >= 0) {
@@ -1680,7 +1690,10 @@ const App: React.FC = () => {
                   <h2 className="text-3xl font-black mb-8 text-[#024930]">{t.dataManagement}</h2>
                   <div className="grid md:grid-cols-2 gap-6 mb-10 relative z-10">
                     <div onClick={() => {
-                      const template = [{ 'type': 'Standard', 'company_name': 'Acme Corp', 'date': '12.12.2025', 'bundle_name_de': 'Brunch Set', 'bundle_name_en': 'Brunch Set', 'item_name_de': 'Croissant', 'item_name_en': 'Croissant', 'allergens_de': 'Gluten, Eier', 'diet_de': 'Vegetarisch' }];
+                      const template = [
+                        { 'Type': 'Bundle', 'Bundle Name DE': 'Mix Box', 'Bundle Name EN': 'Mix Box', 'Item Name DE': 'Produckt A', 'Item Name EN': 'Product A', 'Diet': 'Vegan', 'Allergens': 'None' },
+                        { 'Type': 'Catering', 'Company': 'GYG', 'Date': '12.12.2025', 'Bundle Name DE': 'Lunch Set', 'Bundle Name EN': 'Lunch Set', 'Item Name DE': 'Meal 1', 'Item Name EN': 'Meal 1', 'Diet': 'Meat', 'Allergens': 'Gluten' }
+                      ];
                       const ws = XLSX.utils.json_to_sheet(template);
                       const wb = XLSX.utils.book_new();
                       XLSX.utils.book_append_sheet(wb, ws, "Labels");

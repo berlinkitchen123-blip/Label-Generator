@@ -734,7 +734,7 @@ const App: React.FC = () => {
         });
 
         // 2. Map Column Indices Robustly
-        let colMap = { nameDe: -1, nameEn: -1, itemDe: -1, itemEn: -1, allergens: -1, diet: -1, type: -1 };
+        let colMap = { nameDe: -1, nameEn: -1, itemDe: -1, itemEn: -1, allergens: -1, diet: -1, type: -1, company: -1, date: -1 };
         let headerRowIdx = -1;
         for (let i = 0; i < Math.min(allCells.length, 20); i++) {
           const row = allCells[i];
@@ -750,6 +750,8 @@ const App: React.FC = () => {
               else if (v.includes('allergen')) colMap.allergens = cIdx;
               else if (v.includes('diet') || v.includes('ernährung') || v.includes('veg')) colMap.diet = cIdx;
               else if (v.includes('type') || v.includes('art')) colMap.type = cIdx;
+              else if (v.includes('company_name') || v.includes('firma') || v.includes('kunde')) colMap.company = cIdx;
+              else if (v.includes('date') || v.includes('datum')) colMap.date = cIdx;
             });
             break;
           }
@@ -771,14 +773,17 @@ const App: React.FC = () => {
           const itemDe = getValue([colMap.itemDe], 'item_name_de');
           if (!itemDe) return;
 
+          const rowComp = getValue([colMap.company], 'company_name');
+          const rowDate = getValue([colMap.date], 'date');
+
           if (!bundleMap[nameDe]) {
             bundleMap[nameDe] = {
               id: generateSafeId(),
               name_de: nameDe,
               name_en: nameEn,
               items: [],
-              date: foundDate,
-              company_name: foundCompany || 'GetYourGuide',
+              date: rowDate || foundDate,
+              company_name: rowComp || foundCompany || 'GetYourGuide',
               service_type: foundService || 'LUNCH'
             };
           }
@@ -1136,7 +1141,7 @@ const App: React.FC = () => {
     return (
       <div className="w-[210mm] h-[297mm] bg-[#FEACCF] relative flex flex-col items-center justify-center p-24 text-[#024930] box-border overflow-hidden" style={{ fontFamily: "'Inter', sans-serif" }}>
         <div className="absolute top-20 text-center">
-          <h1 className="text-[80px] font-black tracking-[-0.05em] leading-none uppercase">GetYourGuide</h1>
+          <h1 className="text-[80px] font-black tracking-[-0.05em] leading-none uppercase">{companyName || 'GetYourGuide'}</h1>
         </div>
 
         <div className="text-center flex flex-col items-center gap-20">
@@ -1323,6 +1328,10 @@ const App: React.FC = () => {
               ))}
             </div>
           ))}
+          {/* Include the QR/Review page at the end of the labels as requested */}
+          <div className="w-[210mm] h-[297mm]" style={{ pageBreakAfter: 'always' }}>
+            {activeTab === 'gyg' ? <GYGRatingPage /> : <ReviewPrint size="A4" />}
+          </div>
         </>
       );
     }

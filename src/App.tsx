@@ -893,7 +893,7 @@ const App: React.FC = () => {
       if (!b) return [];
       const filteredBundle = {
         ...b,
-        items: sel.selectedItemIds ? b.items.filter(i => sel.selectedItemIds.includes(i.id)) : b.items
+        items: sel.selectedItemIds ? b.items.filter(i => sel.selectedItemIds?.includes(i.id)) : b.items
       };
       return Array(sel.quantity).fill(filteredBundle);
     });
@@ -918,7 +918,7 @@ const App: React.FC = () => {
 
         if (!services[serviceType]) services[serviceType] = [];
         const itemsToPrint = s.selectedItemIds
-          ? b.items.filter(item => s.selectedItemIds.includes(item.id))
+          ? b.items.filter(item => s.selectedItemIds?.includes(item.id))
           : b.items;
         services[serviceType].push(...itemsToPrint);
       }
@@ -1078,7 +1078,7 @@ const App: React.FC = () => {
       const b = bundles.find((x: Bundle) => x.id === s.bundleId);
       if (!b) return [];
       const itemsToPrint = s.selectedItemIds
-        ? b.items.filter(item => s.selectedItemIds.includes(item.id))
+        ? b.items.filter(item => s.selectedItemIds?.includes(item.id))
         : b.items;
       // Respect quantity: multiply items by quantity
       return Array(s.quantity).fill(b).flatMap(() => itemsToPrint);
@@ -1206,7 +1206,7 @@ const App: React.FC = () => {
       const b = bundles.find((x: Bundle) => x.id === s.bundleId);
       if (!b) return [];
       const itemsToPrint = s.selectedItemIds
-        ? b.items.filter(item => s.selectedItemIds.includes(item.id))
+        ? b.items.filter(item => s.selectedItemIds?.includes(item.id))
         : b.items;
       // Respect quantity for labels as well
       return Array(s.quantity).fill(b).flatMap(() => itemsToPrint);
@@ -1352,7 +1352,7 @@ const App: React.FC = () => {
         const b = bundles.find((x: Bundle) => x.id === sel.bundleId);
         if (!b) return [];
         const itemsToPrint = sel.selectedItemIds
-          ? b.items.filter(item => sel.selectedItemIds.includes(item.id))
+          ? b.items.filter(item => sel.selectedItemIds?.includes(item.id))
           : b.items;
         return Array(sel.quantity).fill(b).flatMap(() => itemsToPrint);
       });
@@ -1402,7 +1402,7 @@ const App: React.FC = () => {
       const b = bundles.find((x: Bundle) => x.id === sel.bundleId);
       if (!b) return [];
       const itemsToPrint = sel.selectedItemIds
-        ? b.items.filter(item => sel.selectedItemIds.includes(item.id))
+        ? b.items.filter(item => sel.selectedItemIds?.includes(item.id))
         : b.items;
       return Array(sel.quantity).fill(b).flatMap(() => itemsToPrint);
     });

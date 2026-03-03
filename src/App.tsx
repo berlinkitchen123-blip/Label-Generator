@@ -25,7 +25,9 @@ import {
   ChefHat,
   RotateCcw,
   Utensils,
-  BookOpen
+  BookOpen,
+  ChevronDown,
+  ChevronUp
 } from 'lucide-react';
 import { initializeApp, getApp, getApps, FirebaseApp } from 'firebase/app';
 import { getDatabase, ref, child, get, set, remove, update, Database } from 'firebase/database';
@@ -140,6 +142,7 @@ interface Bundle {
 interface Selection {
   bundleId: string;
   quantity: number;
+  selectedItemIds?: string[];
 }
 
 interface ImportRow {
@@ -651,11 +654,33 @@ const App: React.FC = () => {
       return matchesSearch;
     }), [bundles, searchTerm, activeTab]);
 
+  const [expandedSelections, setExpandedSelections] = useState<string[]>([]);
+  const toggleExpand = (bundleId: string) => {
+    setExpandedSelections(prev =>
+      prev.includes(bundleId) ? prev.filter(id => id !== bundleId) : [...prev, bundleId]
+    );
+  };
+  const toggleItemSelection = (bundleId: string, itemId: string, isCatering: boolean) => {
+    const set = isCatering ? setCateringSelections : setSelections;
+    set(prev => prev.map(s => {
+      if (s.bundleId !== bundleId) return s;
+      const b = bundles.find(x => x.id === bundleId);
+      if (!b) return s;
+      let current = s.selectedItemIds || b.items.map(i => i.id);
+      if (current.includes(itemId)) {
+        current = current.filter(id => id !== itemId);
+      } else {
+        current = [...current, itemId];
+      }
+      return { ...s, selectedItemIds: current.length === b.items.length ? undefined : current };
+    }));
+  };
+
   const addSelection = (bundleId: string, isCatering = false) => {
     const param = isCatering ? setCateringSelections : setSelections;
-    param(prev => {
-      const existing = prev.find(s => s.bundleId === bundleId);
-      if (existing) return prev.map(s => s.bundleId === bundleId ? { ...s, quantity: s.quantity + 1 } : s);
+    param((prev: Selection[]) => {
+      const existing = prev.find((s: Selection) => s.bundleId === bundleId);
+      if (existing) return prev.map((s: Selection) => s.bundleId === bundleId ? { ...s, quantity: s.quantity + 1 } : s);
       return [...prev, { bundleId, quantity: 1 }];
     });
 
@@ -864,8 +889,13 @@ const App: React.FC = () => {
     const targetSelections = (activeTab === 'catering' || (isPreviewing && previewType === 'menu')) ? cateringSelections : selections;
 
     const allLabels = targetSelections.flatMap(sel => {
-      const b = bundles.find(b => b.id === sel.bundleId);
-      return b ? Array(sel.quantity).fill(b) : [];
+      const b = bundles.find(bundle => bundle.id === sel.bundleId);
+      if (!b) return [];
+      const filteredBundle = {
+        ...b,
+        items: sel.selectedItemIds ? b.items.filter(i => sel.selectedItemIds.includes(i.id)) : b.items
+      };
+      return Array(sel.quantity).fill(filteredBundle);
     });
     const groups = [];
     for (let i = 0; i < allLabels.length; i += 4) groups.push(allLabels.slice(i, i + 4));
@@ -887,7 +917,10 @@ const App: React.FC = () => {
         else if (name.includes('snack') || name.includes('fingerfood')) serviceType = 'Snacks';
 
         if (!services[serviceType]) services[serviceType] = [];
-        services[serviceType].push(...b.items);
+        const itemsToPrint = s.selectedItemIds
+          ? b.items.filter(item => s.selectedItemIds.includes(item.id))
+          : b.items;
+        services[serviceType].push(...itemsToPrint);
       }
     });
 
@@ -1044,8 +1077,11 @@ const App: React.FC = () => {
     const allItems: BundleItem[] = cateringSelections.flatMap((s: Selection) => {
       const b = bundles.find((x: Bundle) => x.id === s.bundleId);
       if (!b) return [];
+      const itemsToPrint = s.selectedItemIds
+        ? b.items.filter(item => s.selectedItemIds.includes(item.id))
+        : b.items;
       // Respect quantity: multiply items by quantity
-      return Array(s.quantity).fill(b).flatMap(() => b.items);
+      return Array(s.quantity).fill(b).flatMap(() => itemsToPrint);
     }).filter(item => (item.item_name_de || item.item_name_en));
 
     // Deduplicate for Menu Summary only
@@ -1169,8 +1205,11 @@ const App: React.FC = () => {
     const allItems: BundleItem[] = cateringSelections.flatMap((s: Selection) => {
       const b = bundles.find((x: Bundle) => x.id === s.bundleId);
       if (!b) return [];
+      const itemsToPrint = s.selectedItemIds
+        ? b.items.filter(item => s.selectedItemIds.includes(item.id))
+        : b.items;
       // Respect quantity for labels as well
-      return Array(s.quantity).fill(b).flatMap(() => b.items);
+      return Array(s.quantity).fill(b).flatMap(() => itemsToPrint);
     });
 
     // Curated color palette for variety and readability
@@ -1312,7 +1351,10 @@ const App: React.FC = () => {
       const allItems = cateringSelections.flatMap((sel: Selection) => {
         const b = bundles.find((x: Bundle) => x.id === sel.bundleId);
         if (!b) return [];
-        return Array(sel.quantity).fill(b).flatMap(() => b.items);
+        const itemsToPrint = sel.selectedItemIds
+          ? b.items.filter(item => sel.selectedItemIds.includes(item.id))
+          : b.items;
+        return Array(sel.quantity).fill(b).flatMap(() => itemsToPrint);
       });
       const pages = [];
       for (let i = 0; i < allItems.length; i += 4) pages.push(allItems.slice(i, i + 4));
@@ -1359,7 +1401,10 @@ const App: React.FC = () => {
     const allItems = selections.flatMap((sel: Selection) => {
       const b = bundles.find((x: Bundle) => x.id === sel.bundleId);
       if (!b) return [];
-      return Array(sel.quantity).fill(b).flatMap(() => b.items);
+      const itemsToPrint = sel.selectedItemIds
+        ? b.items.filter(item => sel.selectedItemIds.includes(item.id))
+        : b.items;
+      return Array(sel.quantity).fill(b).flatMap(() => itemsToPrint);
     });
 
     const pages = [];
@@ -1479,11 +1524,37 @@ const App: React.FC = () => {
                       {selections.map(sel => {
                         const b = bundles.find(x => x.id === sel.bundleId);
                         if (!b) return null;
+                        const isExpanded = expandedSelections.includes(sel.bundleId);
                         return (
-                          <div key={sel.bundleId} className="flex items-center gap-4 bg-[#F8F7F6] rounded-xl p-4 border border-[#F8F7F6] hover:border-[#FEACCF]/50 transition-colors">
-                            <div className="flex-1"><p className="font-bold text-[#024930]">{lang === 'de' ? b.name_de : b.name_en}</p></div>
-                            <input type="number" min="1" value={sel.quantity} onChange={(e) => setSelections(prev => prev.map(s => s.bundleId === sel.bundleId ? { ...s, quantity: parseInt(e.target.value) || 1 } : s))} className="w-16 bg-white rounded-lg p-2 text-center text-[#024930] font-black border-none shadow-sm focus:ring-2 focus:ring-[#FEACCF]" />
-                            <button onClick={() => setSelections(prev => prev.filter(s => s.bundleId !== sel.bundleId))} className="text-[#024930]/20 hover:text-red-400 px-2"><X size={20} /></button>
+                          <div key={sel.bundleId} className="flex flex-col bg-[#F8F7F6] rounded-xl border border-[#F8F7F6] hover:border-[#FEACCF]/50 transition-all overflow-hidden">
+                            <div className="flex items-center gap-4 p-4">
+                              <button onClick={() => toggleExpand(sel.bundleId)} className="text-[#024930]/40 hover:text-[#024930]">
+                                {isExpanded ? <ChevronUp size={20} /> : <ChevronDown size={20} />}
+                              </button>
+                              <div className="flex-1 cursor-pointer" onClick={() => toggleExpand(sel.bundleId)}>
+                                <p className="font-bold text-[#024930]">{lang === 'de' ? b.name_de : b.name_en}</p>
+                                <p className="text-[10px] font-black text-[#024930]/40 uppercase tracking-widest">{sel.selectedItemIds ? sel.selectedItemIds.length : b.items.length} of {b.items.length} items</p>
+                              </div>
+                              <input type="number" min="1" value={sel.quantity} onChange={(e) => setSelections(prev => prev.map(s => s.bundleId === sel.bundleId ? { ...s, quantity: parseInt(e.target.value) || 1 } : s))} className="w-16 bg-white rounded-lg p-2 text-center text-[#024930] font-black border-none shadow-sm focus:ring-2 focus:ring-[#FEACCF]" />
+                              <button onClick={() => setSelections(prev => prev.filter(s => s.bundleId !== sel.bundleId))} className="text-[#024930]/20 hover:text-red-400 px-2"><X size={20} /></button>
+                            </div>
+                            {isExpanded && (
+                              <div className="bg-white/50 p-4 pt-0 space-y-2 border-t border-[#024930]/5 max-h-48 overflow-y-auto">
+                                {b.items.map(item => (
+                                  <label key={item.id} className="flex items-center gap-3 cursor-pointer group p-1 hover:bg-[#FEACCF]/10 rounded-lg transition-colors">
+                                    <input
+                                      type="checkbox"
+                                      checked={!sel.selectedItemIds || sel.selectedItemIds.includes(item.id)}
+                                      onChange={() => toggleItemSelection(sel.bundleId, item.id, false)}
+                                      className="rounded text-[#024930] focus:ring-[#FEACCF]"
+                                    />
+                                    <span className="text-[11px] font-bold text-[#024930]/70 group-hover:text-[#024930]">
+                                      {lang === 'de' ? item.item_name_de : item.item_name_en}
+                                    </span>
+                                  </label>
+                                ))}
+                              </div>
+                            )}
                           </div>
                         );
                       })}
@@ -1557,14 +1628,37 @@ const App: React.FC = () => {
                       {cateringSelections.map(sel => {
                         const b = bundles.find(x => x.id === sel.bundleId);
                         if (!b) return null;
+                        const isExpanded = expandedSelections.includes(sel.bundleId);
                         return (
-                          <div key={sel.bundleId} className="flex items-center gap-4 bg-[#F8F7F6] rounded-xl p-4 border border-[#F8F7F6] hover:border-[#FEACCF]/50 transition-colors">
-                            <div className="flex-1">
-                              <p className="font-bold text-[#024930]">{lang === 'de' ? b.name_de : b.name_en}</p>
-                              <p className="text-[10px] text-[#024930]/50 uppercase font-black tracking-wider">{b.items.length} item{b.items.length !== 1 ? 's' : ''}</p>
+                          <div key={sel.bundleId} className="flex flex-col bg-[#F8F7F6] rounded-xl border border-[#F8F7F6] hover:border-[#FEACCF]/50 transition-all overflow-hidden">
+                            <div className="flex items-center gap-4 p-4">
+                              <button onClick={() => toggleExpand(sel.bundleId)} className="text-[#024930]/40 hover:text-[#024930]">
+                                {isExpanded ? <ChevronUp size={20} /> : <ChevronDown size={20} />}
+                              </button>
+                              <div className="flex-1 cursor-pointer" onClick={() => toggleExpand(sel.bundleId)}>
+                                <p className="font-bold text-[#024930]">{lang === 'de' ? b.name_de : b.name_en}</p>
+                                <p className="text-[10px] text-[#024930]/50 uppercase font-black tracking-wider">{sel.selectedItemIds ? sel.selectedItemIds.length : b.items.length} of {b.items.length} items</p>
+                              </div>
+                              <input type="number" min="1" value={sel.quantity} onChange={(e) => setCateringSelections(prev => prev.map(s => s.bundleId === sel.bundleId ? { ...s, quantity: parseInt(e.target.value) || 1 } : s))} className="w-16 bg-white rounded-lg p-2 text-center text-[#024930] font-black border-none shadow-sm focus:ring-2 focus:ring-[#FEACCF]" />
+                              <button onClick={() => setCateringSelections(prev => prev.filter(s => s.bundleId !== sel.bundleId))} className="text-[#024930]/20 hover:text-red-400 px-2"><X size={20} /></button>
                             </div>
-                            <input type="number" min="1" value={sel.quantity} onChange={(e) => setCateringSelections(prev => prev.map(s => s.bundleId === sel.bundleId ? { ...s, quantity: parseInt(e.target.value) || 1 } : s))} className="w-16 bg-white rounded-lg p-2 text-center text-[#024930] font-black border-none shadow-sm focus:ring-2 focus:ring-[#FEACCF]" />
-                            <button onClick={() => setCateringSelections(prev => prev.filter(s => s.bundleId !== sel.bundleId))} className="text-[#024930]/20 hover:text-red-400 px-2"><X size={20} /></button>
+                            {isExpanded && (
+                              <div className="bg-white/50 p-4 pt-0 space-y-2 border-t border-[#024930]/5 max-h-48 overflow-y-auto">
+                                {b.items.map(item => (
+                                  <label key={item.id} className="flex items-center gap-3 cursor-pointer group p-1 hover:bg-[#FEACCF]/10 rounded-lg transition-colors">
+                                    <input
+                                      type="checkbox"
+                                      checked={!sel.selectedItemIds || sel.selectedItemIds.includes(item.id)}
+                                      onChange={() => toggleItemSelection(sel.bundleId, item.id, true)}
+                                      className="rounded text-[#024930] focus:ring-[#FEACCF]"
+                                    />
+                                    <span className="text-[11px] font-bold text-[#024930]/70 group-hover:text-[#024930]">
+                                      {lang === 'de' ? item.item_name_de : item.item_name_en}
+                                    </span>
+                                  </label>
+                                ))}
+                              </div>
+                            )}
                           </div>
                         );
                       })}
@@ -1646,11 +1740,37 @@ const App: React.FC = () => {
                       {cateringSelections.map(sel => {
                         const b = bundles.find(x => x.id === sel.bundleId);
                         if (!b) return null;
+                        const isExpanded = expandedSelections.includes(sel.bundleId);
                         return (
-                          <div key={sel.bundleId} className="flex items-center gap-4 bg-[#F8F7F6] rounded-xl p-4 border border-[#F8F7F6]">
-                            <div className="flex-1 text-[#024930] font-bold">{lang === 'de' ? b.name_de : b.name_en}</div>
-                            <input type="number" min="1" value={sel.quantity} onChange={(e) => setCateringSelections(prev => prev.map(s => s.bundleId === sel.bundleId ? { ...s, quantity: parseInt(e.target.value) || 1 } : s))} className="w-16 bg-white rounded-lg p-2 text-center text-[#024930] font-black border-none shadow-sm" />
-                            <button onClick={() => setCateringSelections(prev => prev.filter(s => s.bundleId !== sel.bundleId))} className="text-[#024930]/20 hover:text-red-400"><X size={20} /></button>
+                          <div key={sel.bundleId} className="flex flex-col bg-[#F8F7F6] rounded-xl border border-[#F8F7F6] hover:border-[#FEACCF]/50 transition-all overflow-hidden">
+                            <div className="flex items-center gap-4 p-4">
+                              <button onClick={() => toggleExpand(sel.bundleId)} className="text-[#024930]/40 hover:text-[#024930]">
+                                {isExpanded ? <ChevronUp size={20} /> : <ChevronDown size={20} />}
+                              </button>
+                              <div className="flex-1 cursor-pointer" onClick={() => toggleExpand(sel.bundleId)}>
+                                <p className="font-bold text-[#024930]">{lang === 'de' ? b.name_de : b.name_en}</p>
+                                <p className="text-[10px] text-[#024930]/50 uppercase font-black tracking-wider">{sel.selectedItemIds ? sel.selectedItemIds.length : b.items.length} of {b.items.length} items</p>
+                              </div>
+                              <input type="number" min="1" value={sel.quantity} onChange={(e) => setCateringSelections(prev => prev.map(s => s.bundleId === sel.bundleId ? { ...s, quantity: parseInt(e.target.value) || 1 } : s))} className="w-16 bg-white rounded-lg p-2 text-center text-[#024930] font-black border-none shadow-sm focus:ring-2 focus:ring-[#FEACCF]" />
+                              <button onClick={() => setCateringSelections(prev => prev.filter(s => s.bundleId !== sel.bundleId))} className="text-[#024930]/20 hover:text-red-400 px-2"><X size={20} /></button>
+                            </div>
+                            {isExpanded && (
+                              <div className="bg-white/50 p-4 pt-0 space-y-2 border-t border-[#024930]/5 max-h-48 overflow-y-auto">
+                                {b.items.map(item => (
+                                  <label key={item.id} className="flex items-center gap-3 cursor-pointer group p-1 hover:bg-[#FEACCF]/10 rounded-lg transition-colors">
+                                    <input
+                                      type="checkbox"
+                                      checked={!sel.selectedItemIds || sel.selectedItemIds.includes(item.id)}
+                                      onChange={() => toggleItemSelection(sel.bundleId, item.id, true)}
+                                      className="rounded text-[#024930] focus:ring-[#FEACCF]"
+                                    />
+                                    <span className="text-[11px] font-bold text-[#024930]/70 group-hover:text-[#024930]">
+                                      {lang === 'de' ? item.item_name_de : item.item_name_en}
+                                    </span>
+                                  </label>
+                                ))}
+                              </div>
+                            )}
                           </div>
                         );
                       })}

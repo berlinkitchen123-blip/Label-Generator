@@ -637,22 +637,37 @@ const App: React.FC = () => {
     localStorage.setItem('bb_catering_session', JSON.stringify(session));
   }, [cateringSelections, companyName, cateringDate, serviceType, activeTab]);
 
-  const filteredBundles = useMemo(() =>
-    bundles.filter(b => {
-      const matchesSearch = b.name_de.toLowerCase().includes(searchTerm.toLowerCase()) ||
-        b.name_en.toLowerCase().includes(searchTerm.toLowerCase());
+  const [expandedAvailable, setExpandedAvailable] = useState<string[]>([]);
+  const toggleAvailableExpand = (bundleId: string) => {
+    setExpandedAvailable(prev =>
+      prev.includes(bundleId) ? prev.filter(id => id !== bundleId) : [...prev, bundleId]
+    );
+  };
 
-      // 1. Explicit Bundle Type (Generator Tab ONLY)
+  const filteredBundles = useMemo(() => {
+    const s = searchTerm.toLowerCase();
+    return bundles.filter(b => {
+      // 1. Check Bundle Name
+      const nameMatches = b.name_de.toLowerCase().includes(s) || b.name_en.toLowerCase().includes(s);
+
+      // 2. Deep Search across ITEMS
+      const itemMatches = b.items.some(i =>
+        i.item_name_de.toLowerCase().includes(s) || i.item_name_en.toLowerCase().includes(s)
+      );
+
+      const matchesSearch = nameMatches || itemMatches;
+
+      // 3. Tab-specific filtering
       if (b.type === 'standard' || !b.company_name) {
         return activeTab === 'generator' && matchesSearch;
       }
 
-      // 2. Explicit Catering/GYG Type (Catering/GYG Tabs)
       const isCatering = b.type === 'catering' || !!b.company_name || !!b.date;
       if (activeTab === 'catering' || activeTab === 'gyg') return matchesSearch && isCatering;
 
       return matchesSearch;
-    }), [bundles, searchTerm, activeTab]);
+    });
+  }, [bundles, searchTerm, activeTab]);
 
   const [expandedSelections, setExpandedSelections] = useState<string[]>([]);
   const toggleExpand = (bundleId: string) => {
@@ -1495,20 +1510,42 @@ const App: React.FC = () => {
                     <input type="text" placeholder={t.searchPlaceholder} value={searchTerm} onChange={(e) => setSearchTerm(e.target.value)} className="w-full bg-white rounded-2xl pl-14 pr-6 py-4 text-sm text-[#024930] border-none focus:ring-2 focus:ring-[#FEACCF] shadow-xl placeholder:text-[#024930]/20" />
                   </div>
                   <div className="space-y-4 max-h-[60vh] overflow-y-auto pr-3">
-                    {filteredBundles.map(bundle => (
-                      <div key={bundle.id} onClick={() => addSelection(bundle.id)} className="bg-white rounded-2xl p-5 flex items-center justify-between cursor-pointer group hover:ring-2 hover:ring-[#FEACCF] transition-all shadow-sm hover:shadow-lg">
-                        <div className="flex items-center gap-4">
-                          <div className="w-10 h-10 rounded-full bg-[#F8F7F6] flex items-center justify-center group-hover:bg-[#FEACCF] transition-colors">
-                            <Soup size={20} className="text-[#024930]" />
+                    {filteredBundles.map(bundle => {
+                      const isExp = expandedAvailable.includes(bundle.id);
+                      return (
+                        <div key={bundle.id} className="flex flex-col bg-white rounded-2xl shadow-sm hover:shadow-lg transition-all overflow-hidden border border-transparent hover:border-[#FEACCF]/30">
+                          <div className="p-5 flex items-center justify-between cursor-pointer group" onClick={() => toggleAvailableExpand(bundle.id)}>
+                            <div className="flex items-center gap-4">
+                              <div className="w-10 h-10 rounded-full bg-[#F8F7F6] flex items-center justify-center group-hover:bg-[#FEACCF] transition-colors">
+                                {isExp ? <ChevronUp size={20} className="text-[#024930]" /> : <Soup size={20} className="text-[#024930]" />}
+                              </div>
+                              <div>
+                                <p className="font-black text-[#024930] text-sm">{lang === 'de' ? bundle.name_de : bundle.name_en}</p>
+                                <p className="text-[10px] font-bold text-[#024930]/40 uppercase tracking-wider">{bundle.items.length} item{bundle.items.length !== 1 ? 's' : ''}</p>
+                              </div>
+                            </div>
+                            <button
+                              onClick={(e) => { e.stopPropagation(); addSelection(bundle.id); }}
+                              className="w-10 h-10 rounded-xl bg-[#024930]/5 text-[#024930] hover:bg-[#024930] hover:text-white transition-all flex items-center justify-center shadow-sm"
+                            >
+                              <Plus size={20} />
+                            </button>
                           </div>
-                          <div>
-                            <p className="font-black text-[#024930] text-sm">{lang === 'de' ? bundle.name_de : bundle.name_en}</p>
-                            <p className="text-[10px] font-bold text-[#024930]/40 uppercase tracking-wider">{bundle.items.length} item{bundle.items.length !== 1 ? 's' : ''}</p>
-                          </div>
+                          {isExp && (
+                            <div className="bg-[#F8F7F6]/50 p-4 pt-0 space-y-2 max-h-40 overflow-y-auto border-t border-[#024930]/5">
+                              {bundle.items.map(item => {
+                                const isMatch = searchTerm && (item.item_name_de.toLowerCase().includes(searchTerm.toLowerCase()) || item.item_name_en.toLowerCase().includes(searchTerm.toLowerCase()));
+                                return (
+                                  <div key={item.id} className={`text-[11px] py-1 px-2 rounded font-bold ${isMatch ? 'bg-[#FEACCF]/40 text-[#024930]' : 'text-[#024930]/60'}`}>
+                                    {lang === 'de' ? item.item_name_de : item.item_name_en}
+                                  </div>
+                                );
+                              })}
+                            </div>
+                          )}
                         </div>
-                        <Plus size={20} className="text-[#024930]/20 group-hover:text-[#024930]" />
-                      </div>
-                    ))}
+                      );
+                    })}
                   </div>
                 </div>
                 <div className="xl:col-span-7">
@@ -1594,19 +1631,42 @@ const App: React.FC = () => {
                   </div>
 
                   <div className="space-y-4 max-h-[50vh] overflow-y-auto pr-3">
-                    {filteredBundles.map(bundle => (
-                      <div key={bundle.id} onClick={() => addSelection(bundle.id, true)} className="bg-white rounded-2xl p-5 flex items-center justify-between cursor-pointer group hover:ring-2 hover:ring-[#FEACCF] transition-all shadow-sm hover:shadow-lg">
-                        <div className="flex items-center gap-4">
-                          <div className="w-10 h-10 rounded-full bg-[#F8F7F6] flex items-center justify-center group-hover:bg-[#FEACCF] transition-colors">
-                            <Utensils size={20} className="text-[#024930]" />
+                    {filteredBundles.map(bundle => {
+                      const isExp = expandedAvailable.includes(bundle.id);
+                      return (
+                        <div key={bundle.id} className="flex flex-col bg-white rounded-2xl shadow-sm hover:shadow-lg transition-all overflow-hidden border border-transparent hover:border-[#FEACCF]/30">
+                          <div className="p-5 flex items-center justify-between cursor-pointer group" onClick={() => toggleAvailableExpand(bundle.id)}>
+                            <div className="flex items-center gap-4">
+                              <div className="w-10 h-10 rounded-full bg-[#F8F7F6] flex items-center justify-center group-hover:bg-[#FEACCF] transition-colors">
+                                {isExp ? <ChevronUp size={20} className="text-[#024930]" /> : <Utensils size={20} className="text-[#024930]" />}
+                              </div>
+                              <div>
+                                <p className="font-black text-[#024930] text-sm">{lang === 'de' ? bundle.name_de : bundle.name_en}</p>
+                                <p className="text-[10px] text-[#024930]/50 uppercase font-black tracking-wider">{bundle.company_name || 'Catering Bundle'} • {bundle.date || 'No Date'}</p>
+                              </div>
+                            </div>
+                            <button
+                              onClick={(e) => { e.stopPropagation(); addSelection(bundle.id, true); }}
+                              className="w-10 h-10 rounded-xl bg-[#024930]/5 text-[#024930] hover:bg-[#024930] hover:text-white transition-all flex items-center justify-center shadow-sm"
+                            >
+                              <Plus size={20} />
+                            </button>
                           </div>
-                          <div>
-                            <p className="font-black text-[#024930] text-sm">{lang === 'de' ? bundle.name_de : bundle.name_en}</p>
-                          </div>
+                          {isExp && (
+                            <div className="bg-[#F8F7F6]/50 p-4 pt-0 space-y-2 max-h-40 overflow-y-auto border-t border-[#024930]/5">
+                              {bundle.items.map(item => {
+                                const isMatch = searchTerm && (item.item_name_de.toLowerCase().includes(searchTerm.toLowerCase()) || item.item_name_en.toLowerCase().includes(searchTerm.toLowerCase()));
+                                return (
+                                  <div key={item.id} className={`text-[11px] py-1 px-2 rounded font-bold ${isMatch ? 'bg-[#FEACCF]/40 text-[#024930]' : 'text-[#024930]/60'}`}>
+                                    {lang === 'de' ? item.item_name_de : item.item_name_en}
+                                  </div>
+                                );
+                              })}
+                            </div>
+                          )}
                         </div>
-                        <Plus size={20} className="text-[#024930]/20 group-hover:text-[#024930]" />
-                      </div>
-                    ))}
+                      );
+                    })}
                   </div>
                 </div>
 
@@ -1710,19 +1770,42 @@ const App: React.FC = () => {
                     <input type="text" placeholder="Search GYG items..." value={searchTerm} onChange={(e) => setSearchTerm(e.target.value)} className="w-full bg-white rounded-2xl pl-14 pr-6 py-4 text-sm text-[#024930] border-none focus:ring-2 focus:ring-[#FEACCF] shadow-xl placeholder:text-[#024930]/20" />
                   </div>
                   <div className="space-y-4 max-h-[50vh] overflow-y-auto pr-3">
-                    {filteredBundles.map(bundle => (
-                      <div key={bundle.id} onClick={() => addSelection(bundle.id, true)} className="bg-white rounded-2xl p-5 flex items-center justify-between cursor-pointer group hover:ring-2 hover:ring-[#FEACCF] transition-all shadow-sm hover:shadow-lg">
-                        <div className="flex items-center gap-4">
-                          <div className="w-10 h-10 rounded-full bg-[#F8F7F6] flex items-center justify-center group-hover:bg-[#FEACCF] transition-colors">
-                            <Utensils size={20} className="text-[#024930]" />
+                    {filteredBundles.map(bundle => {
+                      const isExp = expandedAvailable.includes(bundle.id);
+                      return (
+                        <div key={bundle.id} className="flex flex-col bg-white rounded-2xl shadow-sm hover:shadow-lg transition-all overflow-hidden border border-transparent hover:border-[#FEACCF]/30">
+                          <div className="p-5 flex items-center justify-between cursor-pointer group" onClick={() => toggleAvailableExpand(bundle.id)}>
+                            <div className="flex items-center gap-4">
+                              <div className="w-10 h-10 rounded-full bg-[#F8F7F6] flex items-center justify-center group-hover:bg-[#FEACCF] transition-colors">
+                                {isExp ? <ChevronUp size={20} className="text-[#024930]" /> : <Utensils size={20} className="text-[#024930]" />}
+                              </div>
+                              <div>
+                                <p className="font-black text-[#024930] text-sm">{lang === 'de' ? bundle.name_de : bundle.name_en}</p>
+                                <p className="text-[10px] font-bold text-[#024930]/40 uppercase tracking-widest">{bundle.items.length} dishes</p>
+                              </div>
+                            </div>
+                            <button
+                              onClick={(e) => { e.stopPropagation(); addSelection(bundle.id, true); }}
+                              className="w-10 h-10 rounded-xl bg-[#024930]/5 text-[#024930] hover:bg-[#024930] hover:text-white transition-all flex items-center justify-center shadow-sm"
+                            >
+                              <Plus size={20} />
+                            </button>
                           </div>
-                          <div>
-                            <p className="font-black text-[#024930] text-sm">{lang === 'de' ? bundle.name_de : bundle.name_en}</p>
-                          </div>
+                          {isExp && (
+                            <div className="bg-[#F8F7F6]/50 p-4 pt-0 space-y-2 max-h-40 overflow-y-auto border-t border-[#024930]/5">
+                              {bundle.items.map(item => {
+                                const isMatch = searchTerm && (item.item_name_de.toLowerCase().includes(searchTerm.toLowerCase()) || item.item_name_en.toLowerCase().includes(searchTerm.toLowerCase()));
+                                return (
+                                  <div key={item.id} className={`text-[11px] py-1 px-2 rounded font-bold ${isMatch ? 'bg-[#FEACCF]/40 text-[#024930]' : 'text-[#024930]/60'}`}>
+                                    {lang === 'de' ? item.item_name_de : item.item_name_en}
+                                  </div>
+                                );
+                              })}
+                            </div>
+                          )}
                         </div>
-                        <Plus size={20} className="text-[#024930]/20 group-hover:text-[#024930]" />
-                      </div>
-                    ))}
+                      );
+                    })}
                   </div>
                 </div>
 

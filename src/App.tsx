@@ -125,6 +125,7 @@ interface BundleItem {
   item_name_en: string;
   allergens_de: string;
   diet_de: string;
+  category?: string;
 }
 
 interface Bundle {
@@ -152,6 +153,7 @@ interface ImportRow {
   item_name_en?: string;
   allergens_de?: string;
   diet_de?: string;
+  category?: string;
   service?: string;
   type?: string;
   meal?: string;
@@ -650,9 +652,11 @@ const App: React.FC = () => {
       // 1. Check Bundle Name
       const nameMatches = b.name_de.toLowerCase().includes(s) || b.name_en.toLowerCase().includes(s);
 
-      // 2. Deep Search across ITEMS
+      // 2. Deep Search across ITEMS (including category)
       const itemMatches = b.items.some(i =>
-        i.item_name_de.toLowerCase().includes(s) || i.item_name_en.toLowerCase().includes(s)
+        i.item_name_de.toLowerCase().includes(s) ||
+        i.item_name_en.toLowerCase().includes(s) ||
+        (i.category && i.category.toLowerCase().includes(s))
       );
 
       const matchesSearch = nameMatches || itemMatches;
@@ -774,7 +778,7 @@ const App: React.FC = () => {
         });
 
         // 2. Map Column Indices Robustly
-        let colMap = { nameDe: -1, nameEn: -1, itemDe: -1, itemEn: -1, allergens: -1, diet: -1, type: -1, company: -1, date: -1 };
+        let colMap = { nameDe: -1, nameEn: -1, itemDe: -1, itemEn: -1, allergens: -1, diet: -1, type: -1, company: -1, date: -1, category: -1 };
         let headerRowIdx = -1;
         for (let i = 0; i < Math.min(allCells.length, 20); i++) {
           const row = allCells[i];
@@ -792,6 +796,7 @@ const App: React.FC = () => {
               else if (v.includes('type') || v.includes('art')) colMap.type = cIdx;
               else if (v.includes('company_name') || v.includes('firma') || v.includes('kunde')) colMap.company = cIdx;
               else if (v.includes('date') || v.includes('datum')) colMap.date = cIdx;
+              else if (v.includes('category') || v.includes('kategorie')) colMap.category = cIdx;
             });
             break;
           }
@@ -833,7 +838,8 @@ const App: React.FC = () => {
             item_name_de: itemDe,
             item_name_en: getValue([colMap.itemEn], 'item_name_en') || itemDe,
             allergens_de: getValue([colMap.allergens], 'allergens_de'),
-            diet_de: getValue([colMap.diet], 'diet_de')
+            diet_de: getValue([colMap.diet], 'diet_de'),
+            category: getValue([colMap.category], 'category')
           });
 
           const typeVal = getValue([colMap.type, 0], 'type').toLowerCase();
@@ -1105,18 +1111,31 @@ const App: React.FC = () => {
 
     const categories: Record<string, BundleItem[]> = {
       'MAIN DISHES': [],
+      'SUPPLEMENT': [],
       'SIDE': [],
       'DESSERTS': []
     };
 
     menuItems.forEach(item => {
-      const name = (item.item_name_de + ' ' + item.item_name_en).toLowerCase();
-      if (name.includes('baklava') || name.includes('fruit') || name.includes('dessert') || name.includes('cake') || name.includes('pudding')) {
-        categories['DESSERTS'].push(item);
-      } else if (name.includes('salad') || name.includes('farro') || name.includes('side') || name.includes('rice') || name.includes('pita') || name.includes('couscous')) {
-        categories['SIDE'].push(item);
-      } else {
+      const explicitCat = (item.category || '').toUpperCase();
+      if (explicitCat.includes('MAIN')) {
         categories['MAIN DISHES'].push(item);
+      } else if (explicitCat.includes('SUPPLEMENT')) {
+        categories['SUPPLEMENT'].push(item);
+      } else if (explicitCat.includes('SIDE')) {
+        categories['SIDE'].push(item);
+      } else if (explicitCat.includes('DESSERT')) {
+        categories['DESSERTS'].push(item);
+      } else {
+        // Fallback to keyword search
+        const name = (item.item_name_de + ' ' + item.item_name_en).toLowerCase();
+        if (name.includes('baklava') || name.includes('fruit') || name.includes('dessert') || name.includes('cake') || name.includes('pudding')) {
+          categories['DESSERTS'].push(item);
+        } else if (name.includes('salad') || name.includes('farro') || name.includes('side') || name.includes('rice') || name.includes('pita') || name.includes('couscous')) {
+          categories['SIDE'].push(item);
+        } else {
+          categories['MAIN DISHES'].push(item);
+        }
       }
     });
 
@@ -1257,7 +1276,7 @@ const App: React.FC = () => {
               <div className="absolute top-24 w-full px-20">
                 <div className="border-t-[4px] border-b-[4px] py-8" style={{ borderColor: textColor }}>
                   <h2 className="text-5xl font-black text-center tracking-[0.3em] uppercase">
-                    {dietDisplay.includes('MEAT') ? 'MEAT MAIN' : (dietDisplay.includes('VEGAN') ? 'VEGAN' : dietDisplay)}
+                    {item.category ? item.category.toUpperCase() : (dietDisplay.includes('MEAT') ? 'MEAT MAIN' : (dietDisplay.includes('VEGAN') ? 'VEGAN' : dietDisplay))}
                   </h2>
                 </div>
               </div>
@@ -1585,8 +1604,9 @@ const App: React.FC = () => {
                                       onChange={() => toggleItemSelection(sel.bundleId, item.id, false)}
                                       className="rounded text-[#024930] focus:ring-[#FEACCF]"
                                     />
-                                    <span className="text-[11px] font-bold text-[#024930]/70 group-hover:text-[#024930]">
-                                      {lang === 'de' ? item.item_name_de : item.item_name_en}
+                                    <span className="text-[11px] font-bold text-[#024930]/70 group-hover:text-[#024930] flex-1 flex justify-between items-center">
+                                      <span>{lang === 'de' ? item.item_name_de : item.item_name_en}</span>
+                                      {item.category && <span className="text-[9px] opacity-40 uppercase font-black">{item.category}</span>}
                                     </span>
                                   </label>
                                 ))}
@@ -1712,8 +1732,9 @@ const App: React.FC = () => {
                                       onChange={() => toggleItemSelection(sel.bundleId, item.id, true)}
                                       className="rounded text-[#024930] focus:ring-[#FEACCF]"
                                     />
-                                    <span className="text-[11px] font-bold text-[#024930]/70 group-hover:text-[#024930]">
-                                      {lang === 'de' ? item.item_name_de : item.item_name_en}
+                                    <span className="text-[11px] font-bold text-[#024930]/70 group-hover:text-[#024930] flex-1 flex justify-between items-center">
+                                      <span>{lang === 'de' ? item.item_name_de : item.item_name_en}</span>
+                                      {item.category && <span className="text-[9px] opacity-40 uppercase font-black">{item.category}</span>}
                                     </span>
                                   </label>
                                 ))}
@@ -1847,8 +1868,9 @@ const App: React.FC = () => {
                                       onChange={() => toggleItemSelection(sel.bundleId, item.id, true)}
                                       className="rounded text-[#024930] focus:ring-[#FEACCF]"
                                     />
-                                    <span className="text-[11px] font-bold text-[#024930]/70 group-hover:text-[#024930]">
-                                      {lang === 'de' ? item.item_name_de : item.item_name_en}
+                                    <span className="text-[11px] font-bold text-[#024930]/70 group-hover:text-[#024930] flex-1 flex justify-between items-center">
+                                      <span>{lang === 'de' ? item.item_name_de : item.item_name_en}</span>
+                                      {item.category && <span className="text-[9px] opacity-40 uppercase font-black">{item.category}</span>}
                                     </span>
                                   </label>
                                 ))}

@@ -1219,11 +1219,12 @@ const App: React.FC = () => {
             RATE YOUR {service}<br />WITH US
           </h2>
 
-          <div className="bg-white p-12 rounded-sm shadow-[0_20px_50px_rgba(0,0,0,0.1)]">
+          <div className="p-0">
             <img
-              src={`https://api.qrserver.com/v1/create-qr-code/?size=400x400&data=https://bellabona.com/feedback&bgcolor=ffffff&color=024930`}
-              alt="Feedback QR"
-              className="w-72 h-72"
+              src="./review_qr.png"
+              alt="Review QR"
+              className="w-80 h-80"
+              style={{ mixBlendMode: 'normal' }}
             />
           </div>
         </div>

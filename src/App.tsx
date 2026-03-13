@@ -1221,7 +1221,7 @@ const App: React.FC = () => {
 
           <div className="p-0">
             <img
-              src="./review_qr.png"
+              src={service === 'BRUNCH' ? "./gyg_brunch_qr.png" : "./review_qr.png"}
               alt="Review QR"
               className="w-80 h-80"
               style={{ mixBlendMode: 'normal' }}

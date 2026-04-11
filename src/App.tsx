@@ -588,7 +588,6 @@ const App: React.FC = () => {
   const [deletedBundles, setDeletedBundles] = useState<Bundle[]>([]);
   const [selections, setSelections] = useState<Selection[]>([]);
 
-  // Catering State
   const [cateringSelections, setCateringSelections] = useState<Selection[]>([]);
   const [companyName, setCompanyName] = useState('');
   const [cateringDate, setCateringDate] = useState(new Date().toLocaleDateString('de-DE'));
@@ -602,33 +601,39 @@ const App: React.FC = () => {
   const [isPreviewing, setIsPreviewing] = useState(false);
   const [previewType, setPreviewType] = useState<'labels' | 'menu' | 'review-a4' | 'review-a6' | 'explode-a6'>('labels'); 
   
-  // Smart GYG State
-  const [selectedGygDate, setSelectedGygDate] = useState(new Date().toLocaleDateString('de-DE'));
+  // Smart GYG Mealtime State
   const [selectedGygMealtime, setSelectedGygMealtime] = useState(() => {
     const hours = new Date().getHours();
     return hours < 11 ? 'BRUNCH' : 'LUNCH';
   });
 
-  // Auto-load GYG Menu Effect
+  // Auto-load Daily Menu Effect (Universal)
   useEffect(() => {
-    if (activeTab === 'gyg') {
-      const match = bundles.find((b: Bundle) => 
-        (b.company_name?.toLowerCase().includes('gyg') || b.company_name?.toLowerCase().includes('getyourguide')) &&
-        b.date === selectedGygDate &&
-        b.service_type === selectedGygMealtime
-      );
+    if (activeTab === 'gyg' || activeTab === 'catering') {
+      const isGYG = activeTab === 'gyg';
       
-      if (match) {
-        setCateringSelections([{ bundleId: match.id, quantity: 1, selectedItemIds: match.items.map((i: BundleItem) => i.id) }]);
-        setCompanyName(match.company_name || 'GetYourGuide');
-        setCateringDate(match.date || selectedGygDate);
-        setServiceType(match.service_type || selectedGygMealtime);
+      const dayMatches = bundles.filter((b: Bundle) => {
+        const isCurrentDate = b.date === cateringDate;
+        const belongsToStore = isGYG 
+          ? (b.company_name?.toLowerCase().includes('gyg') || b.company_name?.toLowerCase().includes('getyourguide'))
+          : !(b.company_name?.toLowerCase().includes('gyg') || b.company_name?.toLowerCase().includes('getyourguide'));
+        
+        // For GYG, also match mealtime
+        const mealMatch = isGYG ? b.service_type === selectedGygMealtime : true;
+        
+        return isCurrentDate && belongsToStore && mealMatch;
+      });
+      
+      if (dayMatches.length > 0) {
+        const newSelections = dayMatches.map((m: Bundle) => ({ bundleId: m.id, quantity: 1, selectedItemIds: m.items.map((i: BundleItem) => i.id) }));
+        setCateringSelections(newSelections);
+        if (dayMatches[0].company_name) setCompanyName(dayMatches[0].company_name);
+        if (dayMatches[0].service_type && isGYG) setServiceType(dayMatches[0].service_type);
       } else {
-        // If no match found, we don't necessarily want to clear if the user is building it
-        // but for "Smart Management" we might want to inform the user
+        setCateringSelections([]); // Clear if no matches for that date
       }
     }
-  }, [activeTab, selectedGygDate, selectedGygMealtime, bundles]);
+  }, [activeTab, cateringDate, selectedGygMealtime, bundles]);
 
   const fileInputRef = useRef<HTMLInputElement>(null);
 
@@ -1739,12 +1744,44 @@ const App: React.FC = () => {
                       <ChefHat size={300} />
                     </div>
 
-                    <div className="flex justify-between mb-10 relative z-10">
-                      <div>
-                        <h2 className="text-2xl font-black text-[#024930]">Catering Menu</h2>
-                        <p className="text-[#024930]/50 text-sm font-bold uppercase tracking-wider mt-1">{companyName || 'Untitled Event'} • {cateringDate}</p>
+                    <div className="flex justify-between items-center mb-10 relative z-10 bg-[#F8F7F6] p-4 rounded-2xl border border-[#024930]/5">
+                      <div className="flex items-center gap-4">
+                        <button 
+                         onClick={() => {
+                            const d = new Date(cateringDate.split('.').reverse().join('-'));
+                            d.setDate(d.getDate() - 1);
+                            setCateringDate(d.toLocaleDateString('de-DE'));
+                         }}
+                         className="w-10 h-10 rounded-xl bg-white border border-[#024930]/5 flex items-center justify-center text-[#024930] hover:bg-[#FEACCF] transition-all shadow-sm"
+                        >
+                           <ChevronDown className="rotate-90" size={18} />
+                        </button>
+                        <div>
+                          <p className="text-[10px] font-black text-[#024930]/40 uppercase tracking-widest leading-none mb-1">Catering Date</p>
+                          <h2 className="text-xl font-black text-[#024930] leading-none">{cateringDate}</h2>
+                        </div>
+                        <button 
+                         onClick={() => {
+                            const d = new Date(cateringDate.split('.').reverse().join('-'));
+                            d.setDate(d.getDate() + 1);
+                            setCateringDate(d.toLocaleDateString('de-DE'));
+                         }}
+                         className="w-10 h-10 rounded-xl bg-white border border-[#024930]/5 flex items-center justify-center text-[#024930] hover:bg-[#FEACCF] transition-all shadow-sm"
+                        >
+                           <ChevronDown className="-rotate-90" size={18} />
+                        </button>
                       </div>
-                      {cateringSelections.length > 0 && <button onClick={() => setCateringSelections([])} className="text-red-400 font-bold uppercase text-[10px] tracking-widest hover:text-red-500">Clear Menu</button>}
+                      <div className="flex gap-4">
+                        {cateringSelections.length > 0 && (
+                          <button 
+                            onClick={() => { setPreviewType('review-a6'); setIsPreviewing(true); }}
+                            className="bg-[#024930] text-white px-6 py-3 rounded-xl font-bold text-xs uppercase tracking-widest shadow-lg hover:shadow-xl transition-all flex items-center gap-2"
+                          >
+                            <BookOpen size={16} /> Print QR Cards (A6)
+                          </button>
+                        )}
+                        {cateringSelections.length > 0 && <button onClick={() => setCateringSelections([])} className="text-red-400 font-bold uppercase text-[10px] tracking-widest hover:text-red-500 bg-white border border-red-100 px-4 rounded-xl">Clear</button>}
+                      </div>
                     </div>
 
                     <div className="flex-1 space-y-4 relative z-10">
@@ -1825,9 +1862,9 @@ const App: React.FC = () => {
                     <div className="flex items-center gap-4 bg-white/50 p-2 rounded-2xl border border-white/50 shadow-inner">
                       <button 
                          onClick={() => {
-                            const d = new Date(selectedGygDate.split('.').reverse().join('-'));
+                            const d = new Date(cateringDate.split('.').reverse().join('-'));
                             d.setDate(d.getDate() - 1);
-                            setSelectedGygDate(d.toLocaleDateString('de-DE'));
+                            setCateringDate(d.toLocaleDateString('de-DE'));
                          }}
                          className="w-10 h-10 rounded-xl bg-white flex items-center justify-center text-[#024930] hover:bg-[#FEACCF] transition-all"
                       >
@@ -1836,14 +1873,14 @@ const App: React.FC = () => {
                       
                       <div className="px-4 text-center min-w-[140px]">
                          <p className="text-[10px] font-black text-[#024930]/40 uppercase tracking-widest">Selected Date</p>
-                         <p className="text-lg font-black text-[#024930]">{selectedGygDate}</p>
+                         <p className="text-lg font-black text-[#024930]">{cateringDate}</p>
                       </div>
 
                       <button 
                          onClick={() => {
-                            const d = new Date(selectedGygDate.split('.').reverse().join('-'));
+                            const d = new Date(cateringDate.split('.').reverse().join('-'));
                             d.setDate(d.getDate() + 1);
-                            setSelectedGygDate(d.toLocaleDateString('de-DE'));
+                            setCateringDate(d.toLocaleDateString('de-DE'));
                          }}
                          className="w-10 h-10 rounded-xl bg-white flex items-center justify-center text-[#024930] hover:bg-[#FEACCF] transition-all"
                       >
@@ -1896,10 +1933,10 @@ const App: React.FC = () => {
                             <button 
                               key={b.id}
                               onClick={() => {
-                                setSelectedGygDate(b.date || '');
+                                setCateringDate(b.date || '');
                                 setSelectedGygMealtime(b.service_type || 'LUNCH');
                               }}
-                              className={`w-full flex items-center justify-between p-3 rounded-xl transition-all ${selectedGygDate === b.date && selectedGygMealtime === b.service_type ? 'bg-[#FEACCF] text-[#024930]' : 'bg-white/5 text-white/60 hover:bg-white/10'}`}
+                              className={`w-full flex items-center justify-between p-3 rounded-xl transition-all ${cateringDate === b.date && selectedGygMealtime === b.service_type ? 'bg-[#FEACCF] text-[#024930]' : 'bg-white/5 text-white/60 hover:bg-white/10'}`}
                             >
                               <div className="text-left">
                                 <p className="text-[10px] font-black uppercase opacity-60">{b.date}</p>
@@ -2208,8 +2245,8 @@ const App: React.FC = () => {
                 ) : activeTab === 'catering' ? (
                   // Catering Previews (Labels + Review Card)
                   (() => {
-                    const allItems: any[] = cateringSelections.flatMap(sel => {
-                      const b = bundles.find(x => x.id === sel.bundleId);
+                    const allItems: (BundleItem | { isReviewCard: boolean })[] = cateringSelections.flatMap((sel: Selection) => {
+                      const b = bundles.find((x: Bundle) => x.id === sel.bundleId);
                       if (!b) return [];
                       return Array(sel.quantity).fill(b).flatMap(() => b.items);
                     });
@@ -2222,9 +2259,9 @@ const App: React.FC = () => {
 
                     return (
                       <div className="flex flex-col gap-12 pb-12">
-                        {pages.map((pageItems, pIdx) => (
-                          <div key={pIdx} className="bg-white shadow-2xl origin-top scale-[0.6]" style={{ width: '210mm', height: '297mm', display: 'grid', gridTemplateColumns: '105mm 105mm', gridTemplateRows: '148.5mm 148.5mm' }}>
-                            {pageItems.map((item, iIdx) => (
+                        {pages.map((pageItems: (BundleItem | { isReviewCard: boolean })[], pIdxIdx: number) => (
+                          <div key={pIdxIdx} className="bg-white shadow-2xl origin-top scale-[0.6]" style={{ width: '210mm', height: '297mm', display: 'grid', gridTemplateColumns: '105mm 105mm', gridTemplateRows: '148.5mm 148.5mm' }}>
+                            {pageItems.map((item: any, iIdx: number) => (
                               <div key={iIdx} style={{ width: '105mm', height: '148.5mm' }}>
                                 {('isReviewCard' in item) ? <ReviewPrint size="A6" /> : <CateringItemLabel item={item} lang={lang} forPrint />}
                               </div>

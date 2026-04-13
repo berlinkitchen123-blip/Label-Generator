@@ -687,7 +687,7 @@ const App: React.FC = () => {
       const nameMatches = b.name_de.toLowerCase().includes(s) || b.name_en.toLowerCase().includes(s);
 
       // 2. Deep Search across ITEMS (including category)
-      const itemMatches = b.items.some(i =>
+      const itemMatches = (b.items || []).some(i =>
         i.item_name_de.toLowerCase().includes(s) ||
         i.item_name_en.toLowerCase().includes(s) ||
         (i.category && i.category.toLowerCase().includes(s))

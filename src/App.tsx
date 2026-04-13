@@ -640,8 +640,8 @@ const App: React.FC = () => {
   const init = async () => {
     try {
       const all = await DataService.getBundles();
-      setBundles(all.filter(b => !b.deleted));
-      setDeletedBundles(all.filter(b => b.deleted));
+      setBundles(all.filter(b => !b.deleted).map(b => ({ ...b, items: b.items || [] })));
+      setDeletedBundles(all.filter(b => b.deleted).map(b => ({ ...b, items: b.items || [] })));
     } catch (e) { }
   };
 
@@ -920,8 +920,9 @@ const App: React.FC = () => {
           }
         });
 
-        setBundles(mergedBundles);
-        await DataService.saveBundles(mergedBundles);
+        const safeMerged = mergedBundles.map(b => ({ ...b, items: b.items || [] }));
+        setBundles(safeMerged);
+        await DataService.saveBundles(safeMerged);
         alert(t.successImport);
       } catch (err) { alert(t.errorImport); }
       finally {

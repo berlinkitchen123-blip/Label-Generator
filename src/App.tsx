@@ -588,6 +588,7 @@ const App: React.FC = () => {
   const [deletedBundles, setDeletedBundles] = useState<Bundle[]>([]);
   const [selections, setSelections] = useState<Selection[]>([]);
 
+  // Catering State
   const [cateringSelections, setCateringSelections] = useState<Selection[]>([]);
   const [companyName, setCompanyName] = useState('');
   const [cateringDate, setCateringDate] = useState(new Date().toLocaleDateString('de-DE'));
@@ -599,42 +600,7 @@ const App: React.FC = () => {
   const [isProcessingImport, setIsProcessingImport] = useState(false);
   const [isMigrating, setIsMigrating] = useState(false);
   const [isPreviewing, setIsPreviewing] = useState(false);
-  const [previewType, setPreviewType] = useState<'labels' | 'menu' | 'review-a4' | 'review-a6' | 'explode-a6'>('labels'); 
-  
-  // Smart GYG Mealtime State
-  const [selectedGygMealtime, setSelectedGygMealtime] = useState(() => {
-    const hours = new Date().getHours();
-    return hours < 11 ? 'BRUNCH' : 'LUNCH';
-  });
-
-  // Auto-load Daily Menu Effect (Universal)
-  useEffect(() => {
-    if (activeTab === 'gyg' || activeTab === 'catering') {
-      const isGYG = activeTab === 'gyg';
-      
-      const dayMatches = bundles.filter((b: Bundle) => {
-        const isCurrentDate = b.date === cateringDate;
-        const belongsToStore = isGYG 
-          ? (b.company_name?.toLowerCase().includes('gyg') || b.company_name?.toLowerCase().includes('getyourguide'))
-          : !(b.company_name?.toLowerCase().includes('gyg') || b.company_name?.toLowerCase().includes('getyourguide'));
-        
-        // For GYG, also match mealtime
-        const mealMatch = isGYG ? b.service_type === selectedGygMealtime : true;
-        
-        return isCurrentDate && belongsToStore && mealMatch;
-      });
-      
-      if (dayMatches.length > 0) {
-        const newSelections = dayMatches.map((m: Bundle) => ({ bundleId: m.id, quantity: 1, selectedItemIds: m.items.map((i: BundleItem) => i.id) }));
-        setCateringSelections(newSelections);
-        if (dayMatches[0].company_name) setCompanyName(dayMatches[0].company_name);
-        if (dayMatches[0].service_type && isGYG) setServiceType(dayMatches[0].service_type);
-      } else {
-        setCateringSelections([]); // Clear if no matches for that date
-      }
-    }
-  }, [activeTab, cateringDate, selectedGygMealtime, bundles]);
-
+  const [previewType, setPreviewType] = useState<'labels' | 'menu' | 'review-a4' | 'review-a6' | 'explode-a6'>('labels'); // New state for preview type
   const fileInputRef = useRef<HTMLInputElement>(null);
 
   const init = async () => {
@@ -847,43 +813,27 @@ const App: React.FC = () => {
             return String(row[keyProp] || '').trim();
           };
 
+          const nameDe = getValue([colMap.nameDe, 0], 'bundle_name_de') || 'Unnamed Bundle';
+          const nameEn = getValue([colMap.nameEn], 'bundle_name_en') || nameDe;
           const itemDe = getValue([colMap.itemDe], 'item_name_de');
           if (!itemDe) return;
 
-          const rowComp = getValue([colMap.company], 'company_name') || foundCompany || 'Standard';
-          let rowDate = getValue([colMap.date], 'date') || foundDate;
-          
-          // Format date consistently if it's a date object
-          if (rowDate && !isNaN(Date.parse(rowDate))) {
-            const d = new Date(rowDate);
-            rowDate = d.toLocaleDateString('de-DE');
-          }
+          const rowComp = getValue([colMap.company], 'company_name');
+          const rowDate = getValue([colMap.date], 'date');
 
-          let rowService = getValue([colMap.type], 'service_type') || foundService || 'LUNCH';
-          if (rowService.toLowerCase().includes('brunch')) rowService = 'BRUNCH';
-          else if (rowService.toLowerCase().includes('lunch') || rowService.toLowerCase().includes('mittag')) rowService = 'LUNCH';
-
-          // Create a unique key for grouping: Date + Company + Mealtime
-          // This allows multiple items on the same day/mealtime to be grouped into one bundle (Menu)
-          const groupingKey = `${rowDate}_${rowComp}_${rowService}`.toUpperCase();
-
-          const nameDe = getValue([colMap.nameDe], 'bundle_name_de') || `${rowComp} ${rowService} (${rowDate})`;
-          const nameEn = getValue([colMap.nameEn], 'bundle_name_en') || nameDe;
-
-          if (!bundleMap[groupingKey]) {
-            bundleMap[groupingKey] = {
+          if (!bundleMap[nameDe]) {
+            bundleMap[nameDe] = {
               id: generateSafeId(),
               name_de: nameDe,
               name_en: nameEn,
               items: [],
-              date: rowDate,
-              company_name: rowComp,
-              service_type: rowService,
-              type: 'catering'
+              date: rowDate || foundDate,
+              company_name: rowComp || foundCompany || 'GetYourGuide',
+              service_type: foundService || 'LUNCH'
             };
           }
 
-          bundleMap[groupingKey].items.push({
+          bundleMap[nameDe].items.push({
             id: generateSafeId(),
             item_name_de: itemDe,
             item_name_en: getValue([colMap.itemEn], 'item_name_en') || itemDe,
@@ -892,10 +842,13 @@ const App: React.FC = () => {
             category: getValue([colMap.category], 'category')
           });
 
-          // If manual 'type' column says 'Standard', override the grouping to be a standard bundle
           const typeVal = getValue([colMap.type, 0], 'type').toLowerCase();
           if (typeVal.includes('bundle')) {
-            bundleMap[groupingKey].type = 'standard';
+            bundleMap[nameDe].type = 'standard';
+            bundleMap[nameDe].company_name = ''; // Clear metadata for standard bundles
+            bundleMap[nameDe].date = '';
+          } else if (typeVal.includes('catering')) {
+            bundleMap[nameDe].type = 'catering';
           }
         };
 
@@ -1484,7 +1437,7 @@ const App: React.FC = () => {
       const b = bundles.find((x: Bundle) => x.id === sel.bundleId);
       if (!b) return [];
       const itemsToPrint = sel.selectedItemIds
-        ? b.items.filter((item: BundleItem) => sel.selectedItemIds?.includes(item.id))
+        ? b.items.filter(item => sel.selectedItemIds?.includes(item.id))
         : b.items;
       return Array(sel.quantity).fill(b).flatMap(() => itemsToPrint);
     });
@@ -1744,44 +1697,12 @@ const App: React.FC = () => {
                       <ChefHat size={300} />
                     </div>
 
-                    <div className="flex justify-between items-center mb-10 relative z-10 bg-[#F8F7F6] p-4 rounded-2xl border border-[#024930]/5">
-                      <div className="flex items-center gap-4">
-                        <button 
-                         onClick={() => {
-                            const d = new Date(cateringDate.split('.').reverse().join('-'));
-                            d.setDate(d.getDate() - 1);
-                            setCateringDate(d.toLocaleDateString('de-DE'));
-                         }}
-                         className="w-10 h-10 rounded-xl bg-white border border-[#024930]/5 flex items-center justify-center text-[#024930] hover:bg-[#FEACCF] transition-all shadow-sm"
-                        >
-                           <ChevronDown className="rotate-90" size={18} />
-                        </button>
-                        <div>
-                          <p className="text-[10px] font-black text-[#024930]/40 uppercase tracking-widest leading-none mb-1">Catering Date</p>
-                          <h2 className="text-xl font-black text-[#024930] leading-none">{cateringDate}</h2>
-                        </div>
-                        <button 
-                         onClick={() => {
-                            const d = new Date(cateringDate.split('.').reverse().join('-'));
-                            d.setDate(d.getDate() + 1);
-                            setCateringDate(d.toLocaleDateString('de-DE'));
-                         }}
-                         className="w-10 h-10 rounded-xl bg-white border border-[#024930]/5 flex items-center justify-center text-[#024930] hover:bg-[#FEACCF] transition-all shadow-sm"
-                        >
-                           <ChevronDown className="-rotate-90" size={18} />
-                        </button>
+                    <div className="flex justify-between mb-10 relative z-10">
+                      <div>
+                        <h2 className="text-2xl font-black text-[#024930]">Catering Menu</h2>
+                        <p className="text-[#024930]/50 text-sm font-bold uppercase tracking-wider mt-1">{companyName || 'Untitled Event'} • {cateringDate}</p>
                       </div>
-                      <div className="flex gap-4">
-                        {cateringSelections.length > 0 && (
-                          <button 
-                            onClick={() => { setPreviewType('review-a6'); setIsPreviewing(true); }}
-                            className="bg-[#024930] text-white px-6 py-3 rounded-xl font-bold text-xs uppercase tracking-widest shadow-lg hover:shadow-xl transition-all flex items-center gap-2"
-                          >
-                            <BookOpen size={16} /> Print QR Cards (A6)
-                          </button>
-                        )}
-                        {cateringSelections.length > 0 && <button onClick={() => setCateringSelections([])} className="text-red-400 font-bold uppercase text-[10px] tracking-widest hover:text-red-500 bg-white border border-red-100 px-4 rounded-xl">Clear</button>}
-                      </div>
+                      {cateringSelections.length > 0 && <button onClick={() => setCateringSelections([])} className="text-red-400 font-bold uppercase text-[10px] tracking-widest hover:text-red-500">Clear Menu</button>}
                     </div>
 
                     <div className="flex-1 space-y-4 relative z-10">
@@ -1848,115 +1769,30 @@ const App: React.FC = () => {
             ) : activeTab === 'gyg' ? (
               <div className="grid grid-cols-1 xl:grid-cols-12 gap-10">
                 <div className="xl:col-span-12 mb-6">
-                  <div className="bg-[#FEACCF]/20 p-6 rounded-3xl border border-[#FEACCF]/30 flex flex-col md:flex-row items-center justify-between gap-6">
+                  <div className="bg-[#FEACCF]/20 p-6 rounded-3xl border border-[#FEACCF]/30 flex items-center justify-between">
                     <div className="flex items-center gap-6">
                       <div className="w-16 h-16 rounded-2xl bg-[#024930] flex items-center justify-center shadow-xl">
                         <BookOpen size={32} className="text-[#FEACCF]" />
                       </div>
                       <div>
-                        <h2 className="text-3xl font-black text-[#024930]">GYG Smart Portal</h2>
-                        <p className="text-[#024930]/60 font-bold uppercase tracking-widest text-xs mt-1">Daily Menu Auto-Pilot</p>
+                        <h2 className="text-3xl font-black text-[#024930]">GYG Portal</h2>
+                        <p className="text-[#024930]/60 font-bold uppercase tracking-widest text-xs mt-1">Getyourguide Specialized Menu System</p>
                       </div>
                     </div>
-
-                    <div className="flex items-center gap-4 bg-white/50 p-2 rounded-2xl border border-white/50 shadow-inner">
-                      <button 
-                         onClick={() => {
-                            const d = new Date(cateringDate.split('.').reverse().join('-'));
-                            d.setDate(d.getDate() - 1);
-                            setCateringDate(d.toLocaleDateString('de-DE'));
-                         }}
-                         className="w-10 h-10 rounded-xl bg-white flex items-center justify-center text-[#024930] hover:bg-[#FEACCF] transition-all"
-                      >
-                         <ChevronUp className="-rotate-90" size={20} />
-                      </button>
-                      
-                      <div className="px-4 text-center min-w-[140px]">
-                         <p className="text-[10px] font-black text-[#024930]/40 uppercase tracking-widest">Selected Date</p>
-                         <p className="text-lg font-black text-[#024930]">{cateringDate}</p>
-                      </div>
-
-                      <button 
-                         onClick={() => {
-                            const d = new Date(cateringDate.split('.').reverse().join('-'));
-                            d.setDate(d.getDate() + 1);
-                            setCateringDate(d.toLocaleDateString('de-DE'));
-                         }}
-                         className="w-10 h-10 rounded-xl bg-white flex items-center justify-center text-[#024930] hover:bg-[#FEACCF] transition-all"
-                      >
-                         <ChevronUp className="rotate-90" size={20} />
-                      </button>
-                    </div>
-
-                    <div className="flex gap-2 bg-[#024930]/5 p-2 rounded-2xl">
-                      <button 
-                        onClick={() => setSelectedGygMealtime('BRUNCH')}
-                        className={`px-6 py-3 rounded-xl font-black text-xs tracking-widest transition-all ${selectedGygMealtime === 'BRUNCH' ? 'bg-[#024930] text-white shadow-lg' : 'text-[#024930]/40 hover:text-[#024930]'}`}
-                      >
-                        BRUNCH
-                      </button>
-                      <button 
-                        onClick={() => setSelectedGygMealtime('LUNCH')}
-                        className={`px-6 py-3 rounded-xl font-black text-xs tracking-widest transition-all ${selectedGygMealtime === 'LUNCH' ? 'bg-[#024930] text-white shadow-lg' : 'text-[#024930]/40 hover:text-[#024930]'}`}
-                      >
-                        LUNCH
-                      </button>
-                    </div>
-
-                    <div className="text-right hidden xl:block">
-                      <p className="text-sm font-black text-[#024930]">Status</p>
-                      <p className={`text-[10px] font-bold uppercase tracking-[0.2em] ${cateringSelections.length > 0 ? 'text-green-500' : 'text-red-400'}`}>
-                        {cateringSelections.length > 0 ? '✓ Menu Loaded' : '⚠ No Menu Data'}
-                      </p>
+                    <div className="text-right">
+                      <p className="text-sm font-black text-[#024930]">{companyName || "GetYourGuide"}</p>
+                      <p className="text-[10px] font-bold text-[#024930]/40 uppercase tracking-[0.2em]">{cateringDate}</p>
                     </div>
                   </div>
                 </div>
 
                 <div className="xl:col-span-5 space-y-8">
-                  <div className="space-y-4 max-h-[40vh] overflow-y-auto pr-3">
-                    <div className="bg-[#024930] p-4 rounded-2xl mb-4 shadow-lg border border-white/10">
-                      <div className="flex items-center gap-3 mb-4">
-                        <DatabaseIcon className="text-[#FEACCF]" size={18} />
-                        <h3 className="text-white font-black text-xs uppercase tracking-widest">Master Schedule</h3>
-                      </div>
-                      <div className="space-y-2">
-                        {bundles
-                          .filter((b: Bundle) => b.company_name?.toLowerCase().includes('gyg') || b.company_name?.toLowerCase().includes('getyourguide'))
-                          .filter((b: Bundle, i: number, self: Bundle[]) => self.findIndex((t: Bundle) => t.date === b.date && t.service_type === b.service_type) === i) // Unique Date + Mealtime
-                          .sort((a: Bundle, b: Bundle) => {
-                            const dateA = new Date((a.date || '').split('.').reverse().join('-')).getTime();
-                            const dateB = new Date((b.date || '').split('.').reverse().join('-')).getTime();
-                            return dateA - dateB;
-                          })
-                          .slice(0, 5) // Show next 5
-                          .map((b: Bundle) => (
-                            <button 
-                              key={b.id}
-                              onClick={() => {
-                                setCateringDate(b.date || '');
-                                setSelectedGygMealtime(b.service_type || 'LUNCH');
-                              }}
-                              className={`w-full flex items-center justify-between p-3 rounded-xl transition-all ${cateringDate === b.date && selectedGygMealtime === b.service_type ? 'bg-[#FEACCF] text-[#024930]' : 'bg-white/5 text-white/60 hover:bg-white/10'}`}
-                            >
-                              <div className="text-left">
-                                <p className="text-[10px] font-black uppercase opacity-60">{b.date}</p>
-                                <p className="text-xs font-black">{b.service_type}</p>
-                              </div>
-                              <ChevronUp className="rotate-90 opacity-40" size={14} />
-                            </button>
-                          ))
-                        }
-                        {bundles.filter((b: Bundle) => b.company_name?.toLowerCase().includes('gyg')).length === 0 && (
-                          <p className="text-white/40 text-[10px] font-bold text-center py-4">No schedule uploaded yet. <br/>Upload your Excel master plan.</p>
-                        )}
-                      </div>
-                    </div>
-                    
-                    <div className="flex items-center gap-3 px-4 py-2">
-                      <Search size={14} className="text-[#024930]/40" />
-                      <h3 className="text-[#024930]/40 font-black text-[10px] uppercase tracking-widest">Manual Item Search</h3>
-                    </div>
-                    {filteredBundles.map((bundle: Bundle) => {
+                  <div className="relative">
+                    <Search className="absolute left-5 top-1/2 -translate-y-1/2 text-[#024930]/40" size={20} />
+                    <input type="text" placeholder="Search GYG items..." value={searchTerm} onChange={(e) => setSearchTerm(e.target.value)} className="w-full bg-white rounded-2xl pl-14 pr-6 py-4 text-sm text-[#024930] border-none focus:ring-2 focus:ring-[#FEACCF] shadow-xl placeholder:text-[#024930]/20" />
+                  </div>
+                  <div className="space-y-4 max-h-[50vh] overflow-y-auto pr-3">
+                    {filteredBundles.map(bundle => {
                       const isExp = expandedAvailable.includes(bundle.id);
                       return (
                         <div key={bundle.id} className="flex flex-col bg-white rounded-2xl shadow-sm hover:shadow-lg transition-all overflow-hidden border border-transparent hover:border-[#FEACCF]/30">
@@ -1979,7 +1815,7 @@ const App: React.FC = () => {
                           </div>
                           {isExp && (
                             <div className="bg-[#F8F7F6]/50 p-4 pt-0 space-y-2 max-h-40 overflow-y-auto border-t border-[#024930]/5">
-                              {bundle.items.map((item: BundleItem) => {
+                              {bundle.items.map(item => {
                                 const isMatch = searchTerm && (item.item_name_de.toLowerCase().includes(searchTerm.toLowerCase()) || item.item_name_en.toLowerCase().includes(searchTerm.toLowerCase()));
                                 return (
                                   <div key={item.id} className={`text-[11px] py-1 px-2 rounded font-bold ${isMatch ? 'bg-[#FEACCF]/40 text-[#024930]' : 'text-[#024930]/60'}`}>
@@ -2245,8 +2081,8 @@ const App: React.FC = () => {
                 ) : activeTab === 'catering' ? (
                   // Catering Previews (Labels + Review Card)
                   (() => {
-                    const allItems: (BundleItem | { isReviewCard: boolean })[] = cateringSelections.flatMap((sel: Selection) => {
-                      const b = bundles.find((x: Bundle) => x.id === sel.bundleId);
+                    const allItems: any[] = cateringSelections.flatMap(sel => {
+                      const b = bundles.find(x => x.id === sel.bundleId);
                       if (!b) return [];
                       return Array(sel.quantity).fill(b).flatMap(() => b.items);
                     });
@@ -2259,9 +2095,9 @@ const App: React.FC = () => {
 
                     return (
                       <div className="flex flex-col gap-12 pb-12">
-                        {pages.map((pageItems: (BundleItem | { isReviewCard: boolean })[], pIdxIdx: number) => (
-                          <div key={pIdxIdx} className="bg-white shadow-2xl origin-top scale-[0.6]" style={{ width: '210mm', height: '297mm', display: 'grid', gridTemplateColumns: '105mm 105mm', gridTemplateRows: '148.5mm 148.5mm' }}>
-                            {pageItems.map((item: any, iIdx: number) => (
+                        {pages.map((pageItems, pIdx) => (
+                          <div key={pIdx} className="bg-white shadow-2xl origin-top scale-[0.6]" style={{ width: '210mm', height: '297mm', display: 'grid', gridTemplateColumns: '105mm 105mm', gridTemplateRows: '148.5mm 148.5mm' }}>
+                            {pageItems.map((item, iIdx) => (
                               <div key={iIdx} style={{ width: '105mm', height: '148.5mm' }}>
                                 {('isReviewCard' in item) ? <ReviewPrint size="A6" /> : <CateringItemLabel item={item} lang={lang} forPrint />}
                               </div>
